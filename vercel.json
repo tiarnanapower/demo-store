@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/buyer-portal", "destination": "/buyer-portal/index.html" },
+    { "source": "/buyer-portal/", "destination": "/buyer-portal/index.html" },
+    { "source": "/buyer-portal/:file*", "destination": "/buyer-portal/:file*" }
+  ]
+}
