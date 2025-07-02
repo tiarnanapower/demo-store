@@ -37,17 +37,17 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
       <Script
         type="module"
         crossOrigin=""
-          src="https://store-sq6hqlnwup.mybigcommerce.com/content/buyer-portal/index.js"
+          src="https://store-sq6hqlnwup.mybigcommerce.com/content/buyer-portal/index.Du0Zm4IT.js"
       ></Script>
       <Script
         noModule
         crossOrigin=""
-        src="https://store-sq6hqlnwup.mybigcommerce.com/content/buyer-portal/polyfills-legacy.js"
+        src="https://store-sq6hqlnwup.mybigcommerce.com/content/buyer-portal/polyfills-legacy.D32xEujE.js"
       ></Script>
       <Script
         noModule
         crossOrigin=""
-        src="https://store-sq6hqlnwup.mybigcommerce.com/content/buyer-portal/index-legacy.js"
+        src="https://store-sq6hqlnwup.mybigcommerce.com/content/buyer-portal/index-legacy.BzGK4GUz.js"
       ></Script>
     </>
   );
