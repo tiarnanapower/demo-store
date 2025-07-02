@@ -16,40 +16,43 @@ interface Props {
 export function ScriptProduction({ cartId, storeHash, channelId, token, environment }: Props) {
   useB2BAuth(token);
   useB2BCart(cartId);
-  console.log(channelId)
-  console.log(storeHash);
-   return (
+
+  return (
     <>
-      <Script>
+      <Script id="b3-config" strategy="beforeInteractive">
         {`
-        window.b3CheckoutConfig = {
-          routes: {
-            dashboard: '/#/dashboard',
-          },
-        }
-        window.B3 = {
-          setting: {
-            store_hash: '${storeHash}',  
-            channel_id: ${channelId},
-          },
-        }
+          window.b3CheckoutConfig = {
+            routes: {
+              dashboard: '/#/dashboard',
+            },
+          };
+          window.B3 = {
+            setting: {
+              store_hash: "${storeHash}",
+              channel_id: ${channelId},
+            },
+          };
         `}
       </Script>
+
       <Script
         type="module"
         crossOrigin=""
-        src="https://demo-store-core.vercel.app/index.*.js"
-      ></Script>
+        strategy="afterInteractive"
+        src="https://demo-store-core.vercel.app/index.js"
+      />
       <Script
         noModule
         crossOrigin=""
-        src="https://demo-store-core.vercel.app/polyfills-legacy.*.js"
-      ></Script>
+        strategy="afterInteractive"
+        src="https://demo-store-core.vercel.app/polyfills-legacy.js"
+      />
       <Script
         noModule
         crossOrigin=""
-        src="https://demo-store-core.vercel.app/index-legacy.*.js"
-      ></Script>
+        strategy="afterInteractive"
+        src="https://demo-store-core.vercel.app/index-legacy.js"
+      />
     </>
   );
 }
