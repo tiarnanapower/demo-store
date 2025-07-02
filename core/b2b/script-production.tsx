@@ -17,27 +17,38 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
   useB2BAuth(token);
   useB2BCart(cartId);
 
-  return (
+   return (
     <>
-      <Script id="b2b-config">
+      <Script>
         {`
-            window.B3 = {
-              setting: {
-                store_hash: '${storeHash}',
-                channel_id: ${channelId},
-                platform: 'catalyst',
-                cart_url: '/cart',
-              }
-            }
+        window.b3CheckoutConfig = {
+          routes: {
+            dashboard: '/#/dashboard',
+          },
+        }
+        window.B3 = {
+          setting: {
+            store_hash: '${storeHash}',  
+            channel_id: ${channelId},
+          },
+        }
         `}
       </Script>
       <Script
-        data-channelid={channelId}
-        data-environment={environment}
-        data-storehash={storeHash}
-        src={`https://cdn.bundleb2b.net/b2b/${environment}/storefront/headless.js`}
         type="module"
-      />
+        crossOrigin=""
+        src="https://demo-store-core.vercel.app/index.*.js"
+      ></Script>
+      <Script
+        noModule
+        crossOrigin=""
+        src="https://demo-store-core.vercel.app/polyfills-legacy.*.js"
+      ></Script>
+      <Script
+        noModule
+        crossOrigin=""
+        src="https://demo-store-core.vercel.app/index-legacy.*.js"
+      ></Script>
     </>
   );
 }
