@@ -25,7 +25,7 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
           routes: {
             dashboard: '/#/dashboard',
           },
-        }
+        } 
         window.B3 = {
           setting: {
             store_hash: '${storeHash}',  
@@ -37,17 +37,17 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
       <Script
         type="module"
         crossOrigin=""
-        src="https://demo-store-core.vercel.app/index.js"
+          src="https://store-sq6hqlnwup.mybigcommerce.com/content/buyer-portal/index.js"
       ></Script>
       <Script
         noModule
         crossOrigin=""
-        src="https://demo-store-core.vercel.app/polyfills-legacy.js"
+        src="https://store-sq6hqlnwup.mybigcommerce.com/content/buyer-portal/polyfills-legacy.js"
       ></Script>
       <Script
         noModule
         crossOrigin=""
-        src="https://demo-store-core.vercel.app/index-legacy.js"
+        src="https://store-sq6hqlnwup.mybigcommerce.com/content/buyer-portal/index-legacy.js"
       ></Script>
     </>
   );
