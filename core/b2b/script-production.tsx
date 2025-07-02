@@ -16,7 +16,8 @@ interface Props {
 export function ScriptProduction({ cartId, storeHash, channelId, token, environment }: Props) {
   useB2BAuth(token);
   useB2BCart(cartId);
-
+  console.log(channelId)
+  console.log(storeHash);
    return (
     <>
       <Script>
