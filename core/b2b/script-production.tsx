@@ -44,15 +44,15 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
       <script
         type="module"
         crossOrigin=''
-        src="https://mellow-sprite-147223.netlify.app/index.DCRBdQ0W.js"
+        src="https://heroic-starlight-88043c.netlify.app/index.Ct8G1BOs.js"
       ></script>
       <script
         crossOrigin=''
-        src="https://mellow-sprite-147223.netlify.app/polyfills-legacy.CRfQEHlo.js"
+        src="https://heroic-starlight-88043c.netlify.app/polyfills-legacy.D32xEujE.js"
       ></script>
       <script
         crossOrigin=''
-        src="https://mellow-sprite-147223.netlify.app/index-legacy.x_CMcoSq.js"
+        src="https://heroic-starlight-88043c.netlify.app/index-legacy.C8qmM-uM.js"
       ></script>
     </>
   );
