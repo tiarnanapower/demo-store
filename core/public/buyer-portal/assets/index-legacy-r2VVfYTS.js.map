@@ -1,1 +1,0 @@
-{"version":3,"file":"index-legacy-r2VVfYTS.js","sources":["../../src/pages/CompanyOrderList/index.tsx"],"sourcesContent":["import Order from '../order/Order';\n\nexport default function CompanyOrderList() {\n  return <Order isCompanyOrder />;\n}\n"],"names":["jsx","Order","isCompanyOrder"],"mappings":"ohCAEA,WACE,OAAOA,EAAAA,IAACC,EAAA,CAAMC,gBAAc,GAC9B"}

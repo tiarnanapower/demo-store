@@ -1,1 +1,0 @@
-{"version":3,"file":"index-v_urXdOw.js","sources":["../../src/pages/MyOrders/index.tsx"],"sourcesContent":["import Order from '../order/Order';\n\nexport default function MyOrders() {\n  return <Order />;\n}\n"],"names":["MyOrders","Order"],"mappings":"qyBAEA,SAAwBA,GAAW,CACjC,aAAQC,EAAA,EAAM,CAChB"}
