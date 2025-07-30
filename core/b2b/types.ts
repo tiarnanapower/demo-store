@@ -5,15 +5,17 @@ export interface B2BProductOption {
   valueEntityId: number;
   text: string;
   number: number;
-  date?: {
-    utc: string;
-  };
+  date:
+    | {
+        utc: string;
+      }
+    | undefined;
 }
 
 export interface QuoteConfigProps {
   key: string;
   value: string;
-  extraFields: Record<string, string>;
+  extraFields: Record<string,string>;
 }
 
 export enum B2BRole {
@@ -26,25 +28,19 @@ export enum B2BRole {
   B2C = 99,
   GUEST = 100,
 }
-
 export interface B2BProfile {
-  id: number;
-  phoneNumber: string;
-  firstName: string;
-  lastName: string;
-  emailAddress: string;
+  id:              number;
+  phoneNumber:     string;
+  firstName:       string;
+  lastName:        string;
+  emailAddress:    string;
   customerGroupId: number;
-  role: number;
-  userType: number;
-  loginType: number;
+  role:            number;
+  userType:        number;
+  loginType:       number;
   companyRoleName: string;
 }
 
-interface LineItem {
-  productEntityId: number;
-  quantity?: number;
-  selectedOptions?: B2BProductOption[];
-}
 
 declare global {
   interface Window {
@@ -57,33 +53,21 @@ declare global {
           getB2BToken: () => string;
         };
         quote?: {
-          getQuoteConfigs: () => QuoteConfigProps[];
+          getQuoteConfigs: () => QuoteConfigProps[]; 
           addProductsFromCartId: (cartId: string) => Promise<void>;
-          addProducts: (products: LineItem[]) => Promise<void>;
-        };
-        shoppingList?: {
-          addProductFromPage: (product: LineItem) => Promise<void>;
-        };
-        cart?: {
-          getEntityId: () => string;
-          setEntityId: (cartId: string) => void;
+          addProducts: (
+            products: Array<{
+              sku: string;
+              productEntityId: number;
+              quantity?: number;
+              selectedOptions?: B2BProductOption[];
+            }>,
+          ) => Promise<void>;
         };
       };
       callbacks?: {
-        addEventListener: {
-          (
-            event: 'on-registered',
-            callback: (props: {
-              data: Record<'email' | 'password' | 'landingLoginLocation', string>;
-            }) => void,
-          ): void;
-          (event: 'on-logout', callback: (props: { data: Record<string, string> }) => void): void;
-          (event: 'on-cart-created', callback: (props: { data: { cartId: string } }) => void): void;
-        };
-        removeEventListener: (
-          event: 'on-logout' | 'on-registered' | 'on-cart-created',
-          callback: unknown,
-        ) => void;
+        addEventListener: (event: 'on-logout' | 'on-registered', callback: (props: { data: Record<string,string> }) => void) => void;
+        removeEventListener: (event: 'on-logout' | 'on-registered', callback: (props: { data: Record<string,string> }) => void) => void;
         dispatchEvent: (event: string) => void;
       };
     };

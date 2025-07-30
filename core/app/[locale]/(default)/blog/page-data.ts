@@ -6,6 +6,7 @@ import { client } from '~/client';
 import { PaginationFragment } from '~/client/fragments/pagination';
 import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
+import { BlogPostCardFragment } from '~/components/blog-post-card/fragment';
 
 const BlogQuery = graphql(`
   query BlogQuery {
@@ -36,18 +37,8 @@ const BlogPostsPageQuery = graphql(
             posts(first: $first, after: $after, last: $last, before: $before, filters: $filters) {
               edges {
                 node {
-                  author
                   entityId
-                  name
-                  path
-                  plainTextSummary
-                  publishedDate {
-                    utc
-                  }
-                  thumbnailImage {
-                    url: urlTemplate(lossy: true)
-                    altText
-                  }
+                  ...BlogPostCardFragment
                 }
               }
               pageInfo {
@@ -59,7 +50,7 @@ const BlogPostsPageQuery = graphql(
       }
     }
   `,
-  [PaginationFragment],
+  [BlogPostCardFragment, PaginationFragment],
 );
 
 export interface BlogPostsFiltersInput {

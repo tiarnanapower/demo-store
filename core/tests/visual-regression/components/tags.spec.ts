@@ -1,4 +1,4 @@
-import { expect, test } from '~/tests/fixtures';
+import { expect, test } from '@playwright/test';
 
 test('Tags', async ({ page }) => {
   await page.goto('/shop-all/?brand=37');

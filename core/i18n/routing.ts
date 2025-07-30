@@ -1,7 +1,12 @@
 import { createNavigation } from 'next-intl/navigation';
 import { defineRouting } from 'next-intl/routing';
 
-import { defaultLocale, locales } from './locales';
+import { buildConfig } from '~/build-config/reader';
+
+const localeNodes = buildConfig.get('locales');
+
+export const locales = localeNodes.map((locale) => locale.code);
+export const defaultLocale = localeNodes.find((locale) => locale.isDefault)?.code ?? 'en';
 
 interface LocaleEntry {
   id: string;
@@ -51,6 +56,12 @@ export const routing = defineRouting({
   locales,
   defaultLocale,
   localePrefix,
+  // configure `NEXT_LOCALE` cookie to work inside of the Makeswift Builder's canvas
+  localeCookie: {
+    partitioned: true,
+    secure: true,
+    sameSite: 'none',
+  },
 });
 
 // Lightweight wrappers around Next.js' navigation APIs

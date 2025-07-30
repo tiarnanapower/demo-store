@@ -14,7 +14,7 @@ interface Review {
 interface Props {
   reviews: Streamable<Review[]>;
   averageRating: Streamable<number>;
-  totalCount?: Streamable<string>;
+  totalCount?: Streamable<number>;
   paginationInfo?: Streamable<CursorPaginationInfo>;
   nextLabel?: Streamable<string>;
   previousLabel?: Streamable<string>;

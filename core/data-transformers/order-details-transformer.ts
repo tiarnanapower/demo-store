@@ -36,7 +36,7 @@ function getStatusColor(
 
 export const orderDetailsTransformer = (
   order: ExistingResultType<typeof getCustomerOrderDetails>,
-  t: ExistingResultType<typeof getTranslations<'Account.Orders.Details'>>,
+  t: ExistingResultType<typeof getTranslations>,
   format: ExistingResultType<typeof getFormatter>,
 ): Order => {
   return {
@@ -49,26 +49,15 @@ export const orderDetailsTransformer = (
         return {
           id: String(consignment.entityId),
           lineItems: consignment.lineItems.map((lineItem) => {
-            const price = lineItem.catalogProductWithOptionSelections?.prices?.price
-              ? format.number(lineItem.catalogProductWithOptionSelections.prices.price.value, {
-                  style: 'currency',
-                  currency: lineItem.catalogProductWithOptionSelections.prices.price.currencyCode,
-                })
-              : format.number(lineItem.subTotalListPrice.value / lineItem.quantity, {
-                  style: 'currency',
-                  currency: lineItem.subTotalListPrice.currencyCode,
-                });
-
             return {
               id: String(lineItem.entityId),
               title: lineItem.name,
               subtitle: lineItem.brand ?? '',
-              price,
-              totalPrice: format.number(lineItem.subTotalListPrice.value, {
+              price: format.number(lineItem.subTotalListPrice.value, {
                 style: 'currency',
                 currency: lineItem.subTotalListPrice.currencyCode,
               }),
-              href: lineItem.baseCatalogProduct?.path ?? undefined,
+              href: lineItem.baseCatalogProduct?.path ?? `/product/${lineItem.productEntityId}`,
               image: lineItem.image
                 ? {
                     src: lineItem.image.url,
@@ -76,16 +65,12 @@ export const orderDetailsTransformer = (
                   }
                 : undefined,
               quantity: lineItem.quantity,
-              metadata: lineItem.productOptions.map((option) => ({
-                label: option.name,
-                value: option.value,
-              })),
             };
           }),
           title:
             arr.length > 1
-              ? t('destinationWithCount', { number: index + 1, total: arr.length })
-              : t('destination'),
+              ? t('destinationWithCountTitle', { number: index + 1, total: arr.length })
+              : t('destinationTitle'),
           address: {
             city: consignment.shippingAddress.city ?? '',
             country: consignment.shippingAddress.country,
@@ -111,7 +96,7 @@ export const orderDetailsTransformer = (
       }),
       lineItems: [
         {
-          label: t('subtotal'),
+          label: t('summarySubtotalLabel'),
           value: format.number(order.subTotal.value, {
             style: 'currency',
             currency: order.subTotal.currencyCode,
@@ -127,14 +112,14 @@ export const orderDetailsTransformer = (
           };
         }),
         {
-          label: t('shipping'),
+          label: t('summaryShippingLabel'),
           value: format.number(order.shippingCostTotal.value, {
             style: 'currency',
             currency: order.shippingCostTotal.currencyCode,
           }),
         },
         {
-          label: t('tax'),
+          label: t('summaryTaxLabel'),
           value: format.number(order.taxTotal.value, {
             style: 'currency',
             currency: order.taxTotal.currencyCode,

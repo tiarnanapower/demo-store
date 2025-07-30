@@ -3,10 +3,10 @@ import { ResultOf } from 'gql.tada';
 import { getTranslations } from 'next-intl/server';
 
 import { Field } from '@/vibes/soul/sections/product-detail/schema';
-import { ProductOptionsFragment } from '~/app/[locale]/(default)/product/[slug]/page-data';
+import { ProductFormFragment } from '~/app/[locale]/(default)/product/[slug]/page-data';
 
 export const productOptionsTransformer = async (
-  productOptions: ResultOf<typeof ProductOptionsFragment>['productOptions'],
+  productOptions: ResultOf<typeof ProductFormFragment>['productOptions'],
 ) => {
   const t = await getTranslations('Product.ProductDetails');
 
@@ -102,26 +102,7 @@ export const productOptionsTransformer = async (
             };
           }
 
-          case 'ProductPickList': {
-            return {
-              persist: option.isVariantOption,
-              type: 'card-radio-group',
-              label: option.displayName,
-              required: option.isRequired,
-              name: option.entityId.toString(),
-              defaultValue: values.find((value) => value.isDefault)?.entityId.toString(),
-              options: values
-                .filter(
-                  (value) =>
-                    '__typename' in value && value.__typename === 'ProductPickListOptionValue',
-                )
-                .map((value) => ({
-                  label: value.label,
-                  value: value.entityId.toString(),
-                })),
-            };
-          }
-
+          case 'ProductPickList':
           case 'ProductPickListWithImages': {
             return {
               id: option.entityId,
@@ -194,8 +175,6 @@ export const productOptionsTransformer = async (
           required: option.isRequired,
           name: option.entityId.toString(),
           defaultValue: option.defaultText ?? undefined,
-          minLength: option.minLength ?? undefined,
-          maxLength: option.maxLength ?? undefined,
         };
       }
 

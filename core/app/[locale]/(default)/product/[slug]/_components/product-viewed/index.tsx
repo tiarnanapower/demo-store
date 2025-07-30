@@ -1,42 +1,41 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
-import { PricingFragment } from '~/client/fragments/pricing';
 import { FragmentOf } from '~/client/graphql';
-import { useAnalytics } from '~/lib/analytics/react';
+import { bodl } from '~/lib/bodl';
 
 import { ProductViewedFragment } from './fragment';
 
 interface Props {
-  product: FragmentOf<typeof ProductViewedFragment> & FragmentOf<typeof PricingFragment>;
+  product: FragmentOf<typeof ProductViewedFragment>;
 }
 
+const productItemTransform = (p: FragmentOf<typeof ProductViewedFragment>) => {
+  return {
+    product_id: p.entityId.toString(),
+    product_name: p.name,
+    brand_name: p.brand?.name,
+    sku: p.sku,
+    sale_price: p.prices?.salePrice?.value,
+    purchase_price: p.prices?.salePrice?.value || p.prices?.price.value || 0,
+    base_price: p.prices?.price.value,
+    retail_price: p.prices?.retailPrice?.value,
+    currency: p.prices?.price.currencyCode || 'USD',
+    variant_id: p.variants.edges?.map((variant) => variant.node.entityId),
+  };
+};
+
 export const ProductViewed = ({ product }: Props) => {
-  const isMounted = useRef(false);
-  const analytics = useAnalytics();
-
   useEffect(() => {
-    if (isMounted.current) {
-      return;
-    }
+    const transformedProduct = productItemTransform(product);
 
-    isMounted.current = true;
-
-    analytics?.navigation.productViewed({
-      value: product.prices?.price.value ?? 0,
-      currency: product.prices?.price.currencyCode ?? 'USD',
-      items: [
-        {
-          id: product.entityId.toString(),
-          name: product.name,
-          brand: product.brand?.name,
-          sku: product.sku,
-          price: product.prices?.salePrice?.value,
-        },
-      ],
+    bodl.navigation.productViewed({
+      product_value: transformedProduct.purchase_price,
+      currency: transformedProduct.currency,
+      line_items: [transformedProduct],
     });
-  }, [analytics, product]);
+  }, [product]);
 
   return null;
 };

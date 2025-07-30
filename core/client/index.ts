@@ -1,7 +1,5 @@
-import { BigCommerceAuthError, createClient } from '@bigcommerce/catalyst-client';
+import { createClient } from '@bigcommerce/catalyst-client';
 import { headers } from 'next/headers';
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { redirect } from 'next/navigation';
 import { getLocale as getServerLocale } from 'next-intl/server';
 
 import { getChannelIdFromLocale } from '../channels.config';
@@ -27,6 +25,7 @@ const getLocale = async () => {
 
 export const client = createClient({
   storefrontToken: process.env.BIGCOMMERCE_STOREFRONT_TOKEN ?? '',
+  xAuthToken: process.env.BIGCOMMERCE_ACCESS_TOKEN ?? '',
   storeHash: process.env.BIGCOMMERCE_STORE_HASH ?? '',
   channelId: process.env.BIGCOMMERCE_CHANNEL_ID,
   backendUserAgentExtensions: backendUserAgent,
@@ -61,9 +60,6 @@ export const client = createClient({
       headers: requestHeaders,
     };
   },
-  onError: (error, queryType) => {
-    if (error instanceof BigCommerceAuthError && queryType === 'query') {
-      redirect('/api/auth/signout');
-    }
-  },
 });
+
+export { b2bClient } from './b2b-client';

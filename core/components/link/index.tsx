@@ -2,6 +2,8 @@
 
 import { ComponentPropsWithRef, ComponentRef, forwardRef, useReducer } from 'react';
 
+import { cn } from '~/lib/utils';
+
 import { Link as NavLink, useRouter } from '../../i18n/routing';
 
 type NextLinkProps = Omit<ComponentPropsWithRef<typeof NavLink>, 'prefetch'>;
@@ -51,7 +53,7 @@ export const Link = forwardRef<ComponentRef<'a'>, Props>(
 
     return (
       <NavLink
-        className={className}
+        className={cn(className)}
         href={href}
         onMouseEnter={prefetch === 'hover' ? triggerPrefetch : undefined}
         onTouchStart={prefetch === 'hover' ? triggerPrefetch : undefined}

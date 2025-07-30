@@ -8,7 +8,6 @@ export const useSDK = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const getQuoteConfigs = window.b2b?.utils?.quote?.getQuoteConfigs;
-
       if (!getQuoteConfigs) {
         return;
       }

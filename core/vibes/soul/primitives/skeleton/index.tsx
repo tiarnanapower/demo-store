@@ -16,16 +16,14 @@ function SkeletonRoot({
   className,
   children,
   pending = false,
-  hideOverflow = false,
 }: {
   className?: string;
   children?: React.ReactNode;
   pending?: boolean;
-  hideOverflow?: boolean;
 }) {
   return (
     <div
-      className={clsx('@container', hideOverflow && 'overflow-hidden', className)}
+      className={clsx('@container', className)}
       data-pending={pending ? '' : undefined}
       role={pending ? 'status' : undefined}
     >

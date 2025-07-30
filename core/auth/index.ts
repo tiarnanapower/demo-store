@@ -1,15 +1,14 @@
 import { decodeJwt } from 'jose';
-import NextAuth, { type NextAuthConfig, User } from 'next-auth';
+import NextAuth, { type DefaultSession, type NextAuthConfig, User } from 'next-auth';
 import 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 
-import { anonymousSignIn, clearAnonymousSession } from '~/auth/anonymous-session';
-import { loginWithB2B } from '~/b2b/client';
 import { client } from '~/client';
+import { b2bClient } from '~/client/b2b-client';
 import { graphql } from '~/client/graphql';
-import { clearCartId, setCartId } from '~/lib/cart';
+import { clearCartId, getCartId, setCartId } from '~/lib/cart';
 import { serverToast } from '~/lib/server-toast';
 
 const LoginMutation = graphql(`
@@ -53,41 +52,25 @@ const LoginWithTokenMutation = graphql(`
 `);
 
 const LogoutMutation = graphql(`
-  mutation LogoutMutation($cartEntityId: String) {
-    logout(cartEntityId: $cartEntityId) {
+  mutation LogoutMutation {
+    logout {
       result
-      cartUnassignResult {
-        cart {
-          entityId
-        }
-      }
     }
   }
 `);
 
-const cartIdSchema = z
-  .string()
-  .uuid()
-  .or(z.literal('undefined')) // auth.js seems to pass the cart id as a string literal 'undefined' when not set.
-  .optional()
-  .transform((val) => (val === 'undefined' ? undefined : val));
-
 const PasswordCredentials = z.object({
+  type: z.literal('password'),
   email: z.string().email(),
   password: z.string().min(1),
-  cartId: cartIdSchema,
 });
 
 const JwtCredentials = z.object({
+  type: z.literal('jwt'),
   jwt: z.string(),
-  cartId: cartIdSchema,
 });
 
-const SessionUpdate = z.object({
-  user: z.object({
-    cartId: cartIdSchema,
-  }),
-});
+export const Credentials = z.discriminatedUnion('type', [PasswordCredentials, JwtCredentials]);
 
 async function handleLoginCart(guestCartId?: string, loginResultCartId?: string) {
   const t = await getTranslations('Cart');
@@ -105,12 +88,14 @@ async function handleLoginCart(guestCartId?: string, loginResultCartId?: string)
   }
 }
 
-async function loginWithPassword(credentials: unknown): Promise<User | null> {
-  const { email, password, cartId } = PasswordCredentials.parse(credentials);
-
+async function loginWithPassword(
+  email: string,
+  password: string,
+  cartEntityId?: string,
+): Promise<User | null> {
   const response = await client.fetch({
     document: LoginMutation,
-    variables: { email, password, cartEntityId: cartId },
+    variables: { email, password, cartEntityId },
     fetchOptions: {
       cache: 'no-store',
     },
@@ -126,33 +111,28 @@ async function loginWithPassword(credentials: unknown): Promise<User | null> {
     return null;
   }
 
-  await handleLoginCart(cartId, result.cart?.entityId);
-
-  const b2bToken = await loginWithB2B({
-    customerId: result.customer.entityId,
-    customerAccessToken: result.customerAccessToken,
-  });
-
-  await clearAnonymousSession();
+  await handleLoginCart(cartEntityId, result.cart?.entityId);
 
   return {
     name: `${result.customer.firstName} ${result.customer.lastName}`,
     email: result.customer.email,
     customerAccessToken: result.customerAccessToken.value,
-    cartId: result.cart?.entityId,
-    b2bToken,
+    ...(process.env.B2B_API_TOKEN && {
+      b2bToken: await b2bClient.login({
+        customerId: result.customer.entityId,
+        customerAccessToken: result.customerAccessToken,
+      }),
+    }),
   };
 }
 
-async function loginWithJwt(credentials: unknown): Promise<User | null> {
-  const { jwt, cartId } = JwtCredentials.parse(credentials);
-
+async function loginWithJwt(jwt: string, cartEntityId?: string): Promise<User | null> {
   const claims = decodeJwt(jwt);
   const channelId = claims.channel_id?.toString() ?? process.env.BIGCOMMERCE_CHANNEL_ID;
   const impersonatorId = claims.impersonator_id?.toString() ?? null;
   const response = await client.fetch({
     document: LoginWithTokenMutation,
-    variables: { jwt, cartEntityId: cartId },
+    variables: { jwt, cartEntityId },
     channelId,
     fetchOptions: {
       cache: 'no-store',
@@ -169,86 +149,83 @@ async function loginWithJwt(credentials: unknown): Promise<User | null> {
     return null;
   }
 
-  await handleLoginCart(cartId, result.cart?.entityId);
-
-  const b2bToken = await loginWithB2B({
-    customerId: result.customer.entityId,
-    customerAccessToken: result.customerAccessToken,
-  });
-
-  await clearAnonymousSession();
+  await handleLoginCart(cartEntityId, result.cart?.entityId);
 
   return {
     name: `${result.customer.firstName} ${result.customer.lastName}`,
     email: result.customer.email,
     customerAccessToken: result.customerAccessToken.value,
     impersonatorId,
-    cartId: result.cart?.entityId,
-    b2bToken,
+    ...(process.env.B2B_API_TOKEN && {
+      b2bToken: await b2bClient.login({
+        customerId: result.customer.entityId,
+        customerAccessToken: result.customerAccessToken,
+      }),
+    }),
   };
 }
 
+async function authorize(credentials: unknown): Promise<User | null> {
+  const parsed = Credentials.parse(credentials);
+  const cartEntityId = await getCartId();
+
+  switch (parsed.type) {
+    case 'password': {
+      const { email, password } = parsed;
+
+      return loginWithPassword(email, password, cartEntityId);
+    }
+
+    case 'jwt': {
+      const { jwt } = parsed;
+
+      return loginWithJwt(jwt, cartEntityId);
+    }
+
+    default:
+      return null;
+  }
+}
+
+const partitionedCookie = (name?: string) =>
+  ({
+    ...(name !== undefined ? { name } : {}),
+    options: {
+      partitioned: true,
+      secure: true,
+      sameSite: 'none',
+    },
+  }) as const;
+
 const config = {
-  // Explicitly setting this value to be undefined. We want the library to handle CSRF checks when taking sensitive actions.
-  // When handling sensitive actions like sign in, sign out, etc., the library will automatically check for CSRF tokens.
-  // If you need to implement your own sensitive actions, you will need to implement CSRF checks yourself.
-  skipCSRFCheck: undefined,
-  // Set this environment variable if you want to trust the host when using `next build` & `next start`.
-  // Otherwise, this will be controlled by process.env.NODE_ENV within the library.
-  trustHost: process.env.AUTH_TRUST_HOST === 'true' ? true : undefined,
   session: {
     strategy: 'jwt',
   },
   pages: {
     signIn: '/login',
-    signOut: '/logout',
   },
+  trustHost: true,
   callbacks: {
-    jwt: ({ token, user, session, trigger }) => {
+    jwt: ({ token, user }) => {
       // user can actually be undefined
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (user?.customerAccessToken) {
-        token.user = {
-          ...token.user,
-          customerAccessToken: user.customerAccessToken,
-        };
+      if (!user) {
+        return token;
       }
 
-      // user can actually be undefined
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (user?.b2bToken) {
+      if (user.customerAccessToken) {
+        token.customerAccessToken = user.customerAccessToken;
+      }
+
+      if (user.b2bToken) {
         token.b2bToken = user.b2bToken;
-      }
-
-      // user can actually be undefined
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (user?.cartId) {
-        token.user = {
-          ...token.user,
-          cartId: user.cartId,
-        };
-      }
-
-      if (trigger === 'update') {
-        const parsedSession = SessionUpdate.safeParse(session);
-
-        if (parsedSession.success) {
-          token.user = {
-            ...token.user,
-            cartId: parsedSession.data.user.cartId,
-          };
-        }
       }
 
       return token;
     },
     session({ session, token }) {
-      if (token.user?.customerAccessToken) {
-        session.user.customerAccessToken = token.user.customerAccessToken;
-      }
-
-      if (token.user?.cartId !== undefined) {
-        session.user.cartId = token.user.cartId;
+      if (token.customerAccessToken) {
+        session.customerAccessToken = token.customerAccessToken;
       }
 
       if (token.b2bToken) {
@@ -260,33 +237,19 @@ const config = {
   },
   events: {
     async signOut(message) {
-      const cartEntityId = 'token' in message ? message.token?.user?.cartId : null;
-      const customerAccessToken =
-        'token' in message ? message.token?.user?.customerAccessToken : null;
+      const customerAccessToken = 'token' in message ? message.token?.customerAccessToken : null;
+      // @todo check if b2bToken is also valid?
 
       if (customerAccessToken) {
         try {
-          const logoutResponse = await client.fetch({
+          await client.fetch({
             document: LogoutMutation,
-            variables: {
-              cartEntityId,
-            },
+            variables: {},
             customerAccessToken,
             fetchOptions: {
               cache: 'no-store',
             },
           });
-
-          // If the logout is successful, we want to establish a new anonymous session.
-          // This will allow us to restore the cart if persistent cart is disabled.
-          await anonymousSignIn();
-
-          // If persistent cart is disabled, we can restore the cart back to the anonymous session.
-          if (logoutResponse.data.logout.cartUnassignResult.cart) {
-            await setCartId(logoutResponse.data.logout.cartUnassignResult.cart.entityId);
-
-            return;
-          }
 
           await clearCartId();
         } catch (error) {
@@ -298,46 +261,66 @@ const config = {
   },
   providers: [
     CredentialsProvider({
-      id: 'password',
       credentials: {
+        type: { type: 'text' },
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
-        cartId: { type: 'text' },
-      },
-      authorize: loginWithPassword,
-    }),
-    CredentialsProvider({
-      id: 'jwt',
-      credentials: {
         jwt: { type: 'text' },
-        cartId: { type: 'text' },
       },
-      authorize: loginWithJwt,
+      authorize,
     }),
   ],
+  // configure NextAuth cookies to work inside of the Makeswift Builder's canvas
+  cookies: {
+    sessionToken: partitionedCookie(),
+    callbackUrl: partitionedCookie(),
+    csrfToken: partitionedCookie(),
+    pkceCodeVerifier: partitionedCookie(),
+    state: partitionedCookie(),
+    nonce: partitionedCookie(),
+    webauthnChallenge: partitionedCookie(),
+  },
 } satisfies NextAuthConfig;
 
-export const { handlers, auth, signIn, signOut, unstable_update: updateSession } = NextAuth(config);
+const { handlers, auth, signIn: nextAuthSignIn, signOut } = NextAuth(config);
 
-export const getSessionCustomerAccessToken = async () => {
+const signIn = (
+  credentials: z.infer<typeof Credentials>,
+  options: { redirect?: boolean | undefined; redirectTo?: string },
+) => nextAuthSignIn('credentials', { ...credentials, ...options });
+
+const getSessionCustomerAccessToken = async () => {
   try {
     const session = await auth();
 
-    return session?.user?.customerAccessToken;
+    return session?.customerAccessToken;
   } catch {
     // No empty
   }
 };
 
-export const isLoggedIn = async () => {
-  const cat = await getSessionCustomerAccessToken();
+export { handlers, auth, signIn, signOut, getSessionCustomerAccessToken };
 
-  return Boolean(cat);
-};
+declare module 'next-auth' {
+  interface Session {
+    user?: DefaultSession['user'];
+    customerAccessToken?: string;
+    b2bToken?: string;
+  }
 
-export {
-  anonymousSignIn,
-  clearAnonymousSession,
-  getAnonymousSession,
-  updateAnonymousSession,
-} from './anonymous-session';
+  interface User {
+    name?: string | null;
+    email?: string | null;
+    customerAccessToken?: string;
+    impersonatorId?: string | null;
+    b2bToken?: string;
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id?: string;
+    customerAccessToken?: string;
+    b2bToken?: string;
+  }
+}

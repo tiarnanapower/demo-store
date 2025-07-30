@@ -1,4 +1,5 @@
 import { expect, test } from '~/tests/fixtures';
+
 import routes from '~/tests/routes';
 
 test('Selecting various options on color panel should update query parameters', async ({

@@ -3,11 +3,10 @@ import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { cache } from 'react';
 
-import { DynamicForm } from '@/vibes/soul/form/dynamic-form';
-import type { Field, FieldGroup } from '@/vibes/soul/form/dynamic-form/schema';
-import { Streamable } from '@/vibes/soul/lib/streamable';
+import { Breadcrumb } from '@/vibes/soul/primitives/breadcrumbs';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
-import { Breadcrumb } from '@/vibes/soul/sections/breadcrumbs';
+import { DynamicForm } from '@/vibes/soul/primitives/dynamic-form';
+import type { Field, FieldGroup } from '@/vibes/soul/primitives/dynamic-form/schema';
 import {
   breadcrumbsTransformer,
   truncateBreadcrumbs,
@@ -34,11 +33,11 @@ interface ContactPage extends WebPage {
 }
 
 const fieldMapping = {
-  fullname: 'fullName',
-  companyname: 'companyName',
-  phone: 'phone',
-  orderno: 'orderNo',
-  rma: 'rma',
+  fullname: 'fullNameLabel',
+  companyname: 'companyNameLabel',
+  phone: 'phoneLabel',
+  orderno: 'orderNoLabel',
+  rma: 'rmaLabel',
 } as const;
 
 type ContactField = keyof typeof fieldMapping;
@@ -67,13 +66,11 @@ const getWebPage = cache(async (id: string): Promise<ContactPage> => {
 });
 
 async function getWebPageBreadcrumbs(id: string): Promise<Breadcrumb[]> {
-  const t = await getTranslations('WebPages.ContactUs');
-
   const webpage = await getWebPage(id);
   const [, ...rest] = webpage.breadcrumbs.reverse();
   const breadcrumbs = [
     {
-      label: t('home'),
+      label: 'Home',
       href: '/',
     },
     ...rest.reverse(),
@@ -111,7 +108,6 @@ async function getContactFields(id: string) {
     id: 'pageId',
     name: 'pageId',
     type: 'hidden',
-    label: 'Page ID',
     defaultValue: String(entityId),
   };
 
@@ -120,14 +116,13 @@ async function getContactFields(id: string) {
     id: 'pagePath',
     name: 'pagePath',
     type: 'hidden',
-    label: 'Page Path',
     defaultValue: path,
   };
 
   const emailField: Field = {
     id: 'email',
     name: 'email',
-    label: `${t('email')} *`,
+    label: `${t('emailLabel')} *`,
     type: 'email',
     required: true,
   };
@@ -135,7 +130,7 @@ async function getContactFields(id: string) {
   const commentsField: Field = {
     id: 'comments',
     name: 'comments',
-    label: `${t('comments')} *`,
+    label: `${t('commentsLabel')} *`,
     type: 'textarea',
     required: true,
   };
@@ -184,8 +179,8 @@ export default async function ContactPage({ params, searchParams }: Props) {
   if (success === 'true') {
     return (
       <WebPageContent
-        breadcrumbs={Streamable.from(() => getWebPageBreadcrumbs(id))}
-        webPage={Streamable.from(() => getWebPageWithSuccessContent(id, t('success')))}
+        breadcrumbs={getWebPageBreadcrumbs(id)}
+        webPage={getWebPageWithSuccessContent(id, t('success'))}
       >
         <ButtonLink
           className="mt-8 @2xl:mt-12 @4xl:mt-16"
@@ -201,15 +196,12 @@ export default async function ContactPage({ params, searchParams }: Props) {
   }
 
   return (
-    <WebPageContent
-      breadcrumbs={Streamable.from(() => getWebPageBreadcrumbs(id))}
-      webPage={Streamable.from(() => getWebPage(id))}
-    >
+    <WebPageContent breadcrumbs={getWebPageBreadcrumbs(id)} webPage={getWebPage(id)}>
       <div className="mt-8 @2xl:mt-12 @4xl:mt-16">
         <DynamicForm
           action={submitContactForm}
           fields={await getContactFields(id)}
-          submitLabel={t('cta')}
+          submitLabel={t('submitFormText')}
         />
       </div>
     </WebPageContent>

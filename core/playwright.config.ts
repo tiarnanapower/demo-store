@@ -1,29 +1,24 @@
 import { defineConfig, devices } from '@playwright/test';
+import { config } from 'dotenv';
 
-import { testEnv } from '~/tests/environment';
+config();
 
 export default defineConfig({
   testDir: './tests',
-  outputDir: './.tests/test-results',
-  workers: 1, // TODO: Implement parallel workers in the future
   expect: {
     toHaveScreenshot: {
       maxDiffPixelRatio: 0.02,
     },
   },
-  reporter: [
-    ['list', { outputFolder: './.tests/reports/list' }],
-    ['html', { outputFolder: './.tests/reports/html' }],
-  ],
+  reporter: [['list'], ['html']],
   use: {
-    locale: testEnv.TESTS_LOCALE,
-    baseURL: testEnv.PLAYWRIGHT_TEST_BASE_URL,
+    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
     extraHTTPHeaders: {
-      'x-vercel-protection-bypass': testEnv.VERCEL_PROTECTION_BYPASS,
-      'x-vercel-set-bypass-cookie': testEnv.CI.toString(),
+      'x-vercel-protection-bypass': process.env.VERCEL_PROTECTION_BYPASS || '',
+      'x-vercel-set-bypass-cookie': process.env.CI ? 'true' : 'false',
     },
   },
   projects: [

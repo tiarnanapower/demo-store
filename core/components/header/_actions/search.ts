@@ -125,7 +125,7 @@ export async function search(
 
     return {
       lastResult: submission.reply({
-        formErrors: [t('somethingWentWrong')],
+        formErrors: [t('error')],
       }),
       searchResults: prevState.searchResults,
       emptyStateTitle,

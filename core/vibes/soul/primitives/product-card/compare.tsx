@@ -1,61 +1,40 @@
 'use client';
 
-import { useQueryState } from 'nuqs';
-import { startTransition } from 'react';
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 
 import { Checkbox } from '@/vibes/soul/form/checkbox';
-import { useCompareDrawer } from '@/vibes/soul/primitives/compare-drawer';
-import { compareParser } from '@/vibes/soul/primitives/compare-drawer/loader';
-
-interface CompareDrawerItem {
-  id: string;
-  image?: { src: string; alt: string };
-  href: string;
-  title: string;
-}
 
 interface Props {
+  productId: string;
   colorScheme?: 'light' | 'dark';
   paramName?: string;
   label?: string;
-  product: CompareDrawerItem;
 }
 
 export const Compare = function Compare({
+  productId,
   colorScheme = 'light',
   paramName = 'compare',
   label = 'Compare',
-  product,
 }: Props) {
-  const [, setParam] = useQueryState(paramName, compareParser);
-
-  const { optimisticItems, setOptimisticItems, maxItems } = useCompareDrawer();
+  const [param, setParam] = useQueryState(
+    paramName,
+    parseAsArrayOf(parseAsString).withOptions({ shallow: false }),
+  );
 
   return (
     <Checkbox
-      checked={!!optimisticItems.find((item) => item.id === product.id)}
+      checked={param?.includes(productId) ?? false}
       colorScheme={colorScheme}
-      disabled={
-        !optimisticItems.find((item) => item.id === product.id) &&
-        maxItems !== undefined &&
-        optimisticItems.length >= maxItems
-      }
       label={label}
       onCheckedChange={(value) => {
-        startTransition(async () => {
-          setOptimisticItems({
-            type: value === true ? 'add' : 'remove',
-            item: product,
-          });
+        void setParam((prev) => {
+          const next =
+            value === true
+              ? [...(prev ?? []), productId]
+              : (prev ?? []).filter((v) => v !== productId);
 
-          await setParam((prev) => {
-            const next =
-              value === true
-                ? [...(prev ?? []), product.id]
-                : (prev ?? []).filter((v) => v !== product.id);
-
-            return next.length > 0 ? next : null;
-          });
+          return next.length > 0 ? next : null;
         });
       }}
     />

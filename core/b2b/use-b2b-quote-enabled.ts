@@ -1,34 +1,36 @@
-'use client';
+'use client'
 
-import { B2BRole } from './types';
-import { useSDK } from './use-b2b-sdk';
+import { useEffect, useState } from "react"
+import { useSDK } from "./use-b2b-sdk"
+import { B2BRole } from "./types"
 
-interface Config {
-  key: string;
-  value: string;
+export const useB2BQuoteEnabled = () => {
+  const [isAddToQuoteEnabled, setIsAddToQuoteEnabled] = useState(false)
+  const sdk = useSDK()
+
+  useEffect(() => {
+    const quoteConfigs = sdk?.utils?.quote?.getQuoteConfigs?.()
+    const role = sdk?.utils?.user?.getProfile()?.role
+    if (!quoteConfigs || isNaN(Number(role))) {
+      return 
+    }
+
+    const guestQuoteEnabled = quoteConfigs?.find(({ key }) => key === "quote_for_guest")?.value === "1"
+    const b2cCustomerQuoteEnabled = quoteConfigs?.find(({ key }) => key === "quote_for_individual_customer")?.value === "1"
+    const b2bCustomerQuoteEnabled = quoteConfigs?.find(({ key }) => key === "quote_for_b2b")?.value === "1"
+
+    if (role === B2BRole.GUEST && guestQuoteEnabled) {
+      setIsAddToQuoteEnabled(true)
+    }
+
+    if (role === B2BRole.B2C && b2cCustomerQuoteEnabled) {
+      setIsAddToQuoteEnabled(true)
+    }
+    
+    if(!([B2BRole.B2C, B2BRole.GUEST].includes(role)) && b2bCustomerQuoteEnabled) {
+      setIsAddToQuoteEnabled(true)
+    }
+  }, [sdk])
+
+  return isAddToQuoteEnabled
 }
-
-const isConfigEnabled = (configs: Config[], key: string): boolean => {
-  return configs.find((c) => c.key === key)?.value === '1';
-};
-
-export const useB2BQuoteEnabled = (): boolean => {
-  const sdk = useSDK();
-
-  const config = sdk?.utils?.quote?.getQuoteConfigs();
-  const role = sdk?.utils?.user.getProfile().role;
-
-  if (!config || role === undefined) {
-    return false;
-  }
-
-  if (role === B2BRole.GUEST) {
-    return isConfigEnabled(config, 'quote_for_guest');
-  }
-
-  if (role === B2BRole.B2C) {
-    return isConfigEnabled(config, 'quote_for_individual_customer');
-  }
-
-  return isConfigEnabled(config, 'quote_for_b2b');
-};

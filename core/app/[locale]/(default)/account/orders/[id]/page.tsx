@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 
-import { Streamable } from '@/vibes/soul/lib/streamable';
 import { OrderDetailsSection } from '@/vibes/soul/sections/order-details-section';
 import { orderDetailsTransformer } from '~/data-transformers/order-details-transformer';
 
@@ -14,32 +13,26 @@ interface Props {
   }>;
 }
 
-export default async function OrderDetails(props: Props) {
+export default async function Order(props: Props) {
   const { id, locale } = await props.params;
-
-  setRequestLocale(locale);
-
-  const t = await getTranslations('Account.Orders.Details');
+  const t = await getTranslations('Account.OrderDetails');
   const format = await getFormatter();
 
-  const streamableOrder = Streamable.from(async () => {
-    const order = await getCustomerOrderDetails(Number(id));
-
-    if (!order) {
-      notFound();
-    }
-
-    return orderDetailsTransformer(order, t, format);
+  const order = await getCustomerOrderDetails({
+    id: Number(id),
   });
+
+  if (!order) {
+    notFound();
+  }
 
   return (
     <OrderDetailsSection
-      order={streamableOrder}
-      orderSummaryLabel={t('orderSummary')}
-      prevHref="/account/orders"
-      shipmentAddressLabel={t('shippingAddress')}
-      shipmentMethodLabel={t('shippingMethod')}
-      summaryTotalLabel={t('summaryTotal')}
+      order={orderDetailsTransformer(order, t, format)}
+      prevHref={`/${locale}/account/orders`}
+      shipmentAddressLabel={t('shippingAddressLabel')}
+      shipmentMethodLabel={t('shippingMethodLabel')}
+      summaryTotalLabel={t('summaryTotalLabel')}
       title={t('title', { orderNumber: id })}
     />
   );

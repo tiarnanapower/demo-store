@@ -1,17 +1,17 @@
 import { ResultOf } from 'gql.tada';
 import { getFormatter } from 'next-intl/server';
 
-import { Product } from '@/vibes/soul/primitives/product-card';
+import { CardProduct } from '@/vibes/soul/primitives/product-card';
 import { ExistingResultType } from '~/client/util';
 import { ProductCardFragment } from '~/components/product-card/fragment';
 
 import { pricesTransformer } from './prices-transformer';
 
-export const singleProductCardTransformer = (
-  product: ResultOf<typeof ProductCardFragment>,
+export const productCardTransformer = (
+  products: Array<ResultOf<typeof ProductCardFragment>>,
   format: ExistingResultType<typeof getFormatter>,
-): Product => {
-  return {
+): CardProduct[] => {
+  return products.map((product) => ({
     id: product.entityId.toString(),
     title: product.name,
     href: product.path,
@@ -20,13 +20,5 @@ export const singleProductCardTransformer = (
       : undefined,
     price: pricesTransformer(product.prices, format),
     subtitle: product.brand?.name ?? undefined,
-    rating: product.reviewSummary.averageRating,
-  };
-};
-
-export const productCardTransformer = (
-  products: Array<ResultOf<typeof ProductCardFragment>>,
-  format: ExistingResultType<typeof getFormatter>,
-): Product[] => {
-  return products.map((product) => singleProductCardTransformer(product, format));
+  }));
 };

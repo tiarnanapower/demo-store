@@ -18,14 +18,6 @@ export const OrderItemFragment = graphql(`
       value
       currencyCode
     }
-    catalogProductWithOptionSelections {
-      prices {
-        price {
-          value
-          currencyCode
-        }
-      }
-    }
     productOptions {
       __typename
       name

@@ -1,4 +1,5 @@
-import { expect, test } from '~/tests/fixtures';
+import { expect, test } from '@playwright/test';
+
 import routes from '~/tests/routes';
 
 test('Checked checkbox with label', async ({ page }) => {

@@ -9,30 +9,33 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { schema } from '@/vibes/soul/sections/sign-in-section/schema';
 import { signIn } from '~/auth';
 import { redirect } from '~/i18n/routing';
-import { getCartId } from '~/lib/cart';
 
-export const login = async (
-  { redirectTo }: { redirectTo: string },
-  _lastResult: SubmissionResult | null,
-  formData: FormData,
-) => {
+const [STOREFRONT_HOME_LOCATION, BUYER_PORTAL_HOME_LOCATION] = ['0', '1'];
+
+
+export const login = async (_lastResult: SubmissionResult | null, formData: FormData) => {
   const locale = await getLocale();
-  const t = await getTranslations('Auth.Login');
-  const cartId = await getCartId();
+  const t = await getTranslations('Login');
 
   const submission = parseWithZod(formData, { schema });
 
   if (submission.status !== 'success') {
-    return submission.reply();
+    return submission.reply({ formErrors: [t('Form.error')] });
   }
 
   try {
-    await signIn('password', {
-      email: submission.value.email,
-      password: submission.value.password,
-      cartId,
-      redirect: false,
-    });
+    await signIn(
+      {
+        type: 'password',
+        email: submission.value.email,
+        password: submission.value.password,
+      },
+      {
+        // We want to use next/navigation for the redirect as it
+        // follows basePath and trailing slash configurations.
+        redirect: false,
+      },
+    );
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -45,16 +48,21 @@ export const login = async (
 
     if (
       error instanceof AuthError &&
-      error.type === 'CallbackRouteError' &&
+      error.name === 'CallbackRouteError' &&
       error.cause &&
-      error.cause.err instanceof BigCommerceGQLError &&
-      error.cause.err.message.includes('Invalid credentials')
+      error.cause.err?.message.includes('Invalid credentials')
     ) {
-      return submission.reply({ formErrors: [t('invalidCredentials')] });
+      return submission.reply({ formErrors: [t('Form.invalidCredentials')] });
     }
 
-    return submission.reply({ formErrors: [t('somethingWentWrong')] });
+    return submission.reply({ formErrors: [t('Form.somethingWentWrong')] });
   }
 
-  return redirect({ href: redirectTo, locale });
+  const landingLoginLocation = formData.get('landingLoginLocation');
+  if([BUYER_PORTAL_HOME_LOCATION, STOREFRONT_HOME_LOCATION].includes(landingLoginLocation as string)) {
+    const href = landingLoginLocation === BUYER_PORTAL_HOME_LOCATION ? '/?section=orders' : '/';
+    return redirect({ href, locale });
+  }
+
+  return redirect({ href: '/?section=orders', locale });
 };

@@ -1,12 +1,11 @@
 import { Product as ProductSchemaType, WithContext } from 'schema-dts';
 
-import { PricingFragment } from '~/client/fragments/pricing';
 import { FragmentOf } from '~/client/graphql';
 
 import { ProductSchemaFragment } from './fragment';
 
 interface Props {
-  product: FragmentOf<typeof ProductSchemaFragment> & FragmentOf<typeof PricingFragment>;
+  product: FragmentOf<typeof ProductSchemaFragment>;
 }
 
 export const ProductSchema = ({ product }: Props) => {

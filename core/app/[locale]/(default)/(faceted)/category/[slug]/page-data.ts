@@ -1,15 +1,16 @@
 import { cache } from 'react';
 
+import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
-import { graphql } from '~/client/graphql';
+import { graphql, VariablesOf } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { BreadcrumbsCategoryFragment } from '~/components/breadcrumbs/fragment';
 
 const CategoryPageQuery = graphql(
   `
-    query CategoryPageQuery($entityId: Int!) {
+    query CategoryPageQuery($categoryId: Int!) {
       site {
-        category(entityId: $entityId) {
+        category(entityId: $categoryId) {
           entityId
           name
           ...BreadcrumbsFragment
@@ -19,7 +20,7 @@ const CategoryPageQuery = graphql(
             metaKeywords
           }
         }
-        categoryTree(rootEntityId: $entityId) {
+        categoryTree(rootEntityId: $categoryId) {
           entityId
           name
           path
@@ -34,23 +35,20 @@ const CategoryPageQuery = graphql(
             }
           }
         }
-        settings {
-          storefront {
-            catalog {
-              productComparisonsEnabled
-            }
-          }
-        }
       }
     }
   `,
   [BreadcrumbsCategoryFragment],
 );
 
-export const getCategoryPageData = cache(async (entityId: number, customerAccessToken?: string) => {
+type Variables = VariablesOf<typeof CategoryPageQuery>;
+
+export const getCategoryPageData = cache(async (variables: Variables) => {
+  const customerAccessToken = await getSessionCustomerAccessToken();
+
   const response = await client.fetch({
     document: CategoryPageQuery,
-    variables: { entityId },
+    variables,
     customerAccessToken,
     fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
   });

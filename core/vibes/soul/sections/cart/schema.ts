@@ -30,17 +30,3 @@ export const couponCodeActionFormDataSchema = ({
       couponCode: z.string(),
     }),
   ]);
-
-export const shippingActionFormDataSchema = z.discriminatedUnion('intent', [
-  z.object({
-    intent: z.literal('add-address'),
-    country: z.string(),
-    city: z.string().optional(),
-    state: z.string().optional(),
-    postalCode: z.string().optional(),
-  }),
-  z.object({
-    intent: z.literal('add-shipping'),
-    shippingOption: z.string(),
-  }),
-]);

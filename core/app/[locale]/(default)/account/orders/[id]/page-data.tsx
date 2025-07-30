@@ -117,7 +117,11 @@ const CustomerOrderDetails = graphql(
   [OrderItemFragment],
 );
 
-export const getCustomerOrderDetails = cache(async (id: number) => {
+interface CustomerOrderDetailsArgs {
+  id: number;
+}
+
+export const getCustomerOrderDetails = cache(async ({ id }: CustomerOrderDetailsArgs) => {
   const customerAccessToken = await getSessionCustomerAccessToken();
 
   const response = await client.fetch({
@@ -129,7 +133,6 @@ export const getCustomerOrderDetails = cache(async (id: number) => {
     },
     fetchOptions: { cache: 'no-store', next: { tags: [TAGS.customer] } },
     customerAccessToken,
-    errorPolicy: 'auth',
   });
 
   const order = response.data.site.order;

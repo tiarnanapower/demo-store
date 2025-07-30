@@ -1,4 +1,4 @@
-import { expect, test } from '~/tests/fixtures';
+import { expect, test } from '@playwright/test';
 
 test('Slideshow multiple slides', async ({ page }) => {
   // Arrange

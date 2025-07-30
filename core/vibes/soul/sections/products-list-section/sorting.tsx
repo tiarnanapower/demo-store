@@ -3,7 +3,7 @@
 import { parseAsString, useQueryState } from 'nuqs';
 import { useOptimistic, useTransition } from 'react';
 
-import { SelectField } from '@/vibes/soul/form/select-field';
+import { Select } from '@/vibes/soul/form/select';
 import { Streamable, useStreamable } from '@/vibes/soul/lib/streamable';
 
 export interface Option {
@@ -35,7 +35,7 @@ export function Sorting({
   const placeholder = useStreamable(streamablePlaceholder) ?? 'Sort by';
 
   return (
-    <SelectField
+    <Select
       hideLabel
       label={label}
       name={paramName}

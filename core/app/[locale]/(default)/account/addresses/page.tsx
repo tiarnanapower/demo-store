@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 import { Address, AddressListSection } from '@/vibes/soul/sections/address-list-section';
 import {
+  fieldToFieldNameTransformer,
   formFieldTransformer,
   injectCountryCodeOptions,
 } from '~/data-transformers/form-field-transformer';
@@ -18,7 +19,6 @@ import { addressAction } from './_actions/address-action';
 import { getCustomerAddresses } from './page-data';
 
 interface Props {
-  params: Promise<{ locale: string }>;
   searchParams: Promise<{
     [key: string]: string | string[] | undefined;
     before?: string;
@@ -26,21 +26,15 @@ interface Props {
   }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-
-  const t = await getTranslations({ locale, namespace: 'Account.Addresses' });
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('Account.Addresses');
 
   return {
     title: t('title'),
   };
 }
 
-export default async function Addresses({ params, searchParams }: Props) {
-  const { locale } = await params;
-
-  setRequestLocale(locale);
-
+export default async function Addresses({ searchParams }: Props) {
   const t = await getTranslations('Account.Addresses');
   const { before, after } = await searchParams;
 
@@ -91,23 +85,29 @@ export default async function Addresses({ params, searchParams }: Props) {
 
       return injectCountryCodeOptions(field, countries ?? []);
     })
+    .filter(exists)
+    .map((field) => {
+      if (Array.isArray(field)) {
+        return field.map(fieldToFieldNameTransformer);
+      }
+
+      return fieldToFieldNameTransformer(field);
+    })
     .filter(exists);
 
   return (
     <AddressListSection
       addressAction={addressAction}
       addresses={addresses}
-      cancelLabel={t('cancel')}
-      createLabel={t('create')}
-      deleteLabel={t('delete')}
-      editLabel={t('edit')}
-      emptyStateTitle={t('EmptyState.title')}
-      fields={[...fields, { name: 'id', type: 'hidden', label: 'ID' }]}
-      minimumAddressCount={0}
-      setDefaultLabel={t('setDefault')}
-      showAddFormLabel={t('cta')}
+      cancelLabel={t('cancelLabel')}
+      createLabel={t('createLabel')}
+      deleteLabel={t('deleteLabel')}
+      editLabel={t('editLabel')}
+      fields={[...fields, { name: 'id', type: 'hidden' }]}
+      setDefaultLabel={t('setDefaultLabel')}
+      showAddFormLabel={t('showAddFormLabel')}
       title={t('title')}
-      updateLabel={t('update')}
+      updateLabel={t('updateLabel')}
     />
   );
 }

@@ -1,6 +1,6 @@
 import { getFormatter } from 'next-intl/server';
 
-import { Order } from '@/vibes/soul/sections/order-list';
+import { Order } from '@/vibes/soul/sections/order-list-section/order-list-item';
 import { getCustomerOrders } from '~/app/[locale]/(default)/account/orders/page-data';
 import { ExistingResultType } from '~/client/util';
 
@@ -20,23 +20,13 @@ export const ordersTransformer = (
       lineItems:
         order.consignments.shipping?.flatMap((consignment) => {
           return consignment.lineItems.map((lineItem) => {
-            const price = lineItem.catalogProductWithOptionSelections?.prices?.price
-              ? format.number(lineItem.catalogProductWithOptionSelections.prices.price.value, {
-                  style: 'currency',
-                  currency: lineItem.catalogProductWithOptionSelections.prices.price.currencyCode,
-                })
-              : format.number(lineItem.subTotalListPrice.value / lineItem.quantity, {
-                  style: 'currency',
-                  currency: lineItem.subTotalListPrice.currencyCode,
-                });
-
             return {
               id: lineItem.entityId.toString(),
-              href: lineItem.baseCatalogProduct?.path ?? '#',
+              href:
+                lineItem.baseCatalogProduct?.path ?? `/product/${String(lineItem.productEntityId)}`,
               title: lineItem.name,
               subtitle: lineItem.brand ?? undefined,
-              price,
-              totalPrice: format.number(lineItem.subTotalListPrice.value, {
+              price: format.number(lineItem.subTotalListPrice.value, {
                 style: 'currency',
                 currency: lineItem.subTotalListPrice.currencyCode,
               }),
@@ -49,6 +39,6 @@ export const ordersTransformer = (
             };
           });
         }) ?? [],
-    } satisfies Order;
+    };
   });
 };

@@ -12,12 +12,5 @@ interface Props {
 export default function Error({ reset }: Props) {
   const t = useTranslations('Error');
 
-  return (
-    <ErrorSection
-      ctaAction={reset}
-      ctaLabel={t('cta')}
-      subtitle={t('subtitle')}
-      title={t('title')}
-    />
-  );
+  return <ErrorSection ctaAction={reset} subtitle={t('message')} title={t('heading')} />;
 }

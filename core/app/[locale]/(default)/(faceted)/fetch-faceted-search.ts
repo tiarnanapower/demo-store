@@ -2,11 +2,12 @@ import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { cache } from 'react';
 import { z } from 'zod';
 
+import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { PaginationFragment } from '~/client/fragments/pagination';
 import { graphql, VariablesOf } from '~/client/graphql';
-import { CurrencyCode } from '~/components/header/fragment';
 import { ProductCardFragment } from '~/components/product-card/fragment';
+import { getPreferredCurrencyCode } from '~/lib/currency';
 
 const GetProductSearchResultsQuery = graphql(
   `
@@ -147,13 +148,6 @@ const GetProductSearchResultsQuery = graphql(
             }
           }
         }
-        settings {
-          storefront {
-            catalog {
-              productComparisonsEnabled
-            }
-          }
-        }
       }
     }
   `,
@@ -173,11 +167,9 @@ interface ProductSearch {
 }
 
 const getProductSearchResults = cache(
-  async (
-    { limit = 9, after, before, sort, filters }: ProductSearch,
-    currencyCode?: CurrencyCode,
-    customerAccessToken?: string,
-  ) => {
+  async ({ limit = 9, after, before, sort, filters }: ProductSearch) => {
+    const customerAccessToken = await getSessionCustomerAccessToken();
+    const currencyCode = await getPreferredCurrencyCode();
     const filterArgs = { filters, sort };
     const paginationArgs = before ? { last: limit, before } : { first: limit, after };
 
@@ -330,7 +322,7 @@ export const PublicSearchParamsSchema = z.object({
 });
 
 const AttributeKey = z.custom<`attr_${string}`>((val) => {
-  return typeof val === 'string' ? /^attr_.+$/.test(val) : false;
+  return typeof val === 'string' ? /^attr_\w+$/.test(val) : false;
 });
 
 export const PublicToPrivateParams = PublicSearchParamsSchema.catchall(SearchParamToArray.nullish())
@@ -399,23 +391,15 @@ export const PublicToPrivateParams = PublicSearchParamsSchema.catchall(SearchPar
 
 export const fetchFacetedSearch = cache(
   // We need to make sure the reference passed into this function is the same if we want it to be memoized.
-  async (
-    params: z.input<typeof PublicSearchParamsSchema>,
-    currencyCode?: CurrencyCode,
-    customerAccessToken?: string,
-  ) => {
+  async (params: z.input<typeof PublicSearchParamsSchema>) => {
     const { after, before, limit = 9, sort, filters } = PublicToPrivateParams.parse(params);
 
-    return getProductSearchResults(
-      {
-        after,
-        before,
-        limit,
-        sort,
-        filters,
-      },
-      currencyCode,
-      customerAccessToken,
-    );
+    return getProductSearchResults({
+      after,
+      before,
+      limit,
+      sort,
+      filters,
+    });
   },
 );

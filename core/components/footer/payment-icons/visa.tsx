@@ -2,10 +2,8 @@ import React from 'react';
 
 export const VisaIcon: React.FC<React.ComponentPropsWithoutRef<'svg'>> = ({ ...props }) => (
   <svg
-    aria-label="Visa"
     fill="currentColor"
     height="24"
-    role="img"
     viewBox="0 0 24 24"
     width="24"
     xmlns="http://www.w3.org/2000/svg"

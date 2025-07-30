@@ -1,11 +1,4 @@
 import { clsx } from 'clsx';
-import { ReactNode } from 'react';
-
-export interface SectionLayoutProps {
-  className?: string;
-  children: ReactNode;
-  containerSize?: 'md' | 'lg' | 'xl' | '2xl' | 'full';
-}
 
 // eslint-disable-next-line valid-jsdoc
 /**
@@ -21,9 +14,19 @@ export interface SectionLayoutProps {
  * }
  * ```
  */
-export function SectionLayout({ className, children, containerSize = '2xl' }: SectionLayoutProps) {
+export function SectionLayout({
+  className,
+  children,
+  containerSize = '2xl',
+  hideOverflow = false,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  containerSize?: 'md' | 'lg' | 'xl' | '2xl';
+  hideOverflow?: boolean;
+}) {
   return (
-    <section className={clsx('overflow-hidden @container', className)}>
+    <section className={clsx('@container', hideOverflow && 'overflow-hidden', className)}>
       <div
         className={clsx(
           'mx-auto px-4 py-10 @xl:px-6 @xl:py-14 @4xl:px-8 @4xl:py-20',
@@ -32,7 +35,6 @@ export function SectionLayout({ className, children, containerSize = '2xl' }: Se
             lg: 'max-w-[var(--section-max-width-lg,1024px)]',
             xl: 'max-w-[var(--section-max-width-xl,1280px)]',
             '2xl': 'max-w-[var(--section-max-width-2xl,1536px)]',
-            full: 'max-w-none',
           }[containerSize],
         )}
       >

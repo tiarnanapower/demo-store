@@ -10,7 +10,6 @@ const allowedLocales = [
   'es-CO',
   'es-MX',
   'es-PE',
-  'es-419',
   'es',
   'it',
   'nl',
