@@ -52,7 +52,7 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
       ></script>
       <script
         crossOrigin=''
-        src="https://demostoreb2b.netlify.app/index-legacy.D6MrrbNB.js"
+        src="https://demostoreb2b.netlify.app////index-legacy.D6MrrbNB.js"
       ></script>
       
     </>
