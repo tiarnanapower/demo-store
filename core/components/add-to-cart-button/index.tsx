@@ -3,7 +3,8 @@
 import { useTranslations } from 'next-intl';
 
 import { FragmentOf } from '~/client/graphql';
-import { Button } from '~/components/ui/button';
+// import { Button } from '~/components/ui/button';
+import { Button } from '@/vibes/soul/primitives/button';
 
 import { AddToCartButtonFragment } from './fragment';
 
@@ -41,7 +42,8 @@ export const AddToCartButton = ({
       className={className}
       disabled={!product.inventory.isInStock}
       loading={loading}
-      loadingText={t('processing')}
+      // shape='rounded'
+      // loadingText={t('processing')}
       type="submit"
     >
       {children}

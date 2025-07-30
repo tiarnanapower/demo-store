@@ -76,6 +76,7 @@ export function ButtonLink({
           }[size],
         {
           pill: 'rounded-full after:rounded-full',
+          // rounded: 'rounded-md after:rounded-md',
           rounded: 'rounded-lg after:rounded-lg',
           square: 'rounded-none after:rounded-none',
           circle: 'aspect-square rounded-full after:rounded-full',

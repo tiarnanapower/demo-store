@@ -32,6 +32,7 @@ interface ProductDetailProduct {
 interface Props<F extends Field> {
   breadcrumbs?: Streamable<Breadcrumb[]>;
   product: Streamable<ProductDetailProduct | null>;
+  selectPlaceHolder?: string;
   action: ProductDetailFormAction<F>;
   fields: Streamable<F[]>;
   quantityLabel?: string;
@@ -46,6 +47,7 @@ interface Props<F extends Field> {
 
 export function ProductDetail<F extends Field>({
   product: streamableProduct,
+  selectPlaceHolder,
   action,
   fields: streamableFields,
   breadcrumbs,
@@ -118,6 +120,7 @@ export function ProductDetail<F extends Field>({
                   >
                     {([fields, ctaLabel, ctaDisabled]) => (
                       <ProductDetailForm
+                        selectPlaceHolder={selectPlaceHolder}
                         action={action}
                         ctaDisabled={ctaDisabled ?? undefined}
                         ctaLabel={ctaLabel ?? undefined}

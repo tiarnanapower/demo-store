@@ -277,6 +277,7 @@
   },
   "Blog": {
     "title": "Blog",
+    "home": "Home",
     "Empty": {
       "title": "No blog posts found",
       "subtitle": "Check back later for more content"
@@ -637,6 +638,9 @@
     "AddToQuoteButton": {
       "addToQuote": "Add to Quote",
       "addCartToQuote": "Add cart to Quote"
+    },
+    "AddToShoppingListButton": {
+      "addToShoppingList": "Add to Shopping List"
     }
   }
 }

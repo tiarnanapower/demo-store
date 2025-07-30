@@ -18,6 +18,12 @@ import { ProductViewed } from './_components/product-viewed';
 import { PaginationSearchParamNames, Reviews } from './_components/reviews';
 import { getProductData } from './page-data';
 
+import { Slot } from "@makeswift/runtime/next";
+import { getSiteVersion } from "@makeswift/runtime/next/server";
+import { client } from "~/lib/makeswift/client";
+
+import { Page as MakeswiftPage } from '~/lib/makeswift';
+
 const cachedProductDataVariables = cache(
   async (productId: string, searchParams: Props['searchParams']) => {
     const options = await searchParams;
@@ -227,6 +233,9 @@ const searchParamsCache = createSearchParamsCache({
 });
 
 export default async function Product(props: Props) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
   const { locale, slug } = await props.params;
 
   setRequestLocale(locale);
@@ -237,9 +246,42 @@ export default async function Product(props: Props) {
   const variables = await cachedProductDataVariables(slug, props.searchParams);
   const parsedSearchParams = searchParamsCache.parse(props.searchParams);
 
+  const contentSnapshotTop = await client.getComponentSnapshot(
+    `product-${productId}-top-content`,
+    { 
+      siteVersion: await getSiteVersion(),
+      locale: locale
+    }
+  );
+
+  const contentSnapshotMiddle = await client.getComponentSnapshot(
+    `product-${productId}-middle-content`,
+    { 
+      siteVersion: await getSiteVersion(),
+      locale: locale
+    }
+  );
+
+  const contentSnapshotBottom = await client.getComponentSnapshot(
+    `product-${productId}-bottom-content`,
+    { 
+      siteVersion: await getSiteVersion(),
+      locale: locale
+    }
+  );
+
   return (
     <>
+      {/* Temporary workaround to load Makeswift theme */}
+      <div className="hidden">
+        <MakeswiftPage locale={locale} path="/empty" />
+      </div>
+      {/* End of temporary workaround to load Makeswift theme */}
+
+      <Slot snapshot={contentSnapshotTop} label={`Product #${productId} Top Content`} />
+
       <ProductDetail
+        selectPlaceHolder={t('ProductDetails.selectAnItem')}
         action={addToCart}
         additionalInformationLabel={t('ProductDetails.additionalInformation')}
         ctaDisabled={getCtaDisabled(props)}
@@ -254,8 +296,10 @@ export default async function Product(props: Props) {
         thumbnailLabel={t('ProductDetails.thumbnail')}
       />
 
+      <Slot snapshot={contentSnapshotMiddle} label={`Product #${productId} Middle Content`} />
+
       <FeaturedProductsCarousel
-        cta={{ label: t('RelatedProducts.cta'), href: '/shop-all' }}
+        cta={{ label: t('RelatedProducts.cta'), href: '/mens' }}
         emptyStateSubtitle={t('RelatedProducts.browseCatalog')}
         emptyStateTitle={t('RelatedProducts.noRelatedProducts')}
         nextLabel={t('RelatedProducts.nextProducts')}
@@ -275,6 +319,8 @@ export default async function Product(props: Props) {
           </>
         )}
       </Stream>
+
+      <Slot snapshot={contentSnapshotBottom} label={`Product #${productId} Bottom Content`} />
     </>
   );
 }

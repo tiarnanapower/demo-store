@@ -16,7 +16,7 @@ interface Props {
   quantity?: number;
 }
 
-export const AddToQuoteButton = ({
+export const AddToShoppingListButton = ({
   productEntityId,
   sku,
   className,
@@ -25,29 +25,39 @@ export const AddToQuoteButton = ({
   quantity = 1,
 }: Props) => {
   const sdk = useSDK();
-  const addProducts = sdk?.utils?.quote?.addProducts;
-  const t = useTranslations('Components.AddToQuoteButton');
+  const addProduct = sdk?.utils?.shoppingList?.addProductFromPage;
+  const t = useTranslations('Components.AddToShoppingListButton');
   const [loading, setLoading] = useState(false);
 
-  if (!addProducts) {
+  if (!addProduct) {
     return null;
   }
 
-  const handleAddToQuote = () => {
+  const handleAddToShoppingList = () => {
     setLoading(true);
     try {
       validate()
       
       const productOptions = Object.values(selectedOptions);
 
-      void addProducts([
+      console.log( {
+        sku,
+        productEntityId: Number(productEntityId),
+        productId: Number(productEntityId), 
+        searchText: "",
+        quantity,
+        selectedOptions: productOptions.length > 0 ? productOptions : undefined,
+      })
+      void addProduct(
         {
           sku,
           productEntityId: Number(productEntityId),
+          productId: Number(productEntityId), 
+          searchText: "",
           quantity,
           selectedOptions: productOptions.length > 0 ? productOptions : undefined,
         },
-      ]).finally(() => setLoading(false));
+      ).finally(() => setLoading(false));
     } finally {
       setLoading(false);
     }
@@ -57,13 +67,13 @@ export const AddToQuoteButton = ({
     <Button
       className={className}
       loading={loading}
-      onClick={handleAddToQuote}
+      onClick={handleAddToShoppingList}
       size="medium"
       type="button"
       // shape='rounded'
-      variant="secondary"
+      variant="tertiary"
     >
-      {t('addToQuote')}
+      {t('addToShoppingList')}
     </Button>
   );
 };

@@ -288,6 +288,7 @@ export function FiltersPanelInner({
             await setParams(nextParams);
           });
         }}
+        // shape='rounded'
         size="small"
         variant="secondary"
       >
@@ -310,6 +311,7 @@ export function FiltersSkeleton() {
         <RangeSkeleton />
       </AccordionSkeleton>
       {/* Reset Filters Button */}
+      {/* <div className="h-10 w-[10ch] animate-pulse rounded-md bg-contrast-100" /> */}
       <div className="h-10 w-[10ch] animate-pulse rounded-full bg-contrast-100" />
     </div>
   );

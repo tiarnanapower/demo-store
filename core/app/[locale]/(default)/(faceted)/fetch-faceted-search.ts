@@ -167,7 +167,7 @@ interface ProductSearch {
 }
 
 const getProductSearchResults = cache(
-  async ({ limit = 9, after, before, sort, filters }: ProductSearch) => {
+  async ({ limit = 12, after, before, sort, filters }: ProductSearch) => {
     const customerAccessToken = await getSessionCustomerAccessToken();
     const currencyCode = await getPreferredCurrencyCode();
     const filterArgs = { filters, sort };
@@ -392,7 +392,7 @@ export const PublicToPrivateParams = PublicSearchParamsSchema.catchall(SearchPar
 export const fetchFacetedSearch = cache(
   // We need to make sure the reference passed into this function is the same if we want it to be memoized.
   async (params: z.input<typeof PublicSearchParamsSchema>) => {
-    const { after, before, limit = 9, sort, filters } = PublicToPrivateParams.parse(params);
+    const { after, before, limit = 12, sort, filters } = PublicToPrivateParams.parse(params);
 
     return getProductSearchResults({
       after,

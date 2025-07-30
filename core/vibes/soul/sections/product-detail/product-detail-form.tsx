@@ -11,13 +11,14 @@ import {
 } from '@conform-to/react';
 import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { createSerializer, parseAsString, useQueryStates } from 'nuqs';
-import { ReactNode, useActionState, useCallback, useEffect, useState } from 'react';
+import { ReactNode, useActionState, useCallback, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { z } from 'zod';
 
 import { ButtonRadioGroup } from '@/vibes/soul/form/button-radio-group';
 import { CardRadioGroup } from '@/vibes/soul/form/card-radio-group';
 import { Checkbox } from '@/vibes/soul/form/checkbox';
+import { DatePicker } from '@/vibes/soul/form/date-picker';
 import { FormStatus } from '@/vibes/soul/form/form-status';
 import { Input } from '@/vibes/soul/form/input';
 import { NumberInput } from '@/vibes/soul/form/number-input';
@@ -28,6 +29,8 @@ import { Button } from '@/vibes/soul/primitives/button';
 import { toast } from '@/vibes/soul/primitives/toaster';
 import { B2BProductOption, B2BRole } from '~/b2b/types';
 import { AddToQuoteButton } from '~/components/add-to-quote-button';
+import { AddToShoppingListButton } from '~/components/add-to-shopping-list-button';
+import { useB2bShoppingListEnabled } from '~/b2b/use-b2b-shopping-list-enabled';
 import { usePathname, useRouter } from '~/i18n/routing';
 
 import { Field, schema, SchemaRawShape } from './schema';
@@ -47,6 +50,7 @@ interface Props<F extends Field> {
   fields: F[];
   action: ProductDetailFormAction<F>;
   productId: string;
+  selectPlaceHolder?: string;
   sku: string;
   ctaLabel?: string;
   quantityLabel?: string;
@@ -73,6 +77,7 @@ export function ProductDetailForm<F extends Field>({
   action,
   fields,
   productId,
+  selectPlaceHolder,
   ctaLabel = 'Add to cart',
   quantityLabel = 'Quantity',
   incrementLabel = 'Increase quantity',
@@ -82,6 +87,7 @@ export function ProductDetailForm<F extends Field>({
   sku,
 }: Props<F>) {
   const isAddToQuoteEnabled = useB2BQuoteEnabled()
+  const isAddToShoppingListEnabled = useB2bShoppingListEnabled()
   const router = useRouter();
   const pathname = usePathname();
 
@@ -228,6 +234,7 @@ export function ProductDetailForm<F extends Field>({
           {fields.map((field) => {
             return (
               <FormField
+                selectPlaceHolder={selectPlaceHolder}
                 field={field}
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 formField={formFields[field.name]!}
@@ -267,7 +274,20 @@ export function ProductDetailForm<F extends Field>({
                   sku={sku}
                 />
               )}
+
             </div>
+          </div>
+          <div className="flex flex-1">
+            {isAddToShoppingListEnabled && (
+              <AddToShoppingListButton
+                className="flex-1"
+                productEntityId={productId}
+                quantity={Number(quantityControl.value)}
+                selectedOptions={selectedOptions}
+                sku={sku}
+                validate={validateQuote}
+              />
+            )}
           </div>
         </div>
       </form>
@@ -283,6 +303,7 @@ function SubmitButton({ children, disabled }: { children: React.ReactNode; disab
       className="w-auto flex-1 @xl:w-56"
       disabled={disabled}
       loading={pending}
+      // shape='rounded'
       size="medium"
       type="submit"
     >
@@ -295,10 +316,12 @@ function FormField({
   field,
   formField,
   onPrefetch,
+  selectPlaceHolder,
 }: {
   field: Field;
   formField: FieldMetadata<string | number | boolean | Date | undefined>;
   onPrefetch: (fieldName: string, value: string) => void;
+  selectPlaceHolder?: string;
 }) {
   const controls = useInputControl(formField);
 
@@ -353,6 +376,21 @@ function FormField({
         />
       );
 
+      case 'date':
+        return (
+          <DatePicker
+            defaultValue={controls.value}
+            errors={formField.errors}
+            key={formField.id}
+            label={field.label}
+            name={formField.name}
+            onBlur={controls.blur}
+            onChange={(e) => handleChange(e.currentTarget.value)}
+            onFocus={controls.focus}
+            required={formField.required}
+          />
+        );
+          
     case 'checkbox':
       return (
         <Checkbox
@@ -371,6 +409,7 @@ function FormField({
     case 'select':
       return (
         <Select
+          placeholder={selectPlaceHolder}
           errors={formField.errors}
           key={formField.id}
           label={field.label}

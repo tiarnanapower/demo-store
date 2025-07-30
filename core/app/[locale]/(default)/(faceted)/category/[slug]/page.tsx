@@ -22,6 +22,12 @@ import { fetchFacetedSearch } from '../../fetch-faceted-search';
 import { CategoryViewed } from './_components/category-viewed';
 import { getCategoryPageData } from './page-data';
 
+import { Slot } from "@makeswift/runtime/next";
+import { getSiteVersion } from "@makeswift/runtime/next/server";
+import { client } from "~/lib/makeswift/client";
+
+import { Page as MakeswiftPage } from '~/lib/makeswift';
+
 const cacheCategoryFacetedSearch = cache((categoryId: string) => {
   return { category: Number(categoryId) };
 });
@@ -255,6 +261,7 @@ type SearchParams = Record<string, string | string[] | undefined>;
 interface Props {
   params: Promise<{
     slug: string;
+    path: string;
     locale: string;
   }>;
   searchParams: Promise<SearchParams>;
@@ -272,6 +279,34 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   };
 }
 
+async function getTopContent(props: Props) : Promise<any | null> {
+  const { locale } = await props.params;
+  const cat = await getCategory(props)
+  const path = cat.path.endsWith('/') ? cat.path.slice(0, -1) : cat.path;
+  const contentSnapshotTop = await client.getComponentSnapshot(
+    `category-landing-content-top-${path.replaceAll('/', '-')}-v0.2`,
+    {
+      siteVersion: await getSiteVersion(),
+      locale
+    }
+  );
+  return contentSnapshotTop
+}
+
+async function getBottomContent(props: Props) : Promise<any | null> {
+  const { locale } = await props.params;
+  const cat = await getCategory(props)
+  const path = cat.path.endsWith('/') ? cat.path.slice(0, -1) : cat.path;
+  const contentSnapshotTop = await client.getComponentSnapshot(
+    `category-landing-content-bottom-${path.replaceAll('/', '-')}-v0.2`,
+    {
+      siteVersion: await getSiteVersion(),
+      locale
+    }
+  );
+  return contentSnapshotTop
+}
+
 export default async function Category(props: Props) {
   const { locale } = await props.params;
 
@@ -279,6 +314,21 @@ export default async function Category(props: Props) {
 
   return (
     <>
+      {/* Temporary workaround to load Makeswift theme */}
+      <div className="hidden">
+        <MakeswiftPage locale={locale} path="/empty" />
+      </div>
+      {/* End ofemporary workaround to load Makeswift theme */}
+      
+      <Stream value={Promise.all([getCategory(props), getTopContent(props)])}>
+        {([category, snapshop]) => (
+          <Slot snapshot={snapshop} label={`Category Landing Top Content for ${category.path}`} 
+            // fallback={(
+            //   <div className="p-4"></div>
+            // )} 
+          />
+        )}
+      </Stream>
       <ProductsListSection
         breadcrumbs={getBreadcrumbs(props)}
         compareLabel={getCompareLabel()}
@@ -298,6 +348,15 @@ export default async function Category(props: Props) {
         title={getTitle(props)}
         totalCount={getTotalCount(props)}
       />
+      <Stream value={Promise.all([getCategory(props), getBottomContent(props)])}>
+        {([category, snapshop]) => (
+          <Slot snapshot={snapshop} label={`Category Landing Bottom Content for ${category.path}`} 
+            // fallback={(
+            //   <div className="p-4"></div>
+            // )} 
+          />
+        )}
+      </Stream>
       <Stream value={Promise.all([getCategory(props), getProducts(props)])}>
         {([category, products]) => (
           <CategoryViewed category={category} categoryId={category.entityId} products={products} />

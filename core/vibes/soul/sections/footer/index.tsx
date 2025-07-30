@@ -314,7 +314,7 @@ export const Footer = forwardRef(function Footer(
                             return (
                               <li key={idx}>
                                 <Link
-                                  className="block rounded-lg py-2 text-sm font-medium text-[var(--footer-link,hsl(var(--contrast-400)))] ring-[var(--footer-focus,hsl(var(--primary)))] transition-colors duration-300 hover:text-[var(--footer-link-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
+                                  className="block rounded-lg py-1 text-sm font-medium text-[var(--footer-link,hsl(var(--contrast-400)))] ring-[var(--footer-focus,hsl(var(--primary)))] transition-colors duration-300 hover:text-[var(--footer-link-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
                                   href={link.href}
                                 >
                                   {link.label}
@@ -332,7 +332,9 @@ export const Footer = forwardRef(function Footer(
           </Stream>
         </div>
 
-        <div className="flex flex-col-reverse items-start gap-y-8 pt-16 @3xl:flex-row @3xl:items-center @3xl:pt-20">
+        
+      </div>
+      <div className="bg-black text-white p-2 mb-8 flex flex-col-reverse items-start gap-y-8 @3xl:flex-row @3xl:items-center">
           {/* Copyright */}
           <Stream
             fallback={
@@ -345,7 +347,7 @@ export const Footer = forwardRef(function Footer(
             {(copyright) => {
               if (copyright != null) {
                 return (
-                  <p className="flex-1 text-sm text-[var(--footer-copyright,hsl(var(--contrast-400)))]">
+                  <p className="flex-1 text-sm pl-16 text-[var(--footer-copyright,hsl(var(--contrast-800)))]">
                     {copyright}
                   </p>
                 );
@@ -356,7 +358,7 @@ export const Footer = forwardRef(function Footer(
           {/* Payment Icons */}
           <Stream
             fallback={
-              <div className="flex animate-pulse flex-wrap gap-2">
+              <div className="flex animate-pulse flex-wrap gap-2 pr-16 ">
                 <div className="h-6 w-[2.1875rem] rounded bg-contrast-100" />
                 <div className="h-6 w-[2.1875rem] rounded bg-contrast-100" />
                 <div className="h-6 w-[2.1875rem] rounded bg-contrast-100" />
@@ -369,12 +371,11 @@ export const Footer = forwardRef(function Footer(
           >
             {(paymentIcons) => {
               if (paymentIcons != null) {
-                return <div className="flex flex-wrap gap-2">{paymentIcons}</div>;
+                return <div className="flex flex-wrap gap-2 pr-16">{paymentIcons}</div>;
               }
             }}
           </Stream>
         </div>
-      </div>
     </footer>
   );
 });

@@ -277,6 +277,7 @@
     },
     "Blog": {
         "title": "Blog",
+        "home": "Accueil",
         "Empty": {
             "title": "Aucun article de blog n’a été trouvé",
             "subtitle": "Pour accéder à d'autres contenus, revenez plus tard"
@@ -407,6 +408,7 @@
     },
     "Product": {
         "ProductDetails": {
+            "selectAnItem": "Choisir une option",
             "quantity": "Quantité",
             "increaseQuantity": "Augmenter la quantité :",
             "decreaseQuantity": "Réduire la quantité",
@@ -633,6 +635,13 @@
                 "increase": "Augmenter le nombre",
                 "decrease": "Diminuer le nombre"
             }
+        },
+        "AddToQuoteButton": {
+            "addToQuote": "Ajouter au devis",
+            "addCartToQuote": "Ajouter le devis au panier"
+        },
+        "AddToShoppingListButton": {
+          "addToShoppingList": "Ajouter à la liste d'achat"
         }
     }
 }

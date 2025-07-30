@@ -111,6 +111,7 @@ export function ProductsListSection({
               <div className="block @3xl:hidden">
                 <SidePanel.Root>
                   <SidePanel.Trigger asChild>
+                    {/* <Button shape='rounded' size="medium" variant="secondary"> */}
                     <Button size="medium" variant="secondary">
                       {filterLabel}
                       <span className="hidden @xl:block">

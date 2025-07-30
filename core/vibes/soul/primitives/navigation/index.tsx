@@ -28,6 +28,8 @@ import { Price } from '@/vibes/soul/primitives/price-label';
 import { ProductCard } from '@/vibes/soul/primitives/product-card';
 import { Link } from '~/components/link';
 import { usePathname, useRouter } from '~/i18n/routing';
+import SearchBar from '~/components/search';
+import { QuickSearch } from '~/components/quick-search';
 
 interface Link {
   label: string;
@@ -528,6 +530,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                       searchInputPlaceholder={searchInputPlaceholder}
                       searchParamName={searchParamName}
                     />
+                    {/* <SearchBar /> */}
                   </div>
                 </Popover.Content>
               </Popover.Portal>
@@ -831,7 +834,8 @@ const useSwitchLocale = () => {
         // @ts-expect-error -- TypeScript will validate that only known `params`
         // are used in combination with a given `pathname`. Since the two will
         // always match for the current route, we can skip runtime checks.
-        { pathname, params },
+        // { pathname, params },
+        { pathname: '/', params },
         { locale },
       ),
     [pathname, params, router],

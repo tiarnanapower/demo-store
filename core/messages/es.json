@@ -277,6 +277,7 @@
     },
     "Blog": {
         "title": "Blog",
+        "home": "Inicio",
         "Empty": {
             "title": "No se encontraron entradas de blog",
             "subtitle": "Comprueba más tarde si hay contenido nuevo"

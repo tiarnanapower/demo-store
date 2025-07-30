@@ -64,6 +64,18 @@ declare global {
             }>,
           ) => Promise<void>;
         };
+        shoppingList?: {
+          addProductFromPage: (
+            product: {
+              sku: string;
+              productEntityId: number;
+              productId?: number;
+              searchText?: string;
+              quantity?: number;
+              selectedOptions?: B2BProductOption[];
+            },
+          ) => Promise<void>;
+        }
       };
       callbacks?: {
         addEventListener: (event: 'on-logout' | 'on-registered', callback: (props: { data: Record<string,string> }) => void) => void;

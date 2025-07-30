@@ -41,7 +41,7 @@ export type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 export function Button({
   variant = 'primary',
   size = 'large',
-  shape = 'pill',
+  shape = 'rounded',
   onClick,
   loading = false,
   disabled = false,
@@ -67,7 +67,7 @@ export function Button({
         }[variant],
         {
           pill: 'rounded-full after:rounded-full',
-          rounded: 'rounded-lg after:rounded-lg',
+          rounded: 'rounded-md after:rounded-md',
           square: 'rounded-none after:rounded-none',
           circle: 'rounded-full after:rounded-full',
         }[shape],

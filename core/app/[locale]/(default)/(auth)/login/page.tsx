@@ -38,6 +38,7 @@ export default async function Login() {
             <li>{t('CreateAccount.ordersTracking')}</li>
             <li>{t('CreateAccount.wishlists')}</li>
           </ul>
+          {/* <ButtonLink shape='rounded' href="/register" variant="secondary"> */}
           <ButtonLink href="/register" variant="secondary">
             {t('CreateAccount.createLink')}
           </ButtonLink>

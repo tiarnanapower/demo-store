@@ -12,6 +12,7 @@ import { redirect } from '~/i18n/routing';
 
 const [STOREFRONT_HOME_LOCATION, BUYER_PORTAL_HOME_LOCATION] = ['0', '1'];
 
+
 export const login = async (_lastResult: SubmissionResult | null, formData: FormData) => {
   const locale = await getLocale();
   const t = await getTranslations('Login');
@@ -58,13 +59,10 @@ export const login = async (_lastResult: SubmissionResult | null, formData: Form
   }
 
   const landingLoginLocation = formData.get('landingLoginLocation');
-  if (
-    typeof landingLoginLocation === 'string' &&
-    [BUYER_PORTAL_HOME_LOCATION, STOREFRONT_HOME_LOCATION].includes(landingLoginLocation)
-  ) {
-    const href =
-      landingLoginLocation === BUYER_PORTAL_HOME_LOCATION ? '/?section=orders' : '/';
+  if([BUYER_PORTAL_HOME_LOCATION, STOREFRONT_HOME_LOCATION].includes(landingLoginLocation as string)) {
+    const href = landingLoginLocation === BUYER_PORTAL_HOME_LOCATION ? '/?section=orders' : '/';
     return redirect({ href, locale });
   }
+
   return redirect({ href: '/?section=orders', locale });
 };

@@ -29,7 +29,7 @@ export function Select({
   hideLabel = false,
   name,
   pending = false,
-  placeholder = 'Select an item',
+  placeholder,
   variant = 'rectangle',
   options,
   className,
