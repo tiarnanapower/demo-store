@@ -54,6 +54,7 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
         crossOrigin=''
         src="https://demostoreb2b.netlify.app/index-legacy.D6MrrbNB.js"
       ></script>
+      
     </>
   );
 }
