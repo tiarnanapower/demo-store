@@ -105,7 +105,6 @@ export default async function RootLayout({ params, children }: Props) {
       <html className={clsx(fonts.map((f) => f.variable))} lang={locale}>
         <head>
           <SiteTheme />
-          <DraftModeScript appOrigin={process.env.MAKESWIFT_APP_ORIGIN} />
         </head>
         <body>
           <Notifications />
