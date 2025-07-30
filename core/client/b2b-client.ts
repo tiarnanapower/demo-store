@@ -27,15 +27,18 @@ async function login({ customerId, customerAccessToken }: LoginWithB2BParams) {
     customerAccessToken,
   };
 
-  const response = await fetch(`${process.env.B2B_API_HOST || 'https://api-b2b.bigcommerce.com'}/api/io/auth/customers/storefront`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      authToken: getEnv('B2B_API_TOKEN'),
+  const response = await fetch(
+    `${process.env.B2B_API_HOST || 'https://api-b2b.bigcommerce.com'}/api/io/auth/customers/storefront`,
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        authToken: getEnv('B2B_API_TOKEN'),
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+  );
 
   const B2BTokenResponseSchema = z.object({
     data: z.object({

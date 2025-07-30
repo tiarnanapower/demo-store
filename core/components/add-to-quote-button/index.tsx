@@ -12,7 +12,7 @@ interface Props {
   sku: string;
   className?: string;
   selectedOptions: B2BProductOption[];
-  validate: () => void
+  validate: () => void;
   quantity?: number;
 }
 
@@ -35,9 +35,10 @@ export const AddToQuoteButton = ({
 
   const handleAddToQuote = () => {
     setLoading(true);
+
     try {
-      validate()
-      
+      validate();
+
       const productOptions = Object.values(selectedOptions);
 
       void addProducts([

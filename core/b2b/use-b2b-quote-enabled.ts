@@ -27,7 +27,7 @@ export const useB2BQuoteEnabled = () => {
       setIsAddToQuoteEnabled(true)
     }
     
-    if(!([B2BRole.B2C, B2BRole.GUEST].includes(role)) && b2bCustomerQuoteEnabled) {
+    if(!(role === B2BRole.B2C && [B2BRole.B2C, B2BRole.GUEST].includes(role)) && b2bCustomerQuoteEnabled) {
       setIsAddToQuoteEnabled(true)
     }
   }, [sdk])

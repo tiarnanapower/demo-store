@@ -4,18 +4,14 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { Button } from '@/vibes/soul/primitives/button';
-import { type B2BProductOption } from '~/b2b/types';
 import { useSDK } from '~/b2b/use-b2b-sdk';
 
 interface Props {
-    cartId: string;
-    className?: string;
+  cartId: string;
+  className?: string;
 }
 
-export const AddCartToQuoteButton = ({
-    cartId,
-    className,
-}: Props) => {
+export const AddCartToQuoteButton = ({ cartId, className }: Props) => {
   const sdk = useSDK();
   const addProductsFromCartId = sdk?.utils?.quote?.addProductsFromCartId;
   const t = useTranslations('Components.AddToQuoteButton');
@@ -27,8 +23,9 @@ export const AddCartToQuoteButton = ({
 
   const handleAddCartToQuote = () => {
     setLoading(true);
+
     try {
-        void addProductsFromCartId(cartId).finally(() => setLoading(false));
+      void addProductsFromCartId(cartId).finally(() => setLoading(false));
     } finally {
       setLoading(false);
     }
