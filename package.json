@@ -32,6 +32,7 @@
     "@radix-ui/react-form": "^0.1.1",
     "next-intl": "^4.3.4",
     "react-hot-toast": "^2.5.1",
-    "swr": "^2.2.5"
+    "swr": "^2.2.5",
+    "tailwind-merge": "^2.6.0"
   }
 }
