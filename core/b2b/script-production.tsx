@@ -44,7 +44,7 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
       <script
         type="module"
         crossOrigin=''
-        src="https://demostoreb2b.netlify.app/index.B6fj-cIc.js"
+        src="https://demostoreb2b.netlify.app/index.C-1RMyzg.js"
       ></script>
       <script
         crossOrigin=''
@@ -52,7 +52,7 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
       ></script>
       <script
         crossOrigin=''
-        src="https://demostoreb2b.netlify.app////index-legacy.D6MrrbNB.js"
+        src="https://demostoreb2b.netlify.app/index-legacy.I7pICwj-.js"
       ></script>
       
     </>
