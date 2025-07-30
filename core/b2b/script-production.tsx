@@ -19,7 +19,7 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
 
     return (
     <>
-      <script>
+      <Script>
         {`
           window.b3CheckoutConfig = {
             routes: {
@@ -40,20 +40,20 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
             'dom.navUserLoginElement': '.navUser-item.navUser-item--account',
           }
         `}
-      </script>
-      <script
+      </Script>
+      <Script
         type="module"
         crossOrigin=''
         src="https://demostoreb2b.netlify.app/index.C-1RMyzg.js"
-      ></script>
-      <script
+      ></Script>
+      <Script
         crossOrigin=''
         src="https://demostoreb2b.netlify.app/polyfills-legacy.D32xEujE.js"
-      ></script>
-      <script
+      ></Script>
+      <Script
         crossOrigin=''
         src="https://demostoreb2b.netlify.app/index-legacy.I7pICwj-.js"
-      ></script>
+      ></Script>
       
     </>
   );
