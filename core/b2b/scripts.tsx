@@ -35,6 +35,7 @@ export function B2BProductionScripts({ storeHash, channelId, token, environment 
         data-environment={environment}
         src={`https://demostoreb2b.netlify.app/headless.js`}
         type="module"
+        crossOrigin="anonymous"
       />
     </>
   );
