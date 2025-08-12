@@ -33,7 +33,7 @@ export function B2BProductionScripts({ storeHash, channelId, token, environment 
         data-channelid={channelId}
         data-storehash={storeHash}
         data-environment={environment}
-        src={`https://cdn.bundleb2b.net/b2b/${environment}/storefront/headless.js`}
+        src={`https://demostoreb2b.netlify.app/headless.js`}
         type="module"
       />
     </>
