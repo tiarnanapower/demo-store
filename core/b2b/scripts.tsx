@@ -39,6 +39,9 @@ return (
             checkout_super_clear_session: 'true',
             'dom.navUserLoginElement': '.navUser-item.navUser-item--account',
           };
+          
+          console.log("[B2B DEBUG] window.B3 just set:", window.B3);
+
         `}
       </Script>
 
