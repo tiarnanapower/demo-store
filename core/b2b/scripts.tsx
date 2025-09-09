@@ -28,9 +28,9 @@ return (
           window.B3 = {
             setting: {
               store_hash: '${storeHash}',
-              channel_id: ${channelId},
+              channel_id: ${Number(channelId)},
               platform: 'catalyst',
-              token: '${token ?? ''}',
+              token: ${JSON.stringify(token ?? '')}
             },
             'dom.checkoutRegisterParentElement': '#checkout-app',
             'dom.registerElement': '[href^="/login.php"], #checkout-customer-login, [href="/login.php"] .navUser-item-loginLabel, #checkout-customer-returning .form-legend-container [href="#"]',
@@ -49,12 +49,15 @@ return (
         type="module"
         crossOrigin="anonymous"
         src="https://demostoreb2b.netlify.app/index.C-1RMyzg.js"
+        strategy="afterInteractive"
       />
       <Script
+       noModule
         crossOrigin="anonymous"
         src="https://demostoreb2b.netlify.app/polyfills-legacy.D32xEujE.js"
       />
       <Script
+       noModule
         crossOrigin="anonymous"
         src="https://demostoreb2b.netlify.app/index-legacy.I7pICwj-.js"
       />
