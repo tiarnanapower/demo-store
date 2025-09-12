@@ -71,6 +71,8 @@ return (
                 cart_url: '/cart',
               }
             }
+            
+            console.log("[B2B DEBUG] window.B3 just set:", window.B3);
         `}
       </Script>
       <Script
