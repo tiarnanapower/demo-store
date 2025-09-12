@@ -15,53 +15,9 @@ interface Props {
 export function B2BProductionScripts({ storeHash, channelId, token, environment }: Props) {
   useB2BAuth(token);
 
-return (
+  return (
     <>
-      {/* <Script id="b3-config" strategy="beforeInteractive">
-        {`
-          window.b3CheckoutConfig = {
-            routes: {
-              dashboard: '/account.php?action=order_status',
-            },
-          };
-
-          window.B3 = {
-            setting: {
-              store_hash: '${storeHash}',
-              channel_id: ${Number(channelId)},
-              platform: 'catalyst',
-              token: ${JSON.stringify(token ?? '')}
-            },
-            'dom.checkoutRegisterParentElement': '#checkout-app',
-            'dom.registerElement': '[href^="/login.php"], #checkout-customer-login, [href="/login.php"] .navUser-item-loginLabel, #checkout-customer-returning .form-legend-container [href="#"]',
-            'dom.openB3Checkout': 'checkout-customer-continue',
-            before_login_goto_page: '/account.php?action=order_status',
-            checkout_super_clear_session: 'true',
-            'dom.navUserLoginElement': '.navUser-item.navUser-item--account',
-          };
-          
-          console.log("[B2B DEBUG] window.B3 just set:", window.B3);
-
-        `}
-      </Script>
-
-      <Script
-        type="module"
-        crossOrigin="anonymous"
-        src="https://demostoreb2b.netlify.app/index.C-1RMyzg.js"
-        strategy="afterInteractive"
-      />
-      <Script
-       noModule
-        crossOrigin="anonymous"
-        src="https://demostoreb2b.netlify.app/polyfills-legacy.D32xEujE.js"
-      />
-      <Script
-       noModule
-        crossOrigin="anonymous"
-        src="https://demostoreb2b.netlify.app/index-legacy.I7pICwj-.js"
-      /> */}
-       <Script id="b2b-config">
+      <Script id="b2b-config">
         {`
             window.B3 = {
               setting: {
@@ -71,8 +27,6 @@ return (
                 cart_url: '/cart',
               }
             }
-            
-            console.log("[B2B DEBUG] window.B3 just set:", window.B3);
         `}
       </Script>
       <Script
