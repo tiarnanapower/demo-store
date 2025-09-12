@@ -41,7 +41,7 @@ export function SignInForm({
   });
 
   return (
-    <form {...getFormProps(form)} action={formAction} className="flex flex-grow flex-col gap-5">
+    <form {...getFormProps(form)} action={formAction} className="flex grow flex-col gap-5">
       <Input
         {...getInputProps(fields.email, { type: 'text' })}
         errors={fields.email.errors}
@@ -69,7 +69,6 @@ function SubmitButton({ children }: { children: React.ReactNode }) {
   const { pending } = useFormStatus();
 
   return (
-    // <Button className="mt-auto w-full" shape='rounded' loading={pending} type="submit" variant="secondary">
     <Button className="mt-auto w-full" loading={pending} type="submit" variant="secondary">
       {children}
     </Button>

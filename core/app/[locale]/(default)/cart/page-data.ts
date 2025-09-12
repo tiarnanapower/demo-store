@@ -1,6 +1,9 @@
+import { cache } from 'react';
+
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql, VariablesOf } from '~/client/graphql';
+import { revalidate } from '~/client/revalidate-target';
 import { TAGS } from '~/client/tags';
 
 export const PhysicalItemFragment = graphql(`
@@ -128,6 +131,61 @@ const MoneyFieldsFragment = graphql(`
   }
 `);
 
+const ShippingInfoFragment = graphql(`
+  fragment ShippingInfoFragment on Checkout {
+    entityId
+    shippingConsignments {
+      entityId
+      availableShippingOptions {
+        cost {
+          value
+        }
+        description
+        entityId
+        isRecommended
+      }
+      selectedShippingOption {
+        entityId
+        description
+        cost {
+          value
+        }
+      }
+      address {
+        city
+        countryCode
+        stateOrProvince
+        postalCode
+      }
+    }
+    handlingCostTotal {
+      value
+    }
+    shippingCostTotal {
+      currencyCode
+      value
+    }
+  }
+`);
+
+const GeographyFragment = graphql(
+  `
+    fragment GeographyFragment on Geography {
+      countries {
+        entityId
+        name
+        code
+        statesOrProvinces {
+          entityId
+          name
+          abbreviation
+        }
+      }
+    }
+  `,
+  [],
+);
+
 const CartPageQuery = graphql(
   `
     query CartPageQuery($cartId: String) {
@@ -136,10 +194,8 @@ const CartPageQuery = graphql(
           entityId
           version
           currencyCode
-          discounts {
-            discountedAmount {
-              ...MoneyFieldsFragment
-            }
+          discountedAmount {
+            ...MoneyFieldsFragment
           }
           lineItems {
             physicalItems {
@@ -167,12 +223,25 @@ const CartPageQuery = graphql(
           }
           coupons {
             code
+            discountedAmount {
+              ...MoneyFieldsFragment
+            }
           }
+          ...ShippingInfoFragment
         }
+      }
+      geography {
+        ...GeographyFragment
       }
     }
   `,
-  [PhysicalItemFragment, DigitalItemFragment, MoneyFieldsFragment],
+  [
+    PhysicalItemFragment,
+    DigitalItemFragment,
+    MoneyFieldsFragment,
+    ShippingInfoFragment,
+    GeographyFragment,
+  ],
 );
 
 type Variables = VariablesOf<typeof CartPageQuery>;
@@ -194,3 +263,35 @@ export const getCart = async (variables: Variables) => {
 
   return data;
 };
+
+const SupportedShippingDestinationsQuery = graphql(`
+  query SupportedShippingDestinations {
+    site {
+      settings {
+        shipping {
+          supportedShippingDestinations {
+            countries {
+              entityId
+              code
+              name
+              statesOrProvinces {
+                entityId
+                name
+                abbreviation
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`);
+
+export const getShippingCountries = cache(async () => {
+  const { data } = await client.fetch({
+    document: SupportedShippingDestinationsQuery,
+    fetchOptions: { next: { revalidate } },
+  });
+
+  return data.site.settings?.shipping?.supportedShippingDestinations.countries ?? [];
+});

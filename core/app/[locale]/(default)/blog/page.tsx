@@ -1,26 +1,21 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SearchParams } from 'nuqs';
 import { createSearchParamsCache, parseAsInteger, parseAsString } from 'nuqs/server';
 
+import { Streamable } from '@/vibes/soul/lib/streamable';
 import { FeaturedBlogPostList } from '@/vibes/soul/sections/featured-blog-post-list';
 import { defaultPageInfo, pageInfoTransformer } from '~/data-transformers/page-info-transformer';
 
 import { getBlog, getBlogPosts } from './page-data';
-
-import { Slot } from "@makeswift/runtime/next";
-import { getSiteVersion } from "@makeswift/runtime/next/server";
-import { client } from "~/lib/makeswift/client";
-
-import { Page as MakeswiftPage } from '~/lib/makeswift';
 
 interface Props {
   params: Promise<{ locale: string }>;
   searchParams: Promise<SearchParams>;
 }
 
-const defaultPostLimit = 12;
+const defaultPostLimit = 9;
 
 const searchParamsCache = createSearchParamsCache({
   tag: parseAsString,
@@ -29,8 +24,10 @@ const searchParamsCache = createSearchParamsCache({
   limit: parseAsInteger.withDefault(defaultPostLimit),
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('Blog');
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+
+  const t = await getTranslations({ locale, namespace: 'Blog' });
   const blog = await getBlog();
 
   return {
@@ -70,10 +67,15 @@ async function getPaginationInfo(searchParamsPromise: Promise<SearchParams>) {
 }
 
 export default async function Blog(props: Props) {
+  const { locale } = await props.params;
+
+  setRequestLocale(locale);
+
+  const t = await getTranslations('Blog');
+
   const searchParamsParsed = searchParamsCache.parse(await props.searchParams);
   const { tag } = searchParamsParsed;
   const blog = await getBlog();
-  const { locale } = await props.params;
 
   if (!blog) {
     return notFound();
@@ -81,54 +83,26 @@ export default async function Blog(props: Props) {
 
   const tagCrumb = tag ? [{ label: tag, href: '#' }] : [];
 
-  const contentSnapshotTop = await client.getComponentSnapshot(
-    `blog-top-content`,
-    { 
-      siteVersion: await getSiteVersion(),
-      locale: locale
-    }
-  );
-
-  const contentSnapshotBottom = await client.getComponentSnapshot(
-    `blog-bottom-content`,
-    { 
-      siteVersion: await getSiteVersion(),
-      locale: locale
-    }
-  );
-
-  const t = await getTranslations('Blog');
-
   return (
-    <>
-      {/* Temporary workaround to load Makeswift theme */}
-      <div className="hidden">
-        <MakeswiftPage locale={locale} path="/empty" />
-      </div>
-      {/* End of temporary workaround to load Makeswift theme */}
-
-      <Slot snapshot={contentSnapshotTop} label={`Blog Top Content`} />
-      <FeaturedBlogPostList
-        breadcrumbs={[
-          {
-            label: t('home'),
-            href: '/',
-          },
-          {
-            label: blog.name,
-            href: tag ? blog.path : '#',
-          },
-          ...tagCrumb,
-        ]}
-        description={blog.description}
-        emptyStateSubtitle={getEmptyStateSubtitle()}
-        emptyStateTitle={getEmptyStateTitle()}
-        paginationInfo={getPaginationInfo(props.searchParams)}
-        placeholderCount={6}
-        posts={listBlogPosts(props.searchParams)}
-        title={blog.name}
-      />
-      <Slot snapshot={contentSnapshotBottom} label={`Blog Bottom Content`} />
-    </>
+    <FeaturedBlogPostList
+      breadcrumbs={[
+        {
+          label: t('home'),
+          href: '/',
+        },
+        {
+          label: blog.name,
+          href: tag ? blog.path : '#',
+        },
+        ...tagCrumb,
+      ]}
+      description={blog.description}
+      emptyStateSubtitle={Streamable.from(getEmptyStateSubtitle)}
+      emptyStateTitle={Streamable.from(getEmptyStateTitle)}
+      paginationInfo={Streamable.from(() => getPaginationInfo(props.searchParams))}
+      placeholderCount={6}
+      posts={Streamable.from(() => listBlogPosts(props.searchParams))}
+      title={blog.name}
+    />
   );
 }

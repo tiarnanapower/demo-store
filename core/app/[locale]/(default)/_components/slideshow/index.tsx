@@ -19,7 +19,7 @@ export function Slideshow() {
       },
       description: t('Slide01.description'),
       cta: {
-        href: '/mens',
+        href: '/shop-all',
         label: t('Slide01.cta'),
       },
     },
@@ -32,7 +32,7 @@ export function Slideshow() {
       },
       description: t('Slide02.description'),
       cta: {
-        href: '/mens',
+        href: '/shop-all',
         label: t('Slide02.cta'),
       },
     },
@@ -45,7 +45,7 @@ export function Slideshow() {
       },
       description: t('Slide03.description'),
       cta: {
-        href: '/mens',
+        href: '/shop-all',
         label: t('Slide03.cta'),
       },
     },
