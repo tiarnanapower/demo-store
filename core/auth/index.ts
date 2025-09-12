@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { anonymousSignIn, clearAnonymousSession } from '~/auth/anonymous-session';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
+import { b2bClient } from '~/client/b2b-client';
 import { clearCartId, setCartId } from '~/lib/cart';
 import { serverToast } from '~/lib/server-toast';
 
@@ -131,6 +132,12 @@ async function loginWithPassword(credentials: unknown): Promise<User | null> {
     email: result.customer.email,
     customerAccessToken: result.customerAccessToken.value,
     cartId: result.cart?.entityId,
+     ...(process.env.B2B_API_TOKEN && {
+      b2bToken: await b2bClient.login({
+        customerId: result.customer.entityId,
+        customerAccessToken: result.customerAccessToken,
+      }),
+    }),
   };
 }
 
@@ -168,6 +175,12 @@ async function loginWithJwt(credentials: unknown): Promise<User | null> {
     customerAccessToken: result.customerAccessToken.value,
     impersonatorId,
     cartId: result.cart?.entityId,
+      ...(process.env.B2B_API_TOKEN && {
+      b2bToken: await b2bClient.login({
+        customerId: result.customer.entityId,
+        customerAccessToken: result.customerAccessToken,
+      }),
+    }),
   };
 }
 
@@ -207,6 +220,10 @@ const config = {
         };
       }
 
+      if (user?.b2bToken) {
+        token.b2bToken = user.b2bToken;
+      }
+
       // user can actually be undefined
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (user?.cartId) {
@@ -236,6 +253,10 @@ const config = {
 
       if (token.user?.cartId !== undefined) {
         session.user.cartId = token.user.cartId;
+      }
+   
+      if (token.user?.b2bToken) {
+        session.user.b2bToken = token.user.b2bToken;
       }
 
       return session;

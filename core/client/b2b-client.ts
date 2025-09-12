@@ -4,7 +4,6 @@ interface LoginWithB2BParams {
   customerId: number;
   customerAccessToken: {
     value: string;
-    expiresAt: string;
   };
 }
 

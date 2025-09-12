@@ -10,6 +10,7 @@ declare module 'next-auth' {
     email?: string | null;
     cartId?: string | null;
     customerAccessToken?: string;
+    b2bToken? : string;
     impersonatorId?: string | null;
   }
 
@@ -22,5 +23,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     id?: string;
     user?: User;
+    b2bToken?: string;
+
   }
 }

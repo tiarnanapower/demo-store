@@ -18,7 +18,7 @@ export async function B2BLoader() {
         channelId={channelId}
         hostname={localBuyerPortalHost}
         storeHash={storeHash}
-        token={session?.b2bToken}
+        token={session?.user?.b2bToken}
       />
     );
   }
@@ -30,7 +30,7 @@ export async function B2BLoader() {
       channelId={channelId}
       environment={environment}
       storeHash={storeHash}
-      token={session?.b2bToken}
+      token={session?.user?.b2bToken}
     />
   );
 }
