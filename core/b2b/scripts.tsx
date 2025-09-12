@@ -17,7 +17,7 @@ export function B2BProductionScripts({ storeHash, channelId, token, environment 
 
 return (
     <>
-      <Script id="b3-config" strategy="beforeInteractive">
+      {/* <Script id="b3-config" strategy="beforeInteractive">
         {`
           window.b3CheckoutConfig = {
             routes: {
@@ -60,6 +60,25 @@ return (
        noModule
         crossOrigin="anonymous"
         src="https://demostoreb2b.netlify.app/index-legacy.I7pICwj-.js"
+      /> */}
+       <Script id="b2b-config">
+        {`
+            window.B3 = {
+              setting: {
+                store_hash: '${storeHash}',
+                channel_id: ${channelId},
+                platform: 'catalyst',
+                cart_url: '/cart',
+              }
+            }
+        `}
+      </Script>
+      <Script
+        data-channelid={channelId}
+        data-storehash={storeHash}
+        data-environment={environment}
+        src={`https://cdn.bundleb2b.net/b2b/${environment}/storefront/headless.js`}
+        type="module"
       />
     </>
   );
