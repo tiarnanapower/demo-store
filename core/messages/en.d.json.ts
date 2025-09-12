@@ -92,10 +92,7 @@ declare const messages: {
       "subCategories": "Categories",
       "Empty": {
         "title": "No products in this category",
-        "subtitle": "Try using different filters.",
-        "Accessories": "Accessories",
-        "Plants": "Plants",
-        "Shop All": "Shop All"
+        "subtitle": "Try using different filters."
       }
     },
     "Search": {
@@ -425,6 +422,8 @@ declare const messages: {
       "decreaseNumber": "Decrease number",
       "thumbnail": "View image number",
       "additionalInformation": "Additional information",
+      "addToQuote": "Add to quote",
+      "addToShoppingList": "Add to shopping list",
       "Submit": {
         "addToCart": "Add to cart",
         "outOfStock": "Out of stock",
@@ -530,6 +529,9 @@ declare const messages: {
       "placeholder": "Enter your email",
       "description": "Stay up to date with the latest news and offers from our store.",
       "success": "Thank you for your interest! Newsletter feature is coming soon!"
+    },
+    "AddToQuoteButton": {
+      "addCartToQuote": "Add cart to quote"
     }
   }
 };

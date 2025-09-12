@@ -1,3 +1,6 @@
+import { ReactNode } from 'react';
+import { ToasterProps } from 'sonner';
+
 export interface B2BProductOption {
   optionEntityId: number;
   optionValueEntityId: number;
@@ -5,17 +8,15 @@ export interface B2BProductOption {
   valueEntityId: number;
   text: string;
   number: number;
-  date:
-    | {
-        utc: string;
-      }
-    | undefined;
+  date?: {
+    utc: string;
+  };
 }
 
 export interface QuoteConfigProps {
   key: string;
   value: string;
-  extraFields: Record<string,string>;
+  extraFields: Record<string, string>;
 }
 
 export enum B2BRole {
@@ -28,22 +29,47 @@ export enum B2BRole {
   B2C = 99,
   GUEST = 100,
 }
+
 export interface B2BProfile {
-  id:              number;
-  phoneNumber:     string;
-  firstName:       string;
-  lastName:        string;
-  emailAddress:    string;
+  id: number;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
   customerGroupId: number;
-  role:            number;
-  userType:        number;
-  loginType:       number;
+  role: number;
+  userType: number;
+  loginType: number;
   companyRoleName: string;
+}
+
+interface LineItem {
+  productEntityId: number;
+  quantity?: number;
+  selectedOptions?: B2BProductOption[];
+}
+
+interface ToastOptions {
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  description?: string;
+  position?: ToasterProps['position'];
+  dismissLabel?: string;
 }
 
 
 declare global {
   interface Window {
+    catalyst?: {
+      toast?: {
+        success: (message: ReactNode, options?: ToastOptions) => void;
+        error: (message: ReactNode, options?: ToastOptions) => void;
+        warning: (message: ReactNode, options?: ToastOptions) => void;
+        info: (message: ReactNode, options?: ToastOptions) => void;
+      };
+    };
     b2b?: {
       utils?: {
         openPage: (page: string) => void;
@@ -53,33 +79,33 @@ declare global {
           getB2BToken: () => string;
         };
         quote?: {
-          getQuoteConfigs: () => QuoteConfigProps[]; 
+          getQuoteConfigs: () => QuoteConfigProps[];
           addProductsFromCartId: (cartId: string) => Promise<void>;
-          addProducts: (
-            products: Array<{
-              sku: string;
-              productEntityId: number;
-              quantity?: number;
-              selectedOptions?: B2BProductOption[];
-            }>,
-          ) => Promise<void>;
+          addProducts: (products: LineItem[]) => Promise<void>;
         };
         shoppingList?: {
-          addProductFromPage: (
-            product: {
-              sku: string;
-              productEntityId: number;
-              productId?: number;
-              searchText?: string;
-              quantity?: number;
-              selectedOptions?: B2BProductOption[];
-            },
-          ) => Promise<void>;
-        }
+          addProductFromPage: (product: LineItem) => Promise<void>;
+        };
+        cart?: {
+          getEntityId: () => string;
+          setEntityId: (cartId: string) => void;
+        };
       };
       callbacks?: {
-        addEventListener: (event: 'on-logout' | 'on-registered', callback: (props: { data: Record<string,string> }) => void) => void;
-        removeEventListener: (event: 'on-logout' | 'on-registered', callback: (props: { data: Record<string,string> }) => void) => void;
+        addEventListener: {
+          (
+            event: 'on-registered',
+            callback: (props: {
+              data: Record<'email' | 'password' | 'landingLoginLocation', string>;
+            }) => void,
+          ): void;
+          (event: 'on-logout', callback: (props: { data: Record<string, string> }) => void): void;
+          (event: 'on-cart-created', callback: (props: { data: { cartId: string } }) => void): void;
+        };
+        removeEventListener: (
+          event: 'on-logout' | 'on-registered' | 'on-cart-created',
+          callback: unknown,
+        ) => void;
         dispatchEvent: (event: string) => void;
       };
     };

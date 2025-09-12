@@ -14,7 +14,6 @@ import './components/site-header/register';
 import './components/site-theme/register';
 import './components/slideshow/register';
 import './components/sticky-sidebar/register';
-import './components/banner/register';
 
 import { MakeswiftComponentType } from '@makeswift/runtime';
 

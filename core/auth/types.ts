@@ -3,6 +3,7 @@ import { User } from 'next-auth';
 declare module 'next-auth' {
   interface Session {
     user?: User;
+    b2bToken?: string;
   }
 
   interface User {
@@ -10,8 +11,8 @@ declare module 'next-auth' {
     email?: string | null;
     cartId?: string | null;
     customerAccessToken?: string;
-    b2bToken? : string;
     impersonatorId?: string | null;
+    b2bToken?: string;
   }
 
   interface AnonymousUser {
@@ -24,6 +25,5 @@ declare module 'next-auth/jwt' {
     id?: string;
     user?: User;
     b2bToken?: string;
-
   }
 }

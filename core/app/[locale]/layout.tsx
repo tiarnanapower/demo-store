@@ -11,10 +11,10 @@ import { cache, PropsWithChildren } from 'react';
 
 import '../../globals.css';
 
-import { B2BLoader } from '~/b2b/loader';
 import { fonts } from '~/app/fonts';
 import { CookieNotifications } from '~/app/notifications';
 import { Providers } from '~/app/providers';
+import { B2BLoader } from '~/b2b/loader';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
@@ -140,9 +140,9 @@ export default async function RootLayout({ params, children }: Props) {
                 </Providers>
               </AnalyticsProvider>
             </NuqsAdapter>
+            <B2BLoader />
           </NextIntlClientProvider>
           <VercelComponents />
-          <B2BLoader />
           <ContainerQueryPolyfill />
           <ScriptManagerScripts scripts={data.site.content.footerScripts} strategy="lazyOnload" />
         </body>

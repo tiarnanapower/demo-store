@@ -5,12 +5,10 @@ import { MiddlewareFactory } from './compose-middlewares';
 
 export const withB2B: MiddlewareFactory = (next) => {
   return (request, event) => {
-    const auth = request.auth;
-
     if (
-      auth &&
-      (request.nextUrl.pathname.includes('/account/') ||
-        request.nextUrl.pathname.includes('/login'))
+      request.auth?.b2bToken &&
+      (request.nextUrl.pathname.startsWith('/account/') ||
+        request.nextUrl.pathname.startsWith('/login'))
     ) {
       return NextResponse.redirect(new URL('/?section=orders', request.url));
     }
@@ -21,6 +19,6 @@ export const withB2B: MiddlewareFactory = (next) => {
 
 declare module 'next/server' {
   interface NextRequest {
-    auth?: Session;
+    auth: Session | null;
   }
 }

@@ -68,7 +68,7 @@ const getFooterData = cache(async () => {
 
 export const Footer = async () => {
   const t = await getTranslations('Components.Footer');
-    const translater = await getTranslations('Faceted.Category.Empty');
+
   const data = await getFooterData();
 
   const logo = data.settings ? logoTransformer(data.settings) : '';
@@ -98,7 +98,7 @@ export const Footer = async () => {
       {
         title: t('categories'),
         links: sectionsData.categoryTree.map((category) => ({
-          label: translater(category.name as any),
+          label: category.name,
           href: category.path,
         })),
       },

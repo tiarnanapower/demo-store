@@ -1,83 +1,32 @@
-⚠️ **IMPORTANT:** As of January 6, 2025, the `main` branch is frozen. The default branch is now `canary`. Please make sure to work with and submit PRs to the `canary` branch.
+# Catalyst + B2B + Makeswift
 
+This branch is intended to be used as a template/starting point for new Catalyst projects that require B2B and Makeswift functionality.
 
-<a href="https://catalyst.dev" target="_blank" rel="noopener norerrer">
-  <img src="https://storage.googleapis.com/bigcommerce-developers/images/catalyst_readme_banner.png" alt="Catalyst for Composable Commerce Image Banner" title="Catalyst">
-</a>
+> [!CAUTION]
+> **THIS TEMPLATE IS IN ALPHA**
 
-<br />
-<br />
+## Getting Started
 
-<div align="center">
+**Requirements:**
 
-[![MIT License](https://img.shields.io/github/license/bigcommerce/catalyst)](LICENSE.md)
-[![Lighthouse Report](https://github.com/bigcommerce/catalyst/actions/workflows/lighthouse.yml/badge.svg)](https://github.com/bigcommerce/catalyst/actions/workflows/lighthouse.yml) [![Lint, Typecheck, gql.tada](https://github.com/bigcommerce/catalyst/actions/workflows/basic.yml/badge.svg)](https://github.com/bigcommerce/catalyst/actions/workflows/basic.yml)
+- A [BigCommerce account](https://www.bigcommerce.com/start-your-trial)
+- A BigCommerce store with B2B Edition enabled, and a Catalyst channel created via [One-Click Catalyst](https://developer.bigcommerce.com/docs/storefront/catalyst/getting-started)
+- Node.js version 22
+- Corepack-enabled `pnpm`
 
-</div>
+  ```bash
+  corepack enable pnpm
+  ```
 
-**Catalyst** is the composable, fully customizable headless commerce framework for
-[BigCommerce](https://www.bigcommerce.com/). Catalyst is built with [Next.js](https://nextjs.org/), uses
-our [React](https://react.dev/) storefront components, and is backed by the
-[GraphQL Storefront API](https://developer.bigcommerce.com/docs/storefront/graphql).
+1. Clone this repository
 
-By choosing Catalyst, you'll have a fully-functional storefront within a few seconds, and spend zero time on wiring
-up APIs or building SEO, Accessibility, and Performance-optimized ecommerce components you've probably written many
-times before. You can instead go straight to work building your brand and making this your own.
+2. Initialize your environment variables
 
-## Demo
+   ```bash
+   pnpm dlx @bigcommerce/create-catalyst@latest init
+   ```
 
-- [Catalyst Demo](https://catalyst-demo.site)
-
-![-----------------------------------------------------](https://storage.googleapis.com/bigcommerce-developers/images/catalyst_readme_hr.png)
-
-<p align="center">
- <a href="https://www.catalyst.dev">🚀 catalyst.dev</a> •
- <a href="https://developer.bigcommerce.com/community">🤗 BigCommerce Developer Community</a> •
- <a href="https://github.com/bigcommerce/catalyst/discussions">💬 GitHub Discussions</a> •
- <a href="/docs">💡 Docs in this repo</a>
-</p>
-
-![-----------------------------------------------------](https://storage.googleapis.com/bigcommerce-developers/images/catalyst_readme_hr.png)
-
-
-## Deploy on Vercel
-
-The easiest way to deploy your Catalyst Storefront is to use the [Vercel Platform](https://vercel.com/new) from the creators of Next.js.
-
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
-<div align="left">
-  <a href="https://vercel.com/new/clone?repository-url=https://github.com/bigcommerce/catalyst&root-directory=core&project-name=my-catalyst-storefront&repository-name=my-catalyst-storefront&integration-ids=oac_nsrwzogJLEFglVwt2060kB0y&external-id=catalyst&demo-title=BigCommerce+Catalyst+with+Vercel&demo-description=Create+a+BigCommerce+Catalyst+Storefront+and+Deploy+to+Vercel&demo-url=catalyst-demo.site&demo-image=https://storage.googleapis.com/s.mkswft.com/RmlsZTozODgzZmY3Yy1hNmVlLTQ1MGUtYjRkMS1mMjEyNzgxNjk5MTY%3D/Social-image-Catalyst.png"><img src="https://vercel.com/button" alt="Deploy with Vercel"/></a>
-</div>
-
-## Quickstart
-
-Create a new project interactively by running:
-
-```bash
-npm create @bigcommerce/catalyst@latest
-```
-
-You'll then get the following prompts:
-
-```console
-? What would you like to call your project?  my-faster-storefront
-? Which would you like?
-❯ Link Catalyst to a BigCommerce Store
-  Use sample data
-
-? Would you like to create a new channel? y
-
-? What would you like to name the new channel? My Faster Storefront
-
-Success! Created 'my-faster-storefront' at '/Users/first.last/Documents/GitHub/my-faster-storefront'
-```
-
-Next steps:
-
-```bash
-cd my-faster-storefront && npm run dev
-```
+3. Fill in any missing environment variables, such as `B2B_API_HOST` and `B2B_API_TOKEN` from `.env.example` into `.env.local`
 
 Learn more about Catalyst at [catalyst.dev](https://catalyst.dev).
 
@@ -87,9 +36,3 @@ Learn more about Catalyst at [catalyst.dev](https://catalyst.dev).
 - [GraphQL Storefront API Playground](https://developer.bigcommerce.com/graphql-storefront/playground)
 - [GraphQL Storefront API Explorer](https://developer.bigcommerce.com/graphql-storefront/explorer)
 - [BigCommerce DevDocs](https://developer.bigcommerce.com/docs/build)
-
-![-----------------------------------------------------](https://storage.googleapis.com/bigcommerce-developers/images/catalyst_readme_hr.png)
-
-> [!IMPORTANT]
-> If you just want to build a storefront, start with the [CLI](#quickstart) which will install the Next.js application in [/core](/core/).
-> If you wish to contribute back to Catalyst or create a fork of Catalyst, you can check the [docs for this monorepo](https://catalyst.dev/docs/monorepo) to get started.

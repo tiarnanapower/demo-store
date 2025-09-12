@@ -88,7 +88,6 @@
         "Category": {
             "subCategories": "Categorías",
             "Empty": {
-                "shopAll" : "Comprar todo",
                 "title": "No hay productos en esta categoría",
                 "subtitle": "Prueba a utilizar otro tipo de filtros."
             }
