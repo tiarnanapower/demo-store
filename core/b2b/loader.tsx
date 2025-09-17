@@ -21,7 +21,6 @@ export async function B2BLoader() {
   } = EnvironmentSchema.parse(process.env);
 
   const session = await auth();
-
   if (LOCAL_BUYER_PORTAL_HOST) {
     return (
       <ScriptDev
