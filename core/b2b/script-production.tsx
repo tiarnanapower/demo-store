@@ -30,14 +30,7 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
             setting: {
               store_hash: '${storeHash}',  
               channel_id: ${channelId},
-              platform: 'catalyst',
             },
-            'dom.checkoutRegisterParentElement': '#checkout-app',
-            'dom.registerElement': '[href^="/login.php"], #checkout-customer-login, [href="/login.php"] .navUser-item-loginLabel, #checkout-customer-returning .form-legend-container [href="#"]',
-            'dom.openB3Checkout': 'checkout-customer-continue',
-            before_login_goto_page: '/account.php?action=order_status',
-            checkout_super_clear_session: 'true',
-            'dom.navUserLoginElement': '.navUser-item.navUser-item--account',
           }
         `}
       </Script>
