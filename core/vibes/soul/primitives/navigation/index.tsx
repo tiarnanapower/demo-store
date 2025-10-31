@@ -427,10 +427,11 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
         {/* Logo */}
         <div
           className={clsx(
-            'flex items-center justify-start self-stretch',
+            'flex items-center justify-start self-stretch space-x-4',
             linksPosition === 'center' ? 'flex-1' : 'flex-1 @4xl:flex-none',
           )}
         >
+            <div className="flex items-center">
           <Logo
             className={clsx(streamableMobileLogo != null ? 'hidden @4xl:flex' : 'flex')}
             height={logoHeight}
@@ -449,6 +450,13 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
               width={mobileLogoWidth}
             />
           )}
+          </div>
+            <div className="w-px h-10 bg-gray-300" />
+            <div className="flex flex-col text-left leading-tight">
+            <span className="text-lg font-semibold text-gray-900">
+              English Language Teaching
+            </span>
+  </div>
         </div>
 
         {/* Top Level Nav Links */}
