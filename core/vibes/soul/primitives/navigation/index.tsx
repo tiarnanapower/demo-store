@@ -119,6 +119,7 @@ interface Props<S extends SearchResult> {
   searchLabel?: string;
   mobileMenuTriggerLabel?: string;
   switchCurrencyLabel?: string;
+  customerGroup?: Boolean;
 }
 
 const MobileMenuButton = forwardRef<
@@ -286,6 +287,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
     searchLabel = 'Search',
     mobileMenuTriggerLabel = 'Toggle navigation',
     switchCurrencyLabel,
+    customerGroup,
   }: Props<S>,
   ref: Ref<HTMLDivElement>,
 ) {
@@ -488,9 +490,12 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
               </ul>
             }
             value={streamableLinks}
-          >
+          > 
             {(links) =>
-              links.map((item, i) => (
+            
+              links
+              .filter(item => customerGroup || !['Teaching Resources', 'Ressources pédagogiques'].includes(item.label)) // hide these if not
+              .map((item, i) => (
                 <NavigationMenu.Item key={i} value={i.toString()}>
                   <NavigationMenu.Trigger asChild>
                     <Link
