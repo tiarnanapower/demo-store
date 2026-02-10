@@ -455,9 +455,9 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
           </div>
             <div className="w-px h-10 bg-gray-300" />
             <div className="flex flex-col text-left leading-tight">
-            <span className="text-lg font-semibold text-gray-900">
+            {/* <span className="text-lg font-semibold text-gray-900">
               English Language Teaching
-            </span>
+            </span> */}
   </div>
         </div>
 
