@@ -1,4 +1,4 @@
-import { DM_Serif_Text, Inter, Roboto_Mono } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans, Roboto_Mono } from 'next/font/google';
 
 export const inter = Inter({
   display: 'swap',
@@ -6,11 +6,11 @@ export const inter = Inter({
   variable: '--font-family-inter',
 });
 
-export const dmSerifText = DM_Serif_Text({
+export const plusJakartaSans = Plus_Jakarta_Sans({
   display: 'swap',
   subsets: ['latin'],
-  weight: '400',
-  variable: '--font-family-dm-serif-text',
+  weight: ['400', '600', '700', '800'],
+  variable: '--font-family-plus-jakarta-sans',
 });
 
 export const robotoMono = Roboto_Mono({
@@ -19,4 +19,4 @@ export const robotoMono = Roboto_Mono({
   variable: '--font-family-roboto-mono',
 });
 
-export const fonts = [inter, dmSerifText, robotoMono];
+export const fonts = [inter, plusJakartaSans, robotoMono];
