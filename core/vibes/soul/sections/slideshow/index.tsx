@@ -166,7 +166,7 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
                   className="relative h-full w-full min-w-0 shrink-0 grow-0 basis-full"
                   key={idx}
                 >
-                  <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-[var(--slideshow-mask,hsl(var(--foreground)/80%))] via-[var(--slideshow-mask,hsl(var(--foreground)/40%))] to-transparent">
+                  <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-[var(--slideshow-mask,hsl(var(--foreground)/80%))] to-transparent">
                     <div className="mx-auto w-full max-w-screen-2xl text-balance px-4 pb-20 pt-16 @xl:px-8 @xl:pb-24 @xl:pt-20 @4xl:px-12 @4xl:pb-28 @4xl:pt-24">
                       <h1 className="m-0 max-w-xl font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] text-4xl font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))] @2xl:text-5xl @2xl:leading-[.9] @4xl:text-7xl">
                         {title}

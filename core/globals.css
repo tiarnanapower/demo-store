@@ -61,7 +61,7 @@
   --footer-focus: hsl(327 100% 44%);
 
   /* Slideshow — DNA hero style */
-  --slideshow-mask: hsl(0 0% 7% / 65%);
+  --slideshow-mask: hsl(0 0% 7% / 45%);
   --slideshow-background: hsl(0 0% 7%);
   --slideshow-title-font-family: var(--font-family-heading);
 
