@@ -51,5 +51,6 @@ runtime.registerComponent(MSSlideshow, {
     }),
     autoplay: Checkbox({ label: 'Autoplay', defaultValue: true }),
     interval: Number({ label: 'Duration', defaultValue: 5, suffix: 's' }),
+    cardStyle: Checkbox({ label: 'Card style (DNA hero)', defaultValue: false }),
   },
 });

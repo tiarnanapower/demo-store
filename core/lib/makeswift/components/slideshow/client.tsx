@@ -17,11 +17,13 @@ interface MSAccordionsProps {
   slides: Slide[];
   autoplay: boolean;
   interval: number;
+  cardStyle: boolean;
 }
 
-export function MSSlideshow({ className, slides, autoplay, interval }: MSAccordionsProps) {
+export function MSSlideshow({ className, slides, autoplay, interval, cardStyle }: MSAccordionsProps) {
   return (
     <Slideshow
+      cardStyle={cardStyle}
       className={className}
       interval={interval * 1000}
       playOnInit={autoplay}

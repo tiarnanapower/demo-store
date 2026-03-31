@@ -33,6 +33,11 @@ interface Props {
   playOnInit?: boolean;
   interval?: number;
   className?: string;
+  /**
+   * When true, renders slide content as a floating white card overlapping the bottom of the hero
+   * (DNA.fi style) instead of a gradient text overlay.
+   */
+  cardStyle?: boolean;
 }
 
 interface UseProgressButtonType {
@@ -104,7 +109,13 @@ const useProgressButton = (
  * }
  * ```
  */
-export function Slideshow({ slides, playOnInit = true, interval = 5000, className }: Props) {
+export function Slideshow({
+  slides,
+  playOnInit = true,
+  interval = 5000,
+  className,
+  cardStyle = false,
+}: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 20 }, [
     Autoplay({ delay: interval, playOnInit }),
     Fade(),
@@ -150,10 +161,15 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
       });
   }, [emblaApi, playCount]);
 
+  const activeSlide = slides[selectedIndex];
+
   return (
     <section
       className={clsx(
-        'relative h-[80vh] min-h-[520px] bg-[var(--slideshow-background,color-mix(in_oklab,hsl(var(--primary)),black_75%))] @container',
+        'relative bg-[var(--slideshow-background,color-mix(in_oklab,hsl(var(--primary)),black_75%))] @container',
+        cardStyle
+          ? 'h-[55vh] min-h-[380px] overflow-visible pb-0 mb-[-5rem]'
+          : 'h-[80vh] min-h-[520px]',
         className,
       )}
     >
@@ -166,29 +182,32 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
                   className="relative h-full w-full min-w-0 shrink-0 grow-0 basis-full"
                   key={idx}
                 >
-                  <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-[var(--slideshow-mask,hsl(var(--foreground)/80%))] to-transparent">
-                    <div className="mx-auto w-full max-w-screen-2xl text-balance px-4 pb-20 pt-16 @xl:px-8 @xl:pb-24 @xl:pt-20 @4xl:px-12 @4xl:pb-28 @4xl:pt-24">
-                      <h1 className="m-0 max-w-xl font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] text-4xl font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))] @2xl:text-5xl @2xl:leading-[.9] @4xl:text-7xl">
-                        {title}
-                      </h1>
-                      {showDescription && (
-                        <p className="mt-2 max-w-xl font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] text-base leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))] @xl:mt-3 @xl:text-lg">
-                          {description}
-                        </p>
-                      )}
-                      {showCta && (
-                        <ButtonLink
-                          className="mt-8 @xl:mt-10"
-                          href={cta?.href ?? '#'}
-                          shape={cta?.shape ?? 'pill'}
-                          size={cta?.size ?? 'large'}
-                          variant={cta?.variant ?? 'primary'}
-                        >
-                          {cta?.label ?? 'Learn more'}
-                        </ButtonLink>
-                      )}
+                  {/* Gradient overlay — only shown in non-card mode */}
+                  {!cardStyle && (
+                    <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-[var(--slideshow-mask,hsl(var(--foreground)/80%))] to-transparent">
+                      <div className="mx-auto w-full max-w-screen-2xl text-balance px-4 pb-20 pt-16 @xl:px-8 @xl:pb-24 @xl:pt-20 @4xl:px-12 @4xl:pb-28 @4xl:pt-24">
+                        <h1 className="m-0 max-w-xl font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] text-4xl font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))] @2xl:text-5xl @2xl:leading-[.9] @4xl:text-7xl">
+                          {title}
+                        </h1>
+                        {showDescription && (
+                          <p className="mt-2 max-w-xl font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] text-base leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))] @xl:mt-3 @xl:text-lg">
+                            {description}
+                          </p>
+                        )}
+                        {showCta && (
+                          <ButtonLink
+                            className="mt-8 @xl:mt-10"
+                            href={cta?.href ?? '#'}
+                            shape={cta?.shape ?? 'pill'}
+                            size={cta?.size ?? 'large'}
+                            variant={cta?.variant ?? 'primary'}
+                          >
+                            {cta?.label ?? 'Learn more'}
+                          </ButtonLink>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {image?.src != null && image.src !== '' && (
                     <Image
@@ -211,8 +230,41 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
         </div>
       </div>
 
+      {/* Floating card — only shown in card mode, rendered outside embla so it can overflow */}
+      {cardStyle && activeSlide != null && (
+        <div
+          className="absolute bottom-0 left-4 z-20 w-[calc(100%-2rem)] translate-y-16 rounded-2xl bg-white p-6 shadow-xl transition-opacity duration-300 @sm:left-6 @sm:w-auto @sm:min-w-[340px] @sm:max-w-md @sm:p-8 @xl:left-10 @xl:p-10"
+          key={selectedIndex}
+        >
+          <h2 className="font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] text-2xl font-bold leading-tight text-[hsl(var(--foreground))] @sm:text-3xl">
+            {activeSlide.title}
+          </h2>
+          {(activeSlide.showDescription ?? true) && activeSlide.description != null && activeSlide.description !== '' && (
+            <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--contrast-400))] @sm:text-base">
+              {activeSlide.description}
+            </p>
+          )}
+          {(activeSlide.showCta ?? true) && (
+            <ButtonLink
+              className="mt-6"
+              href={activeSlide.cta?.href ?? '#'}
+              shape={activeSlide.cta?.shape ?? 'pill'}
+              size={activeSlide.cta?.size ?? 'medium'}
+              variant={activeSlide.cta?.variant ?? 'primary'}
+            >
+              {activeSlide.cta?.label ?? 'Learn more'}
+            </ButtonLink>
+          )}
+        </div>
+      )}
+
       {/* Controls */}
-      <div className="absolute bottom-4 left-1/2 flex w-full max-w-screen-2xl -translate-x-1/2 flex-wrap items-center px-4 @xl:bottom-6 @xl:px-6 @4xl:px-8">
+      <div
+        className={clsx(
+          'absolute left-1/2 flex w-full max-w-screen-2xl -translate-x-1/2 flex-wrap items-center px-4 @xl:px-6 @4xl:px-8',
+          cardStyle ? 'bottom-[5.5rem]' : 'bottom-4 @xl:bottom-6',
+        )}
+      >
         {/* Progress Buttons */}
         {scrollSnaps.map((_: number, index: number) => {
           return (
@@ -236,7 +288,7 @@ export function Slideshow({ slides, playOnInit = true, interval = 5000, classNam
                       ? 'opacity-100 ease-linear animate-in slide-in-from-left'
                       : 'ease-out animate-out fade-out',
                   )}
-                  key={`progress-${playCount}`} // Force the animation to restart when pressing "Play", to match animation with embla's autoplay timer
+                  key={`progress-${playCount}`}
                   style={{
                     animationDuration: index === selectedIndex ? `${interval}ms` : '200ms',
                     width: `${150 / slides.length}px`,
