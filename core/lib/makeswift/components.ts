@@ -1,5 +1,6 @@
 import './components/accordion/register';
 import './components/button-link/register';
+import './components/category-grid/register';
 import './components/card/register';
 import './components/card-carousel/register';
 import './components/carousel/register';

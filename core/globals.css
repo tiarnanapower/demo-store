@@ -30,6 +30,49 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
+  /* Navigation — DNA.fi flat white bar style */
+  --nav-background: hsl(0 0% 100%);
+  --nav-border: hsl(0 0% 92%);
+  --nav-link-text: hsl(0 0% 7%);
+  --nav-link-text-hover: hsl(327 100% 44%);
+  --nav-link-background: transparent;
+  --nav-link-background-hover: hsl(327 100% 96%);
+  --nav-group-text: hsl(0 0% 7%);
+  --nav-group-text-hover: hsl(327 100% 44%);
+  --nav-group-background: transparent;
+  --nav-group-background-hover: hsl(327 100% 96%);
+  --nav-button-icon: hsl(0 0% 15%);
+  --nav-button-icon-hover: hsl(327 100% 44%);
+  --nav-button-background: transparent;
+  --nav-button-background-hover: hsl(327 100% 96%);
+  --nav-cart-count-background: hsl(327 100% 44%);
+  --nav-cart-count-text: hsl(0 0% 100%);
+  --nav-focus: hsl(327 100% 44%);
+
+  /* Footer — DNA.fi clean neutral footer */
+  --footer-background: hsl(0 0% 98%);
+  --footer-border-top: hsl(0 0% 90%);
+  --footer-section-title: hsl(0 0% 7%);
+  --footer-link: hsl(0 0% 35%);
+  --footer-link-hover: hsl(327 100% 44%);
+  --footer-copyright: hsl(0 0% 50%);
+  --footer-social-icon: hsl(0 0% 40%);
+  --footer-social-icon-hover: hsl(327 100% 44%);
+  --footer-focus: hsl(327 100% 44%);
+
+  /* Slideshow — DNA hero style */
+  --slideshow-mask: hsl(0 0% 7% / 65%);
+  --slideshow-background: hsl(0 0% 7%);
+  --slideshow-title-font-family: var(--font-family-heading);
+
+  /* Category grid */
+  --category-grid-background: hsl(0 0% 100%);
+  --category-grid-label: hsl(0 0% 7%);
+  --category-grid-item-background: hsl(0 0% 97%);
+  --category-grid-item-background-hover: hsl(327 100% 97%);
+  --category-grid-item-border: hsl(0 0% 90%);
+  --category-grid-focus: hsl(327 100% 44%);
+
   /* B2B Buyer portal Z index variables */
   --z-index-IFRAME: 12000;
   --z-index-BASE: 12001;
