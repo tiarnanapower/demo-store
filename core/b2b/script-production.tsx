@@ -11,14 +11,51 @@ interface Props {
   token?: string;
   environment: 'staging' | 'production';
   cartId?: string | null;
-  bcGraphqlDomain?: string;
 }
 
-export function ScriptProduction({ cartId, storeHash, channelId, token, environment, bcGraphqlDomain }: Props) {
+export function ScriptProduction({ cartId, storeHash, channelId, token, environment }: Props) {
   useB2BAuth(token);
   useB2BCart(cartId);
 
   return (
+  //  <>
+  //         <Script>
+  //       {`
+  //         window.b3CheckoutConfig = {
+  //           routes: {
+  //             dashboard: '/account.php?action=order_status',
+  //           },
+  //         }
+  //         window.B3 = {
+  //           setting: {
+  //             store_hash: '${storeHash}',  
+  //             channel_id: ${channelId},
+  //           },
+  //           'dom.checkoutRegisterParentElement': '#checkout-app',
+  //           'dom.registerElement': '[href^="/login.php"], #checkout-customer-login, [href="/login.php"] .navUser-item-loginLabel, #checkout-customer-returning .form-legend-container [href="#"]',
+  //           'dom.openB3Checkout': 'checkout-customer-continue',
+  //           before_login_goto_page: '/account.php?action=order_status',
+  //           checkout_super_clear_session: 'true',
+  //           'dom.navUserLoginElement': '.navUser-item.navUser-item--account',
+  //         }
+  //       `}
+  //     </Script>
+  //     <Script
+  //       type="module"
+  //       crossOrigin=""
+  //         src="https://demostoreb2b.netlify.app/index.C-1RMyzg.js"
+  //     ></Script>
+  //     <Script
+  //       noModule
+  //       crossOrigin=""
+  //       src="https://demostoreb2b.netlify.app/polyfills-legacy.D32xEujE.js"
+  //     ></Script>
+  //     <Script
+  //       noModule
+  //       crossOrigin=""
+  //       src="https://demostoreb2b.netlify.app/index-legacy.I7pICwj-.js"
+  //     ></Script>
+  //   </>
     <>
       <Script id="b2b-config">
         {`
@@ -28,7 +65,6 @@ export function ScriptProduction({ cartId, storeHash, channelId, token, environm
                 channel_id: ${channelId},
                 platform: 'catalyst',
                 cart_url: '/cart',
-                bc_graphql_domain: '${bcGraphqlDomain ?? 'mybigcommerce.com'}',
               }
             }
         `}
