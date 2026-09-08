@@ -1,11 +1,14 @@
-import { MemoryKvAdapter } from './adapters/memory';
+import { MemoryKvAdapter, SHARED_STORE_RECHECK_MS } from './adapters/memory';
 import { KvAdapter, SetCommandOptions } from './types';
 
 interface Config {
   logger?: boolean;
 }
 
-const memoryKv = new MemoryKvAdapter();
+// L1 in front of whichever adapter `createKVAdapter` selects. Expires so a
+// process periodically re-reads the shared store and picks up values other
+// processes wrote.
+const memoryKv = new MemoryKvAdapter({ ttlMs: SHARED_STORE_RECHECK_MS });
 
 class KV<Adapter extends KvAdapter> implements KvAdapter {
   private kv?: Adapter;
@@ -82,16 +85,11 @@ class KV<Adapter extends KvAdapter> implements KvAdapter {
 }
 
 async function createKVAdapter() {
-  if (process.env.BC_KV_REST_API_URL && process.env.BC_KV_REST_API_TOKEN) {
-    const { BcKvAdapter } = await import('./adapters/bc');
+  // Prioritize Runtime Cache for Vercel environments
+  if (process.env.VERCEL === '1') {
+    const { RuntimeCacheAdapter } = await import('./adapters/vercel-runtime-cache');
 
-    return new BcKvAdapter();
-  }
-
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-    const { VercelKvAdapter } = await import('./adapters/vercel');
-
-    return new VercelKvAdapter();
+    return new RuntimeCacheAdapter();
   }
 
   if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
@@ -100,6 +98,11 @@ async function createKVAdapter() {
     return new UpstashKvAdapter();
   }
 
+  // Deliberately unbounded, unlike the L1 above. This is the fallback when no
+  // shared store is configured, so there is nothing to re-read: expiring here
+  // would empty both layers together and leave `with-routes` with no cached
+  // value, sending every request past the window into its blocking origin
+  // fetch rather than its background refresh.
   return new MemoryKvAdapter();
 }
 

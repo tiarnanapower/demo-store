@@ -43,7 +43,17 @@
             "newPassword": "Nytt passord",
             "confirmPassword": "Bekreft passord",
             "passwordUpdated": "Passordet er oppdatert!",
-            "somethingWentWrong": "Noe gikk galt. Prøv igjen senere."
+            "somethingWentWrong": "Noe gikk galt. Prøv igjen senere.",
+            "FieldErrors": {
+                "passwordRequired": "Passord er påkrevd",
+                "passwordTooSmall": "Passordet må være minst {minLength, plural, =1 {1 character} other {# tegn}} langt",
+                "passwordLowercaseRequired": "Passordet må inneholde minst én liten bokstav",
+                "passwordUppercaseRequired": "Passordet må inneholde minst én stor bokstav",
+                "passwordNumberRequired": "Passordet må inneholde minst  {minNumbers, plural, =1 {ett tall} other {# tall}}",
+                "passwordSpecialCharacterRequired": "Passordet må inneholde minst ett spesialtegn",
+                "passwordsMustMatch": "Passordene stemmer ikke overens",
+                "confirmPasswordRequired": "Bekreft passordet ditt"
+            }
         },
         "Login": {
             "title": "Logg inn",
@@ -54,6 +64,14 @@
             "password": "Passord",
             "invalidCredentials": "E-postadressen eller passordet er feil. Prøv å logge på igjen, eller tilbakestill passordet ditt.",
             "somethingWentWrong": "Noe gikk galt. Prøv igjen senere.",
+            "passwordResetRequired": "Krever tilbakestilling av passord. Kontroller e-posten din for instruksjoner om hvordan du tilbakestiller passordet.",
+            "invalidToken": "Innloggingskoblingen din er ugyldig eller har utløpt. Prøv å logge inn igjen.",
+            "FieldErrors": {
+                "emailRequired": "E-post er påkrevd",
+                "emailInvalid": "Skriv inn en gyldig e-postadresse",
+                "passwordRequired": "Passord er påkrevd",
+                "invalidInput": "Sjekk inndataene dine og prøv igjen."
+            },
             "CreateAccount": {
                 "title": "Ny kunde?",
                 "accountBenefits": "Opprett en konto hos oss, så kan du:",
@@ -68,14 +86,37 @@
                 "title": "Glemt passord",
                 "subtitle": "Skriv inn e-posten som er knyttet til kontoen din nedenfor. Vi sender deg instruksjoner for å tilbakestille passordet ditt.",
                 "confirmResetPassword": "Hvis e-postadressen {email} er koblet til en konto i butikken vår, har vi sendt deg en e-post for tilbakestilling av passord. Sjekk innboksen og søppelpostmappen hvis du ikke ser den.",
-                "somethingWentWrong": "Noe gikk galt. Prøv igjen senere."
+                "somethingWentWrong": "Noe gikk galt. Prøv igjen senere.",
+                "FieldErrors": {
+                    "emailRequired": "E-post er påkrevd",
+                    "emailInvalid": "Skriv inn en gyldig e-postadresse"
+                }
             }
         },
         "Register": {
             "title": "Registrer deg for en konto",
             "heading": "Ny konto",
             "cta": "Opprett konto",
-            "somethingWentWrong": "Noe gikk galt. Prøv igjen senere."
+            "somethingWentWrong": "Noe gikk galt. Prøv igjen senere.",
+            "recaptchaRequired": "Fullfør reCAPTCHA-verifiseringen.",
+            "FieldErrors": {
+                "firstNameRequired": "Fornavn er påkrevd",
+                "lastNameRequired": "Etternavn er påkrevd",
+                "emailRequired": "E-post er påkrevd",
+                "emailInvalid": "Skriv inn en gyldig e-postadresse",
+                "passwordRequired": "Passord er påkrevd",
+                "passwordTooSmall": "Passordet må være minst {minLength, plural, =1 {1 character} other {# tegn}} langt",
+                "passwordLowercaseRequired": "Passordet må inneholde minst én liten bokstav",
+                "passwordUppercaseRequired": "Passordet må inneholde minst én stor bokstav",
+                "passwordNumberRequired": "Passordet må inneholde minst  {minNumbers, plural, =1 {ett tall} other {# tall}}",
+                "passwordSpecialCharacterRequired": "Passordet må inneholde minst ett spesialtegn",
+                "passwordsMustMatch": "Passordene stemmer ikke overens",
+                "addressLine1Required": "Adresselinje 1 er påkrevd",
+                "cityRequired": "By er påkrevd",
+                "countryRequired": "Land er påkrevd",
+                "stateRequired": "Delstat/provins er påkrevd",
+                "postalCodeRequired": "Postnummer er påkrevd"
+            }
         }
     },
     "Faceted": {
@@ -103,7 +144,8 @@
             "Empty": {
                 "title": "Beklager, ingen resultater for «{term}».",
                 "subtitle": "Prøv et nytt søk."
-            }
+            },
+            "semanticSearchPlaceholder": "Beskriv hva du leter etter"
         },
         "FacetedSearch": {
             "filters": "Filtre",
@@ -159,10 +201,19 @@
                 "summaryTotal": "Totalbeløp",
                 "destination": "Mål",
                 "destinationWithCount": "Destinasjon {number, number}/{total, number}",
+                "digitalDelivery": "Digital levering til {email}",
                 "subtotal": "Delsum",
                 "shipping": "Frakt",
                 "tax": "Avgift",
-                "orderSummary": "Bestillingssammendrag"
+                "orderSummary": "Bestillingssammendrag",
+                "paymentMethodsLabel": "{count, plural, =1 {Betalingsmåte} other {Betalingsmåter}}",
+                "paymentEndingInLabel": "Slutter på",
+                "PaymentMethods": {
+                    "creditCard": "Kredittkort",
+                    "giftCertificate": "Gavekort",
+                    "storeCredit": "Butikkreditt",
+                    "other": "Annet"
+                }
             }
         },
         "Addresses": {
@@ -177,6 +228,15 @@
             "somethingWentWrong": "Noe gikk galt. Prøv igjen senere.",
             "EmptyState": {
                 "title": "Du har ingen adresser"
+            },
+            "FieldErrors": {
+                "firstNameRequired": "Fornavn er påkrevd",
+                "lastNameRequired": "Etternavn er påkrevd",
+                "addressLine1Required": "Adresselinje 1 er påkrevd",
+                "cityRequired": "By er påkrevd",
+                "countryRequired": "Land er påkrevd",
+                "stateRequired": "Delstat/provins er påkrevd",
+                "postalCodeRequired": "Postnummer er påkrevd"
             }
         },
         "Settings": {
@@ -188,7 +248,30 @@
             "currentPassword": "Nåværende passord",
             "newPassword": "Nytt passord",
             "confirmPassword": "Bekreft passord",
-            "cta": "Oppdater"
+            "cta": "Oppdater",
+            "NewsletterSubscription": {
+                "title": "Markedsføringsinnstillinger",
+                "label": "Abonner på nyhetsbrevet vårt.",
+                "marketingPreferencesUpdated": "Markedsføringsinnstillingene er oppdatert!",
+                "somethingWentWrong": "Noe gikk galt. Prøv igjen senere."
+            },
+            "FieldErrors": {
+                "firstNameRequired": "Fornavn er påkrevd",
+                "firstNameTooSmall": "Fornavnet må være minst 2 tegn langt",
+                "lastNameRequired": "Etternavn er påkrevd",
+                "lastNameTooSmall": "Etternavnet må være minst 2 tegn langt",
+                "emailRequired": "E-post er påkrevd",
+                "emailInvalid": "Skriv inn en gyldig e-postadresse",
+                "currentPasswordRequired": "Gjeldende passord kreves",
+                "passwordRequired": "Passord er påkrevd",
+                "passwordTooSmall": "Passordet må være minst {minLength, plural, =1 {1 character} other {# tegn}} langt",
+                "passwordLowercaseRequired": "Passordet må inneholde minst én liten bokstav",
+                "passwordUppercaseRequired": "Passordet må inneholde minst én stor bokstav",
+                "passwordNumberRequired": "Passordet må inneholde minst  {minNumbers, plural, =1 {ett tall} other {# tall}}",
+                "passwordSpecialCharacterRequired": "Passordet må inneholde minst ett spesialtegn",
+                "passwordsMustMatch": "Passordene stemmer ikke overens",
+                "confirmPasswordRequired": "Bekreft passordet ditt"
+            }
         }
     },
     "Wishlist": {
@@ -342,21 +425,29 @@
         "removeItem": "Fjern vare",
         "cartCombined": "Vi la merke til at du hadde varer lagret i en tidligere handlekurv, så vi har lagt dem til i din nåværende handlekurv for deg.",
         "cartRestored": "Du startet en handlekurv på en annen enhet, og vi har gjenopprettet den her, slik at du kan fortsette der du slapp.",
+        "cartUpdateInProgress": "Du har en handlekurvoppdatering i gang. Er du sikker på at du vil forlate denne siden? Endringene kan gå tapt.",
+        "originalPrice": "Opprinnelig pris var {price}.",
+        "currentPrice": "Nåværende pris er {price}.",
+        "quantityReadyToShip": "{antall, number} klar til sending",
+        "quantityOnBackorder": "{antall, nummer} vil være restordre",
+        "partiallyAvailable": "Kun {antall, number} tilgjengelig",
         "CheckoutSummary": {
             "title": "Sammendrag",
             "subTotal": "Delsum",
             "discounts": "Rabatter",
             "tax": "Avgift",
+            "totalIncludesTax": "Inkludert {tax} avgift",
             "total": "Totalbeløp",
             "CouponCode": {
                 "apply": "Bruk",
                 "couponCode": "Kupongkode",
                 "removeCouponCode": "Fjern kupongkode",
                 "invalidCouponCode": "Skriv inn en gyldig kupongkode",
-                "cartNotFound": "Ingen cartId-informasjonskapsel ble funnet."
+                "cartNotFound": "Det oppsto en feil da du hentet handlekurven din"
             },
             "Shipping": {
                 "shipping": "Frakt",
+                "shippingExcludingTax": "Frakt (ekskl. avgift)",
                 "add": "Legg til",
                 "change": "Endre",
                 "cancel": "Avbryt",
@@ -370,9 +461,20 @@
                 "shippingOptions": "Fraktalternativer",
                 "updateShipping": "Oppdater forsendelse",
                 "addShipping": "Legg til forsendelse",
-                "cartNotFound": "Ingen cartId-informasjonskapsel ble funnet.",
-                "noShippingOptions": "Det finnes ingen tilgjengelige forsendelsesalternativer for adressen din"
+                "cartNotFound": "Det oppsto en feil da du hentet handlekurven din",
+                "noShippingOptions": "Det finnes ingen tilgjengelige forsendelsesalternativer for adressen din",
+                "countryRequired": "Land er påkrevd"
             }
+        },
+        "GiftCertificate": {
+            "giftCertificate": "Gavekort",
+            "giftCertificateCode": "Gavekortkode",
+            "removeGiftCertificate": "Fjern gavekortet",
+            "apply": "Bruk",
+            "to": "Til",
+            "message": "Melding",
+            "invalidGiftCertificate": "Skriv inn en gyldig gavekortkode",
+            "cartNotFound": "Det oppsto en feil da du hentet handlekurven din"
         },
         "Empty": {
             "title": "Handlekurven din er tom.",
@@ -380,7 +482,7 @@
             "cta": "Fortsett å handle"
         },
         "Errors": {
-            "cartNotFound": "Ingen cartId-informasjonskapsel ble funnet.",
+            "cartNotFound": "Det oppsto en feil da du hentet handlekurven din",
             "lineItemNotFound": "Linjeelement ikke funnet.",
             "failedToUpdateQuantity": "Kan ikke oppdatere antall.",
             "somethingWentWrong": "Noe gikk galt. Prøv igjen senere."
@@ -401,6 +503,8 @@
         "otherDetails": "Andre detaljer",
         "noOtherDetails": "Det er ingen andre detaljer.",
         "viewOptions": "Vis alternativer",
+        "showMore": "Vis mer",
+        "showLess": "Vis mindre",
         "successMessage": "{cartItems, plural, =1 {1 vare} other {# varer}} lagt til i <cartLink>handlekurven din</cartLink>",
         "missingCart": "Handlekurv ikke funnet. Prøv på nytt senere.",
         "unknownError": "Ukjent feil. Prøv på nytt senere."
@@ -419,6 +523,16 @@
             "decreaseNumber": "Reduser tall",
             "thumbnail": "Vis bildets nummer",
             "additionalInformation": "Mer informasjon",
+            "currentStock": "{antall, nummer} på lager",
+            "backorderQuantity": "{antall, nummer} vil være restordre",
+            "maxPurchasableQuantity": "Maksimalt kjøpsantall er {quantity, number}. Juster, og prøv igjen.",
+            "loadingMoreImages": "Laster inn flere bilder",
+            "imagesLoaded": "{count, plural, =1 {1 bilde til ble lastet inn} other {# flere bilder ble lastet inn}}",
+            "playVideo": "Spill av video",
+            "viewVideo": "Vis video",
+            "videosTitle": "Videoer",
+            "hideVideos": "Skjul videoer",
+            "showVideos": "Vis videoer",
             "Submit": {
                 "addToCart": "Legg i handlekurv",
                 "outOfStock": "Utsolgt",
@@ -446,7 +560,31 @@
             "title": "Anmeldelser",
             "empty": "Ingen anmeldelser har blitt lagt til for dette produktet.",
             "previous": "Tidligere anmeldelser",
-            "next": "Neste anmeldelser"
+            "next": "Neste anmeldelser",
+            "Form": {
+                "button": "Skriv en anmeldelse",
+                "title": "Skriv en anmeldelse",
+                "submit": "Send inn",
+                "cancel": "Avbryt",
+                "ratingLabel": "Vurdering",
+                "titleLabel": "Tittel",
+                "reviewLabel": "Anmeldelse",
+                "nameLabel": "Navn",
+                "emailLabel": "E-post",
+                "successMessage": "Din anmeldelse er sendt inn!",
+                "somethingWentWrong": "Noe gikk galt. Prøv igjen senere.",
+                "recaptchaRequired": "Fullfør reCAPTCHA-verifiseringen.",
+                "FieldErrors": {
+                    "titleRequired": "Tittel er påkrevd",
+                    "authorRequired": "Navn er påkrevd",
+                    "emailRequired": "E-post er påkrevd",
+                    "emailInvalid": "Skriv inn en gyldig e-postadresse",
+                    "textRequired": "Gjennomgang er nødvendig",
+                    "ratingRequired": "Vurdering er påkrevd",
+                    "ratingTooSmall": "Vurderingen må være minst 1",
+                    "ratingTooLarge": "Vurderingen må være maksimalt 5"
+                }
+            }
         }
     },
     "WebPages": {
@@ -466,7 +604,8 @@
                 "email": "E-post",
                 "comments": "Kommentarer/spørsmål",
                 "cta": "Send inn skjema",
-                "somethingWentWrong": "Noe gikk galt. Prøv igjen senere."
+                "somethingWentWrong": "Noe gikk galt. Prøv igjen senere.",
+                "recaptchaRequired": "Fullfør reCAPTCHA-verifiseringen."
             }
         }
     },
@@ -487,13 +626,17 @@
         "search": "Søk"
     },
     "Components": {
+        "ProductCard": {
+            "moreOffers": "+{count, plural, =1 {# flere tilbud} other {# flere tilbud}}"
+        },
         "Header": {
             "home": "Hjem",
             "toggleNavigation": "Veksle navigasjon",
             "Icons": {
                 "account": "Profil",
                 "cart": "Handlekurv",
-                "search": "Åpne popup-vinduet for søk"
+                "search": "Åpne popup-vinduet for søk",
+                "giftCertificates": "Gavekort"
             },
             "SwitchCurrency": {
                 "label": "Bytt valuta",
@@ -517,13 +660,132 @@
             "socialMediaLinks": "Lenker til sosiale medier",
             "categories": "Kategorier",
             "brands": "merker",
-            "navigate": "Naviger"
+            "navigate": "Naviger",
+            "giftCertificates": "Gavekort"
         },
         "Subscribe": {
             "title": "Meld deg på nyhetsbrevet vårt",
             "placeholder": "Skriv inn epostadressen din",
             "description": "Hold deg oppdatert med de siste nyhetene og tilbudene fra butikken vår.",
-            "success": "Takk for interessen! Nyhetsbrevfunksjonen kommer snart!"
+            "subscribedToNewsletter": "Du har abonnert på nyhetsbrevet vårt.",
+            "Errors": {
+                "emailRequired": "E-post er påkrevd",
+                "invalidEmail": "Skriv inn en gyldig e-postadresse",
+                "somethingWentWrong": "Noe gikk galt. Prøv igjen senere."
+            }
+        },
+        "ConsentManager": {
+            "Common": {
+                "rejectAll": "Avvis alle",
+                "acceptAll": "Aksepter alle",
+                "customize": "Tilpass",
+                "save": "Lagre innstillinger"
+            },
+            "CookieBanner": {
+                "title": "Vi verdsetter personvernet ditt",
+                "description": "Dette nettstedet bruker informasjonskapsler for å forbedre nettopplevelsen, analysere trafikken på nettstedet, og vise personlig tilpasset innhold.",
+                "privacyPolicy": "Personvernerklæring"
+            },
+            "Dialog": {
+                "title": "Personverninnstillinger",
+                "description": "Tilpass personverninnstillingene dine her. Du kan velge hvilke typer informasjonskapsler og sporingsteknologier du ønsker å tillate."
+            },
+            "ConsentTypes": {
+                "necessary": {
+                    "title": "Strengt nødvendig",
+                    "description": "Disse informasjonskapslene er avgjørende for at nettsiden skal fungere skikkelig og kan ikke deaktiveres."
+                },
+                "functionality": {
+                    "title": "Funksjonalitet",
+                    "description": "Disse informasjonskapslene muliggjør forbedret funksjonalitet og personalisering av nettstedet."
+                },
+                "marketing": {
+                    "title": "Markedsføring",
+                    "description": "Disse informasjonskapslene brukes til å levere relevante annonser og spore effektiviteten deres."
+                },
+                "measurement": {
+                    "title": "Analyse",
+                    "description": "Disse informasjonskapslene hjelper oss med å forstå hvordan besøkende samhandler med nettstedet og forbedre ytelsen."
+                },
+                "experience": {
+                    "title": "Løsning",
+                    "description": "Disse informasjonskapslene hjelper oss med å gi en bedre brukeropplevelse og teste nye funksjoner."
+                }
+            }
+        },
+        "Price": {
+            "originalPrice": "Opprinnelig pris var {price}.",
+            "currentPrice": "Nåværende pris er {price}.",
+            "range": "Pris fra {minValue} til {maxValue}.",
+            "includingTax": "(Inkl. avgift)",
+            "excludingTax": "(Ekskl. avgift)",
+            "includingTaxFull": "Inkludert avgifter",
+            "excludingTaxFull": "Ekskludert avgifter"
+        }
+    },
+    "GiftCertificates": {
+        "title": "Gavekort",
+        "description": "Gi den perfekte gaven som aldri går av moten. La venner og kjære velge akkurat det de ønsker fra hele kolleksjonen vår.",
+        "purchaseLabel": "Kjøp nå",
+        "checkBalanceLabel": "Sjekk saldo",
+        "expiresAtLabel": "Gyldig til og med",
+        "CheckBalance": {
+            "title": "Sjekk saldo",
+            "description": "Du kan sjekke saldoen og få informasjon om gavekortet ved å skrive inn koden i boksen nedenfor.",
+            "inputLabel": "Kode",
+            "inputPlaceholder": "XXX-XXX-XXX-XXX",
+            "purchasedDateLabel": "Kjøpt",
+            "senderLabel": "Fra",
+            "Errors": {
+                "invalidCode": "Gavekortkoden du skrev inn er ugyldig. Sjekk koden og prøv igjen.",
+                "codeRequired": "Vennligst skriv inn en gavekortkode.",
+                "somethingWentWrong": "Noe gikk galt. Prøv igjen senere."
+            }
+        },
+        "Purchase": {
+            "breadcrumbTitle": "Kjøp et gavekort",
+            "title": "Digitalt gavekort",
+            "description": "Utforsk gavekortene våre, perfekte for enhver anledning. Velg beløpet og tilpass meldingen.",
+            "successMessage": "Gavekort ble lagt til <cartLink> i handlekurven</cartLink>",
+            "missingCart": "Handlekurv ikke funnet. Prøv på nytt senere.",
+            "unknownError": "Ukjent feil. Prøv på nytt senere.",
+            "Form": {
+                "amountLabel": "Beløp",
+                "customAmountLabel": "Beløp (mellom {minAmount} og {maxAmount})",
+                "selectAmountPlaceholder": "Velg et beløp",
+                "customAmountPlaceholder": "Skriv inn egendefinert beløp",
+                "senderNameLabel": "Navnet ditt",
+                "senderEmailLabel": "E-postadressen din",
+                "recipientNameLabel": "Mottakers navn",
+                "recipientEmailLabel": "Mottakers e-postadresse",
+                "namePlaceholder": "Skriv inn et navn",
+                "emailPlaceholder": "Skriv inn e-post",
+                "messageLabel": "Melding",
+                "messagePlaceholder": "Skriv inn melding (valgfritt)",
+                "nonRefundableCheckboxLabel": "Jeg godtar at gavekort ikke kan refunderes",
+                "expiryCheckboxLabel": "Jeg erkjenner at dette gavekortet utløper {expiryDate}",
+                "ctaLabel": "Legg i handlekurv",
+                "Errors": {
+                    "amountRequired": "Velg eller skriv inn et gavekortbeløp",
+                    "amountInvalid": "Velg et gyldig gavekortbeløp",
+                    "amountOutOfRange": "Skriv inn et beløp mellom {minAmount} og {maxAmount}",
+                    "unexpectedSettingsError": "Det oppstod en uventet feil under henting av innstillinger for gavekort. Prøv på nytt senere.",
+                    "senderNameRequired": "Ditt navn er påkrevd",
+                    "senderEmailRequired": "Din e-postadresse er påkrevd",
+                    "recipientNameRequired": "Mottakerens navn er obligatorisk",
+                    "recipientEmailRequired": "Mottakerens e-postadresse er obligatorisk",
+                    "emailInvalid": "Skriv inn en gyldig e-postadresse",
+                    "checkboxRequired": "Du må krysse av i denne boksen for å fortsette"
+                }
+            }
+        }
+    },
+    "Form": {
+        "optional": "valgfri",
+        "recaptchaRequired": "Fullfør reCAPTCHA-verifiseringen.",
+        "Errors": {
+            "invalidInput": "Sjekk inndataene dine og prøv igjen",
+            "invalidFormat": "Den angitte verdien samsvarer ikke med det nødvendige formatet"
         }
     }
 }

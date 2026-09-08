@@ -1,5 +1,231 @@
 # Changelog
 
+## 1.11.0
+
+### Minor Changes
+
+- Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.11.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/46ddb22fc9935530b9062dfd8a6a4c74f74956e7/core/CHANGELOG.md#1110).
+
+## 1.10.0
+
+### Minor Changes
+
+- Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.10.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/85876866fdd785362ac260f3db892f23fc2a9707/core/CHANGELOG.md#1100).
+
+## 1.9.0
+
+### Minor Changes
+
+- Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.9.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/da09e6304d1467ac6193f4d5eb07107a8933e0dc/core/CHANGELOG.md#190).
+
+## 1.8.0
+
+### Minor Changes
+
+- [#3149](https://github.com/bigcommerce/catalyst/pull/3149) [`71cff26`](https://github.com/bigcommerce/catalyst/commit/71cff26b2ac31e55dfb333360cf9e278bcf61040) Thanks [@chanceaclark](https://github.com/chanceaclark)! - Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.8.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/829c3c5cd2e6b46b39d11252a2b2e42edda23468/core/CHANGELOG.md#180).
+
+## 1.7.0
+
+### Minor Changes
+
+- Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.7.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/c0ccea448eb99171a7505671d5f956a611512750/core/CHANGELOG.md#170).
+
+## 1.6.0
+
+### Minor Changes
+
+- Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.6.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/7daf598c469e8f8792504bb013111293ee0765fe/core/CHANGELOG.md#160).
+
+## 1.5.0
+
+### Minor Changes
+
+- Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.5.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/74b0917ff728ad8d04dc3085c31826976351c81d/core/CHANGELOG.md#150).
+
+## 1.4.0
+
+### Minor Changes
+
+- Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.4.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/f9844766e36d4734fb3b11175766e84bca6ffc99/core/CHANGELOG.md#140).
+
+## 1.3.0
+
+### Minor Changes
+
+- Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.3.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/664e69f39e3895c798d4308d547537683cf4a016/core/CHANGELOG.md#130).
+
+## 1.2.0
+
+### Minor Changes
+
+- Pulls in changes from the `@bigcommerce/catalyst-makeswift@1.2.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/bedf1d69634e598a7bdced426afaf6ce686f98fc/core/CHANGELOG.md#120).
+
+### Patch Changes
+
+- [#3080](https://github.com/bigcommerce/catalyst/pull/3080) [`4f145b9`](https://github.com/bigcommerce/catalyst/commit/4f145b90f2852b3f3e27bb93dc757068ffbf50d1) Thanks [@shan-pandian](https://github.com/shan-pandian)! - Fix B2B company registration to correctly resolve the Storefront GraphQL API domain.
+  - Add configurable `BIGCOMMERCE_GRAPHQL_API_DOMAIN` (defaults to `mybigcommerce.com`) and pass it through to the B2B script loader for both dev and production, fixing registration failures on non-production BigCommerce domains
+  - Fix swapped `data-channelid`/`data-storehash` attributes in the dev script.
+
+## 1.1.3
+
+### Patch Changes
+
+- [#2772](https://github.com/bigcommerce/catalyst/pull/2772) [`2670f4d`](https://github.com/bigcommerce/catalyst/commit/2670f4d0837d843e425a179bff588119f689567f) Thanks [@chanceaclark](https://github.com/chanceaclark)! - Catalyst has been upgraded to Next.js 15.5.9. This is a patch version upgrade that requires migration steps for existing stores to fix a security vulnerability.
+
+  ## 🔒 Security Update
+
+  **This upgrade addresses a security vulnerability ([CVE-2025-55184 + CVE-2025-55183](https://nextjs.org/blog/security-update-2025-12-11))** that affects React Server Components. These vulnerabilities allow a Denial of Service attack and Source Code Exposure attach. This upgrade includes:
+  - Next.js 15.5.9 with the security patch
+  - React 19.1.4 and React DOM 19.1.4 with the security patch
+
+  **All users are strongly encouraged to upgrade immediately.**
+
+  ## Key Changes
+  - ⚡ **Next.js 15.5.9**: Upgraded from Next.js 15.5.7 to 15.5.9
+  - ⚛️ **React 19**: Upgraded to React 19.1.4 and React DOM 19.1.4
+
+  ## Migration Guide
+
+  ### Update Dependencies
+
+  If you're maintaining a custom Catalyst store, update your `package.json`:
+
+  ```json
+  {
+    "dependencies": {
+      "next": "15.5.9",
+      "react": "19.1.4",
+      "react-dom": "19.1.4"
+    },
+    "devDependencies": {
+      "@next/bundle-analyzer": "15.5.9",
+      "eslint-config-next": "15.5.9"
+    }
+  }
+  ```
+
+  Then run:
+
+  ```bash
+  pnpm install
+  ```
+
+## 1.1.2
+
+### Patch Changes
+
+- [#2762](https://github.com/bigcommerce/catalyst/pull/2762) [`7f3a184`](https://github.com/bigcommerce/catalyst/commit/7f3a184508acb50a09ecbdb811ec5ce34865e363) Thanks [@chanceaclark](https://github.com/chanceaclark)! - # Next.js 15.5.8 Upgrade
+
+  Catalyst has been upgraded to Next.js 15.5.8. This is a patch version upgrade that requires migration steps for existing stores to fix a security vulnerability.
+
+  ## 🔒 Critical Security Update
+
+  **This upgrade addresses a critical security vulnerability ([CVE-2025-55184 + CVE-2025-55183](https://nextjs.org/blog/security-update-2025-12-11))** that affects React Server Components. These vulnerabilities allow a Denial of Service attack and Source Code Exposure attach. This upgrade includes:
+  - Next.js 15.5.8 with the security patch
+  - React 19.1.3 and React DOM 19.1.3 with the security patch
+
+  **All users are strongly encouraged to upgrade immediately.**
+
+  ## Key Changes
+  - ⚡ **Next.js 15.5.8**: Upgraded from Next.js 15.5.7 to 15.5.8
+  - ⚛️ **React 19**: Upgraded to React 19.1.3 and React DOM 19.1.3
+
+  ## Migration Guide
+
+  ### Update Dependencies
+
+  If you're maintaining a custom Catalyst store, update your `package.json`:
+
+  ```json
+  {
+    "dependencies": {
+      "next": "15.5.8",
+      "react": "19.1.3",
+      "react-dom": "19.1.3"
+    },
+    "devDependencies": {
+      "@next/bundle-analyzer": "15.5.8",
+      "eslint-config-next": "15.5.8"
+    }
+  }
+  ```
+
+  Then run:
+
+  ```bash
+  pnpm install
+  ```
+
+## 1.1.1
+
+### Patch Changes
+
+Catalyst has been upgraded to Next.js 15.5.7. This is a patch version upgrade that requires migration steps for existing stores to fix a security vulnerability.
+
+## 🔒 Critical Security Update
+
+**This upgrade addresses a critical security vulnerability ([CVE-2025-55182](https://react.dev/blog/2025/12/03/critical-security-vulnerability-in-react-server-components))** that affects React Server Components. The vulnerability allowed unauthenticated remote code execution on servers running React Server Components. This upgrade includes:
+
+- Next.js 15.5.7 with the security patch
+- React 19.1.2 and React DOM 19.1.2 with the security patch
+
+**All users are strongly encouraged to upgrade immediately.**
+
+## Key Changes
+
+- ⚡ **Next.js 15.5.7**: Upgraded from Next.js 15.5.1-canary.4 to 15.5.7 (no more canary)
+- ⚛️ **React 19**: Upgraded to React 19.1.2 and React DOM 19.1.2
+- 🔄 **Partial Prerendering (PPR) Removed**: Removed partial prerendering as it's unsupported in non-canary versions of Next.js 15.
+
+### ⚠️ Partial Prerendering (PPR) Removed
+
+**Important**: PPR (Partial Prerendering) has been **removed** in this release as it's unsupported in non-canary versions of Next.js 15.
+
+- The `ppr` experimental flag has been removed from `next.config.ts`
+- Full support for Next.js 16's and it's new cache component patterns will be added in a future release
+- This may result in different performance characteristics compared to the Next.js 15 + PPR setup
+
+## Migration Guide
+
+### Step 1: Update Dependencies
+
+If you're maintaining a custom Catalyst store, update your `package.json`:
+
+```json
+{
+  "dependencies": {
+    "next": "15.5.7",
+    "react": "^19.1.2",
+    "react-dom": "^19.1.2"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "15.5.7",
+    "eslint-config-next": "15.5.7"
+  }
+}
+```
+
+Then run:
+
+```bash
+pnpm install
+```
+
+### Step 2: Update next.config.ts
+
+Remove or comment out PPR configuration:
+
+```typescript
+// Remove or disable:
+// experimental: {
+//   ppr: 'incremental',
+// }
+```
+
+### Step 3: Remove `export const experimental_ppr`
+
+Remove any references to `export const experimental_ppr` in your codebase as it is not being used anymore.
+
 ## 1.1.0
 
 ### Minor Changes

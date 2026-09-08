@@ -34,7 +34,7 @@ const UpdateCartCurrencyMutation = graphql(`
   }
 `);
 
-export const updateCartCurrency = async (cartId: string, currencyCode: CurrencyCode) => {
+const updateCartCurrency = async (cartId: string, currencyCode: CurrencyCode) => {
   const result = await client.fetch({
     document: UpdateCartCurrencyMutation,
     variables: { input: { data: { currencyCode }, cartEntityId: cartId } },
@@ -64,7 +64,7 @@ export const switchCurrency = async (_prevState: SubmissionResult | null, payloa
   if (cartId) {
     await updateCartCurrency(cartId, submission.value.id)
       .then(() => {
-        revalidateTag(TAGS.cart);
+        revalidateTag(TAGS.cart, { expire: 0 });
       })
       .catch((error: unknown) => {
         // eslint-disable-next-line no-console

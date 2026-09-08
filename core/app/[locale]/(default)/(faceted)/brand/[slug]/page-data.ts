@@ -9,6 +9,7 @@ const BrandPageQuery = graphql(`
     site {
       brand(entityId: $entityId) {
         name
+        path
         seo {
           pageTitle
           metaDescription
@@ -16,10 +17,24 @@ const BrandPageQuery = graphql(`
         }
       }
       settings {
+        inventory {
+          defaultOutOfStockMessage
+          showOutOfStockMessage
+          showBackorderMessage
+        }
         storefront {
           catalog {
             productComparisonsEnabled
           }
+        }
+        display {
+          showProductRating
+        }
+        reviews {
+          enabled
+        }
+        tax {
+          plp
         }
       }
     }

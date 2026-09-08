@@ -1,8 +1,8 @@
+import { getSiteVersion } from '@makeswift/runtime/next/server';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { clsx } from 'clsx';
 import type { Metadata } from 'next';
-import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
@@ -20,13 +20,15 @@ import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { WebAnalyticsFragment } from '~/components/analytics/fragment';
 import { AnalyticsProvider } from '~/components/analytics/provider';
+import { ConsentManager } from '~/components/consent-manager';
+import { ScriptsFragment } from '~/components/consent-manager/scripts-fragment';
 import { ContainerQueryPolyfill } from '~/components/polyfills/container-query';
-import { ScriptManagerScripts, ScriptsFragment } from '~/components/scripts';
-import { routing } from '~/i18n/routing';
+import { scriptsTransformer } from '~/data-transformers/scripts-transformer';
+import { getLocaleRouting } from '~/i18n/locale-config';
+import { LocaleRoutingProvider } from '~/i18n/locale-routing-provider';
 import { SiteTheme } from '~/lib/makeswift/components/site-theme';
 import { MakeswiftProvider } from '~/lib/makeswift/provider';
-
-import { getToastNotification } from '../../lib/server-toast';
+import { getToastNotification } from '~/lib/server-toast';
 
 import '~/lib/makeswift/components';
 
@@ -35,6 +37,13 @@ const RootLayoutMetadataQuery = graphql(
     query RootLayoutMetadataQuery {
       site {
         settings {
+          url {
+            vanityUrl
+          }
+          privacy {
+            cookieConsentEnabled
+            privacyPolicyUrl
+          }
           storeName
           seo {
             pageTitle
@@ -69,7 +78,21 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const { pageTitle, metaDescription, metaKeywords } = data.site.settings?.seo || {};
 
+  const vanityUrl = data.site.settings?.url.vanityUrl;
+
+  // Use preview deployment URL so metadataBase (canonical, og:url) points at the preview, not production.
+  let baseUrl: URL | undefined;
+  const previewUrl =
+    process.env.VERCEL_ENV === 'preview' ? `https://${process.env.VERCEL_URL}` : undefined;
+
+  if (previewUrl && URL.canParse(previewUrl)) {
+    baseUrl = new URL(previewUrl);
+  } else if (vanityUrl && URL.canParse(vanityUrl)) {
+    baseUrl = new URL(vanityUrl);
+  }
+
   return {
+    metadataBase: baseUrl,
     title: {
       template: `%s - ${storeName}`,
       default: pageTitle || storeName,
@@ -107,10 +130,13 @@ interface Props extends PropsWithChildren {
 export default async function RootLayout({ params, children }: Props) {
   const { locale } = await params;
 
-  const { data } = await fetchRootLayoutMetadata();
+  const rootData = await fetchRootLayoutMetadata();
   const toastNotificationCookieData = await getToastNotification();
+  const siteVersion = await getSiteVersion();
 
-  if (!routing.locales.includes(locale)) {
+  const localeRouting = await getLocaleRouting();
+
+  if (!localeRouting.locales.includes(locale)) {
     notFound();
   }
 
@@ -118,41 +144,53 @@ export default async function RootLayout({ params, children }: Props) {
   // https://next-intl-docs.vercel.app/docs/getting-started/app-router#add-setRequestLocale-to-all-layouts-and-pages
   setRequestLocale(locale);
 
+  const scripts = scriptsTransformer(rootData.data.site.content.scripts);
+  const isCookieConsentEnabled =
+    rootData.data.site.settings?.privacy?.cookieConsentEnabled ?? false;
+  const privacyPolicyUrl = rootData.data.site.settings?.privacy?.privacyPolicyUrl;
+
   return (
-    <MakeswiftProvider previewMode={(await draftMode()).isEnabled}>
+    <MakeswiftProvider locale={locale} siteVersion={siteVersion}>
       <html className={clsx(fonts.map((f) => f.variable))} lang={locale}>
         <head>
           <SiteTheme />
-          <ScriptManagerScripts
-            scripts={data.site.content.headerScripts}
-            strategy="afterInteractive"
-          />
         </head>
         <body className="flex min-h-screen flex-col">
           <NextIntlClientProvider>
-            <NuqsAdapter>
-              <AnalyticsProvider channelId={data.channel.entityId} settings={data.site.settings}>
-                <Providers>
-                  {toastNotificationCookieData && (
-                    <CookieNotifications {...toastNotificationCookieData} />
-                  )}
-                  {children}
-                </Providers>
-              </AnalyticsProvider>
-            </NuqsAdapter>
-            <B2BLoader />
+            <LocaleRoutingProvider localeRouting={localeRouting}>
+              <ConsentManager
+                isCookieConsentEnabled={isCookieConsentEnabled}
+                privacyPolicyUrl={privacyPolicyUrl}
+                scripts={scripts}
+              >
+                <NuqsAdapter>
+                  <AnalyticsProvider
+                    channelId={rootData.data.channel.entityId}
+                    isCookieConsentEnabled={isCookieConsentEnabled}
+                    settings={rootData.data.site.settings}
+                  >
+                    <Providers>
+                      {toastNotificationCookieData && (
+                        <CookieNotifications {...toastNotificationCookieData} />
+                      )}
+                      {children}
+                    </Providers>
+                  </AnalyticsProvider>
+                </NuqsAdapter>
+              </ConsentManager>
+              <B2BLoader />
+            </LocaleRoutingProvider>
           </NextIntlClientProvider>
           <VercelComponents />
           <ContainerQueryPolyfill />
-          <ScriptManagerScripts scripts={data.site.content.footerScripts} strategy="lazyOnload" />
         </body>
       </html>
     </MakeswiftProvider>
   );
 }
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
+// Intentionally no `generateStaticParams`: every route under `[locale]` already renders on demand
+// (the tree reads cookies), so it would only add a build-time dependency on the locale list, and
+// anything it did prerender would bake in stale subfolder prefixes.
 
 export const fetchCache = 'default-cache';

@@ -8,7 +8,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { schema } from '@/vibes/soul/sections/sign-in-section/schema';
 import { signIn } from '~/auth';
-import { redirect } from '~/i18n/routing';
+import { redirect } from '~/i18n/navigation-server';
 import { getCartId } from '~/lib/cart';
 
 export const login = async (
@@ -48,6 +48,16 @@ export const login = async (
       error.type === 'CallbackRouteError' &&
       error.cause &&
       error.cause.err instanceof BigCommerceGQLError &&
+      error.cause.err.message.includes('Reset password"')
+    ) {
+      return submission.reply({ formErrors: [t('passwordResetRequired')] });
+    }
+
+    if (
+      error instanceof AuthError &&
+      error.type === 'CallbackRouteError' &&
+      error.cause &&
+      error.cause.err instanceof BigCommerceGQLError &&
       error.cause.err.message.includes('Invalid credentials')
     ) {
       return submission.reply({ formErrors: [t('invalidCredentials')] });
@@ -56,5 +66,5 @@ export const login = async (
     return submission.reply({ formErrors: [t('somethingWentWrong')] });
   }
 
-  return redirect({ href: redirectTo, locale });
+  return await redirect({ href: redirectTo, locale });
 };

@@ -46,7 +46,17 @@ declare const messages: {
       "newPassword": "New password",
       "confirmPassword": "Confirm password",
       "passwordUpdated": "Password has been updated successfully!",
-      "somethingWentWrong": "Something went wrong. Please try again later."
+      "somethingWentWrong": "Something went wrong. Please try again later.",
+      "FieldErrors": {
+        "passwordRequired": "Password is required",
+        "passwordTooSmall": "Password must be at least {minLength, plural, =1 {1 character} other {# characters}} long",
+        "passwordLowercaseRequired": "Password must contain at least one lowercase letter",
+        "passwordUppercaseRequired": "Password must contain at least one uppercase letter",
+        "passwordNumberRequired": "Password must contain at least {minNumbers, plural, =1 {one number} other {# numbers}}",
+        "passwordSpecialCharacterRequired": "Password must contain at least one special character",
+        "passwordsMustMatch": "The passwords do not match",
+        "confirmPasswordRequired": "Please confirm your password"
+      }
     },
     "Login": {
       "title": "Login",
@@ -57,6 +67,14 @@ declare const messages: {
       "password": "Password",
       "invalidCredentials": "Your email address or password is incorrect. Try signing in again or reset your password",
       "somethingWentWrong": "Something went wrong. Please try again later.",
+      "passwordResetRequired": "Password reset required. Please check your email for instructions to reset your password.",
+      "invalidToken": "Your login link is invalid or has expired. Please try logging in again.",
+      "FieldErrors": {
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email address",
+        "passwordRequired": "Password is required",
+        "invalidInput": "Please check your input and try again."
+      },
       "CreateAccount": {
         "title": "New customer?",
         "accountBenefits": "Create an account with us and you'll be able to:",
@@ -71,14 +89,37 @@ declare const messages: {
         "title": "Forgot password",
         "subtitle": "Enter the email associated with your account below. We'll send you instructions to reset your password.",
         "confirmResetPassword": "If the email address {email} is linked to an account in our store, we have sent you a password reset email. Please check your inbox and spam folder if you don't see it.",
-        "somethingWentWrong": "Something went wrong. Please try again later."
+        "somethingWentWrong": "Something went wrong. Please try again later.",
+        "FieldErrors": {
+          "emailRequired": "Email is required",
+          "emailInvalid": "Please enter a valid email address"
+        }
       }
     },
     "Register": {
       "title": "Register account",
       "heading": "New account",
       "cta": "Create account",
-      "somethingWentWrong": "Something went wrong. Please try again later."
+      "somethingWentWrong": "Something went wrong. Please try again later.",
+      "recaptchaRequired": "Please complete the reCAPTCHA verification.",
+      "FieldErrors": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email address",
+        "passwordRequired": "Password is required",
+        "passwordTooSmall": "Password must be at least {minLength, plural, =1 {1 character} other {# characters}} long",
+        "passwordLowercaseRequired": "Password must contain at least one lowercase letter",
+        "passwordUppercaseRequired": "Password must contain at least one uppercase letter",
+        "passwordNumberRequired": "Password must contain at least {minNumbers, plural, =1 {one number} other {# numbers}}",
+        "passwordSpecialCharacterRequired": "Password must contain at least one special character",
+        "passwordsMustMatch": "The passwords do not match",
+        "addressLine1Required": "Address line 1 is required",
+        "cityRequired": "City is required",
+        "countryRequired": "Country is required",
+        "stateRequired": "State/Province is required",
+        "postalCodeRequired": "Postal code is required"
+      }
     }
   },
   "Faceted": {
@@ -106,7 +147,8 @@ declare const messages: {
       "Empty": {
         "title": "Sorry, no results for \"{term}\".",
         "subtitle": "Please try another search."
-      }
+      },
+      "semanticSearchPlaceholder": "Describe what you're looking for"
     },
     "FacetedSearch": {
       "filters": "Filters",
@@ -162,10 +204,19 @@ declare const messages: {
         "summaryTotal": "Total",
         "destination": "Destination",
         "destinationWithCount": "Destination {number, number}/{total, number}",
+        "digitalDelivery": "Digital delivery to {email}",
         "subtotal": "Subtotal",
         "shipping": "Shipping",
         "tax": "Tax",
-        "orderSummary": "Order summary"
+        "orderSummary": "Order summary",
+        "paymentMethodsLabel": "{count, plural, =1 {Payment method} other {Payment methods}}",
+        "paymentEndingInLabel": "ending in",
+        "PaymentMethods": {
+          "creditCard": "Credit card",
+          "giftCertificate": "Gift certificate",
+          "storeCredit": "Store credit",
+          "other": "Other"
+        }
       }
     },
     "Addresses": {
@@ -180,6 +231,15 @@ declare const messages: {
       "somethingWentWrong": "Something went wrong. Please try again later.",
       "EmptyState": {
         "title": "You don't have any addresses"
+      },
+      "FieldErrors": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "addressLine1Required": "Address line 1 is required",
+        "cityRequired": "City is required",
+        "countryRequired": "Country is required",
+        "stateRequired": "State/Province is required",
+        "postalCodeRequired": "Postal code is required"
       }
     },
     "Settings": {
@@ -191,7 +251,30 @@ declare const messages: {
       "currentPassword": "Current password",
       "newPassword": "New password",
       "confirmPassword": "Confirm password",
-      "cta": "Update"
+      "cta": "Update",
+      "NewsletterSubscription": {
+        "title": "Marketing preferences",
+        "label": "Subscribe to our newsletter.",
+        "marketingPreferencesUpdated": "Marketing preferences have been updated successfully!",
+        "somethingWentWrong": "Something went wrong. Please try again later."
+      },
+      "FieldErrors": {
+        "firstNameRequired": "First name is required",
+        "firstNameTooSmall": "First name must be at least 2 characters long",
+        "lastNameRequired": "Last name is required",
+        "lastNameTooSmall": "Last name must be at least 2 characters long",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email address",
+        "currentPasswordRequired": "Current password is required",
+        "passwordRequired": "Password is required",
+        "passwordTooSmall": "Password must be at least {minLength, plural, =1 {1 character} other {# characters}} long",
+        "passwordLowercaseRequired": "Password must contain at least one lowercase letter",
+        "passwordUppercaseRequired": "Password must contain at least one uppercase letter",
+        "passwordNumberRequired": "Password must contain at least {minNumbers, plural, =1 {one number} other {# numbers}}",
+        "passwordSpecialCharacterRequired": "Password must contain at least one special character",
+        "passwordsMustMatch": "The passwords do not match",
+        "confirmPasswordRequired": "Please confirm your password"
+      }
     }
   },
   "Wishlist": {
@@ -343,23 +426,32 @@ declare const messages: {
     "increment": "Increase quantity",
     "decrement": "Decrease quantity",
     "removeItem": "Remove item",
+    "addToQuoteFromCart": "Add cart to quote",
     "cartCombined": "We noticed you had items saved in a previous cart, so we've added them to your current cart for you.",
     "cartRestored": "You started a cart on another device, and we've restored it here so you can pick up where you left off.",
+    "cartUpdateInProgress": "You have a cart update in progress. Are you sure you want to leave this page? Your changes may be lost.",
+    "originalPrice": "Original price was {price}.",
+    "currentPrice": "Current price is {price}.",
+    "quantityReadyToShip": "{quantity, number} ready to ship",
+    "quantityOnBackorder": "{quantity, number} will be backordered",
+    "partiallyAvailable": "Only {quantity, number} available",
     "CheckoutSummary": {
       "title": "Summary",
       "subTotal": "Subtotal",
       "discounts": "Discounts",
       "tax": "Tax",
+      "totalIncludesTax": "Includes {tax} tax",
       "total": "Total",
       "CouponCode": {
         "apply": "Apply",
         "couponCode": "Coupon code",
         "removeCouponCode": "Remove coupon code",
         "invalidCouponCode": "Please enter a valid coupon code",
-        "cartNotFound": "No cartId cookie found."
+        "cartNotFound": "An error occurred when retrieving your cart"
       },
       "Shipping": {
         "shipping": "Shipping",
+        "shippingExcludingTax": "Shipping (Ex. Tax)",
         "add": "Add",
         "change": "Change",
         "cancel": "Cancel",
@@ -373,9 +465,20 @@ declare const messages: {
         "shippingOptions": "Shipping options",
         "updateShipping": "Update shipping",
         "addShipping": "Add shipping",
-        "cartNotFound": "No cartId cookie found.",
-        "noShippingOptions": "There are no shipping options available for your address"
+        "cartNotFound": "An error occurred when retrieving your cart",
+        "noShippingOptions": "There are no shipping options available for your address",
+        "countryRequired": "Country is required"
       }
+    },
+    "GiftCertificate": {
+      "giftCertificate": "Gift certificate",
+      "giftCertificateCode": "Gift certificate code",
+      "removeGiftCertificate": "Remove gift certificate",
+      "apply": "Apply",
+      "to": "To",
+      "message": "Message",
+      "invalidGiftCertificate": "Please enter a valid gift certificate code",
+      "cartNotFound": "An error occurred when retrieving your cart"
     },
     "Empty": {
       "title": "Your cart is empty.",
@@ -383,7 +486,7 @@ declare const messages: {
       "cta": "Continue shopping"
     },
     "Errors": {
-      "cartNotFound": "No cartId cookie found.",
+      "cartNotFound": "An error occurred when retrieving your cart",
       "lineItemNotFound": "Line item not found.",
       "failedToUpdateQuantity": "Failed to update quantity.",
       "somethingWentWrong": "Something went wrong. Please try again later."
@@ -404,6 +507,8 @@ declare const messages: {
     "otherDetails": "Other details",
     "noOtherDetails": "There are no other details.",
     "viewOptions": "View options",
+    "showMore": "Show more",
+    "showLess": "Show less",
     "successMessage": "{cartItems, plural, =1 {1 item} other {# items}} added to <cartLink> your cart</cartLink>",
     "missingCart": "Cart not found. Please try again later.",
     "unknownError": "Unknown error. Please try again later."
@@ -424,6 +529,16 @@ declare const messages: {
       "additionalInformation": "Additional information",
       "addToQuote": "Add to quote",
       "addToShoppingList": "Add to shopping list",
+      "currentStock": "{quantity, number} in stock",
+      "backorderQuantity": "{quantity, number} will be on backorder",
+      "maxPurchasableQuantity": "The maximum purchasable quantity is {quantity, number}. Please adjust and try again.",
+      "loadingMoreImages": "Loading more images",
+      "imagesLoaded": "{count, plural, =1 {1 more image loaded} other {# more images loaded}}",
+      "playVideo": "Play video",
+      "viewVideo": "View video",
+      "videosTitle": "Videos",
+      "hideVideos": "Hide videos",
+      "showVideos": "Show videos",
       "Submit": {
         "addToCart": "Add to cart",
         "outOfStock": "Out of stock",
@@ -451,7 +566,31 @@ declare const messages: {
       "title": "Reviews",
       "empty": "No reviews have been added for this product.",
       "previous": "Previous reviews",
-      "next": "Next reviews"
+      "next": "Next reviews",
+      "Form": {
+        "button": "Write a review",
+        "title": "Write a review",
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "ratingLabel": "Rating",
+        "titleLabel": "Title",
+        "reviewLabel": "Review",
+        "nameLabel": "Name",
+        "emailLabel": "Email",
+        "successMessage": "Your review has been submitted successfully!",
+        "somethingWentWrong": "Something went wrong. Please try again later.",
+        "recaptchaRequired": "Please complete the reCAPTCHA verification.",
+        "FieldErrors": {
+          "titleRequired": "Title is required",
+          "authorRequired": "Name is required",
+          "emailRequired": "Email is required",
+          "emailInvalid": "Please enter a valid email address",
+          "textRequired": "Review is required",
+          "ratingRequired": "Rating is required",
+          "ratingTooSmall": "Rating must be at least 1",
+          "ratingTooLarge": "Rating must be at most 5"
+        }
+      }
     }
   },
   "WebPages": {
@@ -471,7 +610,8 @@ declare const messages: {
         "email": "Email",
         "comments": "Comments/questions",
         "cta": "Submit form",
-        "somethingWentWrong": "Something went wrong. Please try again later."
+        "somethingWentWrong": "Something went wrong. Please try again later.",
+        "recaptchaRequired": "Please complete the reCAPTCHA verification."
       }
     }
   },
@@ -492,13 +632,17 @@ declare const messages: {
     "search": "Search"
   },
   "Components": {
+    "ProductCard": {
+      "moreOffers": "+{count, plural, =1 {# more offer} other {# more offers}}"
+    },
     "Header": {
       "home": "Home",
       "toggleNavigation": "Toggle navigation",
       "Icons": {
         "account": "Profile",
         "cart": "Cart",
-        "search": "Open search popup"
+        "search": "Open search popup",
+        "giftCertificates": "Gift certificates"
       },
       "SwitchCurrency": {
         "label": "Switch currency",
@@ -522,16 +666,132 @@ declare const messages: {
       "socialMediaLinks": "Social media links",
       "categories": "Categories",
       "brands": "Brands",
-      "navigate": "Navigate"
+      "navigate": "Navigate",
+      "giftCertificates": "Gift certificates"
     },
     "Subscribe": {
       "title": "Sign up for our newsletter",
       "placeholder": "Enter your email",
       "description": "Stay up to date with the latest news and offers from our store.",
-      "success": "Thank you for your interest! Newsletter feature is coming soon!"
+      "subscribedToNewsletter": "You have been subscribed to our newsletter!",
+      "Errors": {
+        "emailRequired": "Email is required",
+        "invalidEmail": "Please enter a valid email address",
+        "somethingWentWrong": "Something went wrong. Please try again later."
+      }
     },
-    "AddToQuoteButton": {
-      "addCartToQuote": "Add cart to quote"
+    "ConsentManager": {
+      "Common": {
+        "rejectAll": "Reject All",
+        "acceptAll": "Accept All",
+        "customize": "Customize",
+        "save": "Save Settings"
+      },
+      "CookieBanner": {
+        "title": "We value your privacy",
+        "description": "This site uses cookies to improve your browsing experience, analyze site traffic, and show personalized content.",
+        "privacyPolicy": "Privacy Policy"
+      },
+      "Dialog": {
+        "title": "Privacy Settings",
+        "description": "Customize your privacy settings here. You can choose which types of cookies and tracking technologies you would like to allow."
+      },
+      "ConsentTypes": {
+        "necessary": {
+          "title": "Strictly Necessary",
+          "description": "These cookies are essential for the website to function properly and cannot be disabled."
+        },
+        "functionality": {
+          "title": "Functionality",
+          "description": "These cookies enable enhanced functionality and personalization of the website."
+        },
+        "marketing": {
+          "title": "Marketing",
+          "description": "These cookies are used to deliver relevant advertisements and track their effectiveness."
+        },
+        "measurement": {
+          "title": "Analytics",
+          "description": "These cookies help us understand how visitors interact with the website and improve its performance."
+        },
+        "experience": {
+          "title": "Experience",
+          "description": "These cookies help us provide a better user experience and test new features."
+        }
+      }
+    },
+    "Price": {
+      "originalPrice": "Original price was {price}.",
+      "currentPrice": "Current price is {price}.",
+      "range": "Price from {minValue} to {maxValue}.",
+      "includingTax": "(Inc. Tax)",
+      "excludingTax": "(Ex. Tax)",
+      "includingTaxFull": "Including Tax",
+      "excludingTaxFull": "Excluding Tax"
+    }
+  },
+  "GiftCertificates": {
+    "title": "Gift certificates",
+    "description": "Give the perfect gift that never goes out of style. Let friends and loved ones choose exactly what they want from our entire collection.",
+    "purchaseLabel": "Shop now",
+    "checkBalanceLabel": "Check balance",
+    "expiresAtLabel": "Valid thru",
+    "CheckBalance": {
+      "title": "Check balance",
+      "description": "You can check the balance and get the information about your gift certificate by typing the code in the box below.",
+      "inputLabel": "Code",
+      "inputPlaceholder": "xxx-xxx-xxx-xxx",
+      "purchasedDateLabel": "Purchased",
+      "senderLabel": "From",
+      "Errors": {
+        "invalidCode": "The gift certificate code you entered is invalid. Please check the code and try again.",
+        "codeRequired": "Please enter a gift certificate code.",
+        "somethingWentWrong": "Something went wrong. Please try again later."
+      }
+    },
+    "Purchase": {
+      "breadcrumbTitle": "Purchase a gift certificate",
+      "title": "Digital gift certificate",
+      "description": "Explore our gift certificates, perfect for any occasion. Choose the amount and personalize your message.",
+      "successMessage": "Gift certificate has been added to <cartLink> your cart</cartLink>",
+      "missingCart": "Cart not found. Please try again later.",
+      "unknownError": "Unknown error. Please try again later.",
+      "Form": {
+        "amountLabel": "Amount",
+        "customAmountLabel": "Amount (between {minAmount} and {maxAmount})",
+        "selectAmountPlaceholder": "Select an amount",
+        "customAmountPlaceholder": "Enter custom amount",
+        "senderNameLabel": "Your name",
+        "senderEmailLabel": "Your email",
+        "recipientNameLabel": "Recipient's name",
+        "recipientEmailLabel": "Recipient's email",
+        "namePlaceholder": "Enter name",
+        "emailPlaceholder": "Enter email",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Enter your message (optional)",
+        "nonRefundableCheckboxLabel": "I agree that Gift Certificates are non-refundable",
+        "expiryCheckboxLabel": "I acknowledge that this Gift Certificate will expire on {expiryDate}",
+        "ctaLabel": "Add to cart",
+        "Errors": {
+          "amountRequired": "Please select or enter a gift certificate amount",
+          "amountInvalid": "Please select a valid gift certificate amount",
+          "amountOutOfRange": "Please enter an amount between {minAmount} and {maxAmount}",
+          "unexpectedSettingsError": "An unexpected error occurred while retrieving gift certificate settings. Please try again later.",
+          "senderNameRequired": "Your name is required",
+          "senderEmailRequired": "Your email is required",
+          "recipientNameRequired": "Recipient's name is required",
+          "recipientEmailRequired": "Recipient's email is required",
+          "emailInvalid": "Please enter a valid email address",
+          "checkboxRequired": "You must check this box to continue"
+        }
+      }
+    }
+  },
+  "Form": {
+    "optional": "optional",
+    "recaptchaRequired": "Please complete the reCAPTCHA verification.",
+    "Errors": {
+      "invalidInput": "Please check your input and try again",
+      "invalidFormat": "The value entered does not match the required format"
     }
   }
 };

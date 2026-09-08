@@ -1,6 +1,31 @@
 {
   "name": "@bigcommerce/catalyst",
   "description": "Catalyst is BigCommerce's composable front-end framework designed for building custom ecommerce storefronts.",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "dotenv -e .env.local -- turbo run dev",
+    "build": "dotenv -e .env.local -- turbo run build",
+    "lint": "dotenv -e .env.local -- turbo lint",
+    "test": "turbo run test",
+    "test:scripts": "node --test .github/scripts/__tests__/*.test.mts",
+    "typecheck": "turbo typecheck",
+    "changeset:version": "changeset version && node .github/scripts/sync-catalyst-version.mts"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "1.17.3"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.29.4",
+    "@types/node": "^22.15.30",
+    "dotenv-cli": "^8.0.0",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.12",
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3",
+    "unlighthouse": "^0.16.3"
+  },
   "keywords": [
     "bigcommerce",
     "ecommerce",
@@ -10,24 +35,5 @@
     "nextjs"
   ],
   "license": "MIT",
-  "version": "0.1.0",
-  "private": true,
-  "packageManager": "pnpm@10.29.2+sha512.bef43fa759d91fd2da4b319a5a0d13ef7a45bb985a3d7342058470f9d2051a3ba8674e629672654686ef9443ad13a82da2beb9eeb3e0221c87b8154fff9d74b8",
-  "scripts": {
-    "dev": "dotenv -e .env.local -- turbo run dev",
-    "build": "dotenv -e .env.local -- turbo run build",
-    "lint": "dotenv -e .env.local -- turbo lint",
-    "test": "turbo run test",
-    "typecheck": "turbo typecheck"
-  },
-  "devDependencies": {
-    "@changesets/changelog-github": "^0.5.1",
-    "@changesets/cli": "^2.29.4",
-    "dotenv-cli": "^8.0.0",
-    "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.6.12",
-    "turbo": "^2.5.4",
-    "typescript": "^5.8.3",
-    "unlighthouse": "^0.16.3"
-  }
+  "packageManager": "pnpm@10.29.2+sha512.bef43fa759d91fd2da4b319a5a0d13ef7a45bb985a3d7342058470f9d2051a3ba8674e629672654686ef9443ad13a82da2beb9eeb3e0221c87b8154fff9d74b8"
 }

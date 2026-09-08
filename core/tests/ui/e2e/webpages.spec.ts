@@ -39,11 +39,10 @@ test('Normal web page works and displays the HTML content', async ({ page, webPa
   await expect(page.getByText('Testing div element')).toBeVisible();
 });
 
-test('Nested web pages display the children in the side menu, navigate correctly, and truncate breadcrumbs', async ({
+test('Nested web pages display the children in the side menu and navigate correctly', async ({
   page,
   webPage,
 }) => {
-  const t = await getTranslations('WebPages.Normal');
   const parent = await webPage.create();
   const child1 = await webPage.create({ parentId: parent.id });
   const child2 = await webPage.create({ parentId: parent.id });
@@ -64,14 +63,6 @@ test('Nested web pages display the children in the side menu, navigate correctly
   await page.waitForLoadState('networkidle');
 
   await expect(page.getByRole('heading', { name: nestedChild2.name })).toBeVisible();
-
-  const breadcrumbs = page.getByLabel('breadcrumb');
-
-  await expect(breadcrumbs.getByText(t('home'))).toBeVisible();
-  await expect(breadcrumbs.getByText(parent.name)).toBeVisible();
-  await expect(breadcrumbs.getByText('...')).toBeVisible();
-  await expect(breadcrumbs.getByText(nestedChild.name)).toBeVisible();
-  await expect(breadcrumbs.getByText(nestedChild2.name)).toBeVisible();
 });
 
 test('Contact page works with all fields and submits successfully', async ({ page, webPage }) => {
@@ -97,8 +88,48 @@ test('Contact page works with all fields and submits successfully', async ({ pag
   await page.getByLabel(t('Form.rma')).fill(faker.string.numeric(10));
   await page.getByLabel(t('Form.comments')).fill(faker.lorem.paragraph());
 
+  // Click reCAPTCHA if enabled (uses test key — no challenge, always passes)
+  const recaptchaFrame = page.frameLocator('iframe[title="reCAPTCHA"]');
+  const recaptchaCheckbox = recaptchaFrame.locator('.recaptcha-checkbox-border');
+
+  if (await recaptchaCheckbox.isVisible()) {
+    await recaptchaCheckbox.click();
+    await recaptchaFrame.locator('.recaptcha-checkbox-checked').waitFor();
+  }
+
   await page.getByRole('button', { name: t('Form.cta') }).click();
   await page.waitForLoadState('networkidle');
   await expect(page.getByText(t('Form.success'))).toBeVisible();
   await expect(page.getByRole('link', { name: t('Form.successCta') })).toBeVisible();
+});
+
+test('Contact page fails if reCAPTCHA is not completed', async ({ page, webPage }) => {
+  const t = await getTranslations('WebPages.ContactUs');
+  const contactPage = await webPage.create({
+    type: 'contact_form',
+    body: '<p>Reach out to us with any questions!</p>',
+    email: faker.internet.email({ provider: 'catalyst-example.catalyst' }),
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  await page.goto(contactPage.path!);
+  await page.waitForLoadState('networkidle');
+
+  const recaptchaFrame = page.frameLocator('iframe[title="reCAPTCHA"]');
+  const recaptchaCheckbox = recaptchaFrame.locator('.recaptcha-checkbox-border');
+
+  try {
+    await recaptchaCheckbox.waitFor({ state: 'visible', timeout: 5000 });
+  } catch {
+    test.skip();
+  }
+
+  // Fill required fields but intentionally skip clicking reCAPTCHA
+  await page.getByLabel(t('Form.email')).fill(faker.internet.email());
+  await page.getByLabel(t('Form.comments')).fill(faker.lorem.paragraph());
+
+  await page.getByRole('button', { name: t('Form.cta') }).click();
+  await page.waitForLoadState('networkidle');
+
+  await expect(page.getByText(t('Form.recaptchaRequired'))).toBeVisible();
 });

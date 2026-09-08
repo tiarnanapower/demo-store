@@ -248,18 +248,18 @@ const useProgressButton = (
   const onProgressButtonClick = useCallback(
     (index: number) => {
       if (!emblaApi) return;
-      emblaApi.scrollTo(index);
+      emblaApi.goTo(index);
       if (onButtonClick) onButtonClick(emblaApi);
     },
     [emblaApi, onButtonClick],
   );
 
   const onInit = useCallback((emblaAPI: EmblaCarouselType) => {
-    setScrollSnaps(emblaAPI.scrollSnapList());
+    setScrollSnaps(emblaAPI.snapList());
   }, []);
 
   const onSelect = useCallback((emblaAPI: EmblaCarouselType) => {
-    setSelectedIndex(emblaAPI.selectedScrollSnap());
+    setSelectedIndex(emblaAPI.selectedSnap());
   }, []);
 
   useEffect(() => {
@@ -268,7 +268,7 @@ const useProgressButton = (
     onInit(emblaApi);
     onSelect(emblaApi);
 
-    emblaApi.on('reInit', onInit).on('reInit', onSelect).on('select', onSelect);
+    emblaApi.on('reinit', onInit).on('reinit', onSelect).on('select', onSelect);
   }, [emblaApi, onInit, onSelect]);
 
   return {
@@ -313,7 +313,7 @@ export function Slideshow({
   showAutoplayControl = true,
 }: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 20 }, [
-    Autoplay({ delay: interval, playOnInit }),
+    Autoplay({ delay: interval, active: playOnInit }),
     Fade(),
   ]);
   const { selectedIndex, scrollSnaps, onProgressButtonClick } = useProgressButton(emblaApi);
@@ -352,7 +352,7 @@ export function Slideshow({
       .on('autoplay:stop', () => {
         setIsPlaying(false);
       })
-      .on('reInit', () => {
+      .on('reinit', () => {
         setIsPlaying(autoplay.isPlaying());
       });
   }, [emblaApi, playCount]);
@@ -393,7 +393,7 @@ export function Slideshow({
                     placeholder={
                       image.blurDataUrl != null && image.blurDataUrl !== '' ? 'blur' : 'empty'
                     }
-                    priority={idx === 0}
+                    preload={idx === 0}
                     sizes="100vw"
                     src={image.src}
                   />

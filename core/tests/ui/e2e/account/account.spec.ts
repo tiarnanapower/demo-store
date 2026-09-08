@@ -1,7 +1,7 @@
-import { defaultLocale } from '~/i18n/locales';
-import { testEnv } from '~/tests/environment';
 import { expect, test } from '~/tests/fixtures';
 import { getTranslations } from '~/tests/lib/i18n';
+import { isTestLocalePrefixed, withTestLocalePrefix } from '~/tests/lib/locale';
+import { TAGS } from '~/tests/tags';
 
 const accountUrls = [
   '/account/orders',
@@ -18,14 +18,19 @@ accountUrls.forEach((url) => {
 });
 
 accountUrls.forEach((url) => {
-  test(`${url} is restricted for guest users when explicitly browsing to the locale URL`, async ({
-    page,
-  }) => {
-    test.skip(testEnv.TESTS_LOCALE === defaultLocale);
+  test(
+    `${url} is restricted for guest users when explicitly browsing to the locale URL`,
+    { tag: TAGS.alternateLocale },
+    async ({ page }) => {
+      test.skip(!(await isTestLocalePrefixed()));
 
-    await page.goto(`/${testEnv.TESTS_LOCALE}/${url}`);
-    await expect(page).toHaveURL('/login/', { timeout: 1000 });
-  });
+      // The locale's configured subfolder, which is not necessarily `/${TESTS_LOCALE}` — next-intl
+      // treats a custom subfolder as a replacement for the bare locale code, not an alias, so
+      // hitting `/de/...` on a store configured as `/de-de` is a 404.
+      await page.goto(await withTestLocalePrefix(url));
+      await expect(page).toHaveURL('/login/', { timeout: 1000 });
+    },
+  );
 });
 
 test('Account page displays the menu items for each section', async ({ page, customer }) => {

@@ -5,6 +5,7 @@ import { PricingFragment } from '~/client/fragments/pricing';
 import { graphql, VariablesOf } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { FeaturedProductsCarouselFragment } from '~/components/featured-products-carousel/fragment';
+import { ProductVariantsInventoryFragment } from '~/components/product-variants-inventory/fragment';
 
 import { ProductSchemaFragment } from './_components/product-schema/fragment';
 import { ProductViewedFragment } from './_components/product-viewed/fragment';
@@ -111,7 +112,6 @@ export const ProductOptionsFragment = graphql(
             entityId
             displayName
             isRequired
-            isVariantOption
             ...MultipleChoiceFieldFragment
             ...CheckboxFieldFragment
             ...NumberFieldFragment
@@ -138,15 +138,17 @@ const ProductPageMetadataQuery = graphql(`
     site {
       product(entityId: $entityId) {
         name
+        path
         defaultImage {
           altText
-          url: urlTemplate(lossy: true)
+          url(width: 1200, lossy: true)
         }
         seo {
           pageTitle
           metaDescription
           metaKeywords
         }
+        path
         plainTextDescription(characterLimit: 1200)
       }
     }
@@ -170,6 +172,17 @@ const ProductQuery = graphql(
   `
     query ProductQuery($entityId: Int!) {
       site {
+        settings {
+          reviews {
+            enabled
+          }
+          display {
+            showProductRating
+          }
+          tax {
+            pdp
+          }
+        }
         product(entityId: $entityId) {
           entityId
           name
@@ -180,8 +193,17 @@ const ProductQuery = graphql(
           }
           reviewSummary {
             averageRating
+            numberOfReviews
           }
           description
+          featuredPromotions {
+            edges {
+              node {
+                entityId
+                text
+              }
+            }
+          }
           ...ProductOptionsFragment
         }
       }
@@ -198,8 +220,59 @@ export const getProduct = cache(async (entityId: number, customerAccessToken?: s
     fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
   });
 
-  return data.site.product;
+  return data.site;
 });
+
+const StreamableProductVariantInventoryBySkuQuery = graphql(`
+  query ProductVariantBySkuQuery($productId: Int!, $sku: String!) {
+    site {
+      product(entityId: $productId) {
+        variants(skus: [$sku]) {
+          edges {
+            node {
+              id
+              entityId
+              sku
+              inventory {
+                aggregated {
+                  availableToSell
+                  warningLevel
+                  availableOnHand
+                  availableForBackorder
+                  unlimitedBackorder
+                }
+                byLocation {
+                  edges {
+                    node {
+                      locationEntityId
+                      backorderMessage
+                    }
+                  }
+                }
+                isInStock
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`);
+
+type VariantInventoryVariables = VariablesOf<typeof StreamableProductVariantInventoryBySkuQuery>;
+
+export const getStreamableProductVariantInventory = cache(
+  async (variables: VariantInventoryVariables, customerAccessToken?: string) => {
+    const { data } = await client.fetch({
+      document: StreamableProductVariantInventoryBySkuQuery,
+      variables,
+      customerAccessToken,
+      fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate: 60 } },
+    });
+
+    return data.site.product?.variants;
+  },
+);
 
 const StreamableProductQuery = graphql(
   `
@@ -214,7 +287,12 @@ const StreamableProductQuery = graphql(
           optionValueIds: $optionValueIds
           useDefaultOptionSelections: $useDefaultOptionSelections
         ) {
-          images {
+          entityId
+          images(first: 12) {
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
             edges {
               node {
                 altText
@@ -226,6 +304,18 @@ const StreamableProductQuery = graphql(
           defaultImage {
             altText
             url: urlTemplate(lossy: true)
+          }
+          # Product videos. The Storefront GraphQL API only returns the video
+          # title and url (a YouTube watch URL); the dedicated PDP Videos section
+          # renders them via lite-youtube-embed. 25 covers realistic product
+          # video counts without needing pagination.
+          videos(first: 25) {
+            edges {
+              node {
+                title
+                url
+              }
+            }
           }
           sku
           weight {
@@ -245,12 +335,6 @@ const StreamableProductQuery = graphql(
           minPurchaseQuantity
           maxPurchaseQuantity
           warranty
-          inventory {
-            isInStock
-          }
-          availabilityV2 {
-            status
-          }
           ...ProductViewedFragment
           ...ProductSchemaFragment
         }
@@ -269,6 +353,57 @@ export const getStreamableProduct = cache(
       variables,
       customerAccessToken,
       fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
+    });
+
+    return data.site.product;
+  },
+);
+
+const StreamableProductInventoryQuery = graphql(
+  `
+    query StreamableProductInventoryQuery(
+      $entityId: Int!
+      $optionValueIds: [OptionValueId!]
+      $useDefaultOptionSelections: Boolean
+    ) {
+      site {
+        product(
+          entityId: $entityId
+          optionValueIds: $optionValueIds
+          useDefaultOptionSelections: $useDefaultOptionSelections
+        ) {
+          sku
+          inventory {
+            hasVariantInventory
+            isInStock
+            aggregated {
+              availableToSell
+              warningLevel
+              availableOnHand
+              availableForBackorder
+              unlimitedBackorder
+            }
+          }
+          availabilityV2 {
+            status
+          }
+          ...ProductVariantsInventoryFragment
+        }
+      }
+    }
+  `,
+  [ProductVariantsInventoryFragment],
+);
+
+type ProductInventoryVariables = VariablesOf<typeof StreamableProductInventoryQuery>;
+
+export const getStreamableProductInventory = cache(
+  async (variables: ProductInventoryVariables, customerAccessToken?: string) => {
+    const { data } = await client.fetch({
+      document: StreamableProductInventoryQuery,
+      variables,
+      customerAccessToken,
+      fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate: 60 } },
     });
 
     return data.site.product;
@@ -318,3 +453,31 @@ export const getProductPricingAndRelatedProducts = cache(
     return data.site.product;
   },
 );
+
+const InventorySettingsQuery = graphql(`
+  query InventorySettingsQuery {
+    site {
+      settings {
+        inventory {
+          defaultOutOfStockMessage
+          showOutOfStockMessage
+          stockLevelDisplay
+          showBackorderAvailabilityPrompt
+          backorderAvailabilityPrompt
+          showQuantityOnBackorder
+          showBackorderMessage
+        }
+      }
+    }
+  }
+`);
+
+export const getStreamableInventorySettingsQuery = cache(async (customerAccessToken?: string) => {
+  const { data } = await client.fetch({
+    document: InventorySettingsQuery,
+    customerAccessToken,
+    fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
+  });
+
+  return data.site.settings?.inventory;
+});

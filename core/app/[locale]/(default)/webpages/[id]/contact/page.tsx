@@ -8,10 +8,14 @@ import type { Field, FieldGroup } from '@/vibes/soul/form/dynamic-form/schema';
 import { Streamable } from '@/vibes/soul/lib/streamable';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import { Breadcrumb } from '@/vibes/soul/sections/breadcrumbs';
+import { getSessionCustomerAccessToken } from '~/auth';
 import {
   breadcrumbsTransformer,
   truncateBreadcrumbs,
 } from '~/data-transformers/breadcrumbs-transformer';
+import { getMakeswiftPageMetadata } from '~/lib/makeswift';
+import { getRecaptchaSiteKey } from '~/lib/recaptcha';
+import { getMetadataAlternates } from '~/lib/seo/canonical';
 
 import { WebPage, WebPageContent } from '../_components/web-page';
 
@@ -25,12 +29,7 @@ interface Props {
 
 interface ContactPage extends WebPage {
   entityId: number;
-  path: string;
   contactFields: string[];
-  reCaptchaSettings: {
-    isEnabledOnStorefront: boolean;
-    siteKey: string;
-  } | null;
 }
 
 const fieldMapping = {
@@ -43,9 +42,8 @@ const fieldMapping = {
 
 type ContactField = keyof typeof fieldMapping;
 
-const getWebPage = cache(async (id: string): Promise<ContactPage> => {
-  const data = await getWebpageData({ id: decodeURIComponent(id) });
-  const reCaptchaSettings = data.site.settings?.reCaptcha ?? null;
+const getWebPage = cache(async (id: string, customerAccessToken?: string): Promise<ContactPage> => {
+  const data = await getWebpageData({ id: decodeURIComponent(id) }, customerAccessToken);
   const webpage = data.node?.__typename === 'ContactPage' ? data.node : null;
 
   if (!webpage) {
@@ -62,15 +60,17 @@ const getWebPage = cache(async (id: string): Promise<ContactPage> => {
     content: webpage.htmlBody,
     contactFields: webpage.contactFields,
     seo: webpage.seo,
-    reCaptchaSettings,
   };
 });
 
-async function getWebPageBreadcrumbs(id: string): Promise<Breadcrumb[]> {
+async function getWebPageBreadcrumbs(
+  id: string,
+  customerAccessToken?: string,
+): Promise<Breadcrumb[]> {
   const t = await getTranslations('WebPages.ContactUs');
 
-  const webpage = await getWebPage(id);
-  const [, ...rest] = webpage.breadcrumbs.reverse();
+  const webpage = await getWebPage(id, customerAccessToken);
+  const [, ...rest] = [...webpage.breadcrumbs].reverse();
   const breadcrumbs = [
     {
       label: t('home'),
@@ -86,8 +86,12 @@ async function getWebPageBreadcrumbs(id: string): Promise<Breadcrumb[]> {
   return truncateBreadcrumbs(breadcrumbs, 5);
 }
 
-async function getWebPageWithSuccessContent(id: string, message: string) {
-  const webpage = await getWebPage(id);
+async function getWebPageWithSuccessContent(
+  id: string,
+  message: string,
+  customerAccessToken?: string,
+) {
+  const webpage = await getWebPage(id, customerAccessToken);
 
   return {
     ...webpage,
@@ -95,9 +99,9 @@ async function getWebPageWithSuccessContent(id: string, message: string) {
   };
 }
 
-async function getContactFields(id: string) {
+async function getContactFields(id: string, customerAccessToken?: string) {
   const t = await getTranslations('WebPages.ContactUs.Form');
-  const { entityId, path, contactFields } = await getWebPage(id);
+  const { entityId, path, contactFields } = await getWebPage(id, customerAccessToken);
   const toGroupsOfTwo = (fields: Field[]) =>
     fields.reduce<Array<FieldGroup<Field>>>((acc, _, i) => {
       if (i % 2 === 0) {
@@ -159,33 +163,40 @@ async function getContactFields(id: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const webpage = await getWebPage(id);
+  const { id, locale } = await params;
+  const customerAccessToken = await getSessionCustomerAccessToken();
+  const webpage = await getWebPage(id, customerAccessToken);
+  const makeswiftMetadata = await getMakeswiftPageMetadata({ path: webpage.path, locale });
   const { pageTitle, metaDescription, metaKeywords } = webpage.seo;
 
   return {
-    title: pageTitle || webpage.title,
-    description: metaDescription,
-    keywords: metaKeywords ? metaKeywords.split(',') : null,
+    title: makeswiftMetadata?.title || pageTitle || webpage.title,
+    ...((makeswiftMetadata?.description || metaDescription) && {
+      description: makeswiftMetadata?.description || metaDescription,
+    }),
+    ...(metaKeywords && { keywords: metaKeywords.split(',') }),
+    ...(webpage.path && {
+      alternates: await getMetadataAlternates({ path: webpage.path, locale }),
+    }),
   };
 }
 
 export default async function ContactPage({ params, searchParams }: Props) {
   const { id, locale } = await params;
   const { success } = await searchParams;
+  const customerAccessToken = await getSessionCustomerAccessToken();
 
   setRequestLocale(locale);
 
   const t = await getTranslations('WebPages.ContactUs.Form');
 
-  // TODO: Use reCaptcha
-  // const recaptchaSettings = await bypassReCaptcha(data.site.settings?.reCaptcha);
-
   if (success === 'true') {
     return (
       <WebPageContent
-        breadcrumbs={Streamable.from(() => getWebPageBreadcrumbs(id))}
-        webPage={Streamable.from(() => getWebPageWithSuccessContent(id, t('success')))}
+        breadcrumbs={Streamable.from(() => getWebPageBreadcrumbs(id, customerAccessToken))}
+        webPage={Streamable.from(() =>
+          getWebPageWithSuccessContent(id, t('success'), customerAccessToken),
+        )}
       >
         <ButtonLink
           className="mt-8 @2xl:mt-12 @4xl:mt-16"
@@ -200,15 +211,18 @@ export default async function ContactPage({ params, searchParams }: Props) {
     );
   }
 
+  const recaptchaSiteKey = await getRecaptchaSiteKey();
+
   return (
     <WebPageContent
-      breadcrumbs={Streamable.from(() => getWebPageBreadcrumbs(id))}
-      webPage={Streamable.from(() => getWebPage(id))}
+      breadcrumbs={Streamable.from(() => getWebPageBreadcrumbs(id, customerAccessToken))}
+      webPage={Streamable.from(() => getWebPage(id, customerAccessToken))}
     >
       <div className="mt-8 @2xl:mt-12 @4xl:mt-16">
         <DynamicForm
           action={submitContactForm}
-          fields={await getContactFields(id)}
+          fields={await getContactFields(id, customerAccessToken)}
+          recaptchaSiteKey={recaptchaSiteKey}
           submitLabel={t('cta')}
         />
       </div>

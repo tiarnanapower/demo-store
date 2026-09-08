@@ -1,11 +1,12 @@
 'use server';
 
-import { unstable_expirePath } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { getTranslations } from 'next-intl/server';
 
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql, VariablesOf } from '~/client/graphql';
+import { TAGS } from '~/client/tags';
 import { getCartId } from '~/lib/cart';
 
 import { removeItem } from './remove-item';
@@ -29,7 +30,7 @@ export type CartSelectedOptionsInput = ReturnType<
 type Variables = VariablesOf<typeof UpdateCartLineItemMutation>;
 type UpdateCartLineItemInput = Variables['input'];
 
-export interface UpdateProductQuantityParams extends CartLineItemInput {
+interface UpdateProductQuantityParams extends CartLineItemInput {
   lineItemEntityId: UpdateCartLineItemInput['lineItemEntityId'];
 }
 
@@ -87,7 +88,7 @@ export const updateQuantity = async ({
     throw new Error(t('failedToUpdateQuantity'));
   }
 
-  unstable_expirePath('/cart');
+  revalidateTag(TAGS.cart, { expire: 0 });
 
   return cart;
 };

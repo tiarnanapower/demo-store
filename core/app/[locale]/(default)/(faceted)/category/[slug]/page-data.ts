@@ -12,6 +12,8 @@ const CategoryPageQuery = graphql(
         category(entityId: $entityId) {
           entityId
           name
+          path
+          defaultProductSort
           ...BreadcrumbsFragment
           seo {
             pageTitle
@@ -35,10 +37,24 @@ const CategoryPageQuery = graphql(
           }
         }
         settings {
+          inventory {
+            defaultOutOfStockMessage
+            showOutOfStockMessage
+            showBackorderMessage
+          }
           storefront {
             catalog {
               productComparisonsEnabled
             }
+          }
+          display {
+            showProductRating
+          }
+          reviews {
+            enabled
+          }
+          tax {
+            plp
           }
         }
       }

@@ -10,6 +10,7 @@ const EnvironmentSchema = z.object({
   BIGCOMMERCE_CHANNEL_ID: z.string({ message: 'BIGCOMMERCE_CHANNEL_ID is required' }),
   LOCAL_BUYER_PORTAL_HOST: z.string().url().optional(),
   STAGING_B2B_CDN_ORIGIN: z.string().optional(),
+  BIGCOMMERCE_GRAPHQL_API_DOMAIN: z.string().optional().default('mybigcommerce.com'),
 });
 
 export async function B2BLoader() {
@@ -18,12 +19,14 @@ export async function B2BLoader() {
     BIGCOMMERCE_CHANNEL_ID,
     LOCAL_BUYER_PORTAL_HOST,
     STAGING_B2B_CDN_ORIGIN,
+    BIGCOMMERCE_GRAPHQL_API_DOMAIN,
   } = EnvironmentSchema.parse(process.env);
 
   const session = await auth();
   if (LOCAL_BUYER_PORTAL_HOST) {
     return (
       <ScriptDev
+        bcGraphqlDomain={BIGCOMMERCE_GRAPHQL_API_DOMAIN}
         cartId={session?.user?.cartId ?? undefined}
         channelId={BIGCOMMERCE_CHANNEL_ID}
         hostname={LOCAL_BUYER_PORTAL_HOST}
@@ -37,6 +40,7 @@ export async function B2BLoader() {
 
   return (
     <ScriptProduction
+      bcGraphqlDomain={BIGCOMMERCE_GRAPHQL_API_DOMAIN}
       cartId={session?.user?.cartId}
       channelId={BIGCOMMERCE_CHANNEL_ID}
       environment={environment}

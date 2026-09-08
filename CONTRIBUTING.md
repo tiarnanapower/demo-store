@@ -12,6 +12,31 @@ The default branch for this repository is called `canary`. This is the primary d
 
 To contribute to the `canary` branch, you can create a new branch off of `canary` and submit a PR against that branch.
 
+## GraphQL Schema Artifacts
+
+`pnpm run -r generate` downloads the GraphQL Storefront API schema for the channel in your
+`core/.env.local` and writes `core/bigcommerce.graphql` plus the gql.tada introspection type
+`core/bigcommerce-graphql.d.ts`. Run it after cloning, and again whenever you need to pick up schema
+changes — `pnpm run dev` and `pnpm run build` in `core/` also run it first.
+
+**Both files are gitignored in this repository** (see the root `.gitignore`). That is the opposite of
+the guidance we give merchants, who are told to commit them in
+[`core/README.md`](core/README.md#graphql-schema-and-types), and the difference is intentional:
+contributors regularly work against an unreleased Storefront API schema on their own test store, so a
+committed schema here would produce a stream of diffs that belong to nobody's change and conflict
+constantly between `canary` and the `integrations/*` branches. CI regenerates the files from store
+credentials before it lints and typechecks — see `.github/workflows/basic.yml`.
+
+Keep it that way when you touch `.gitignore`: the entries in the root `.gitignore` cover the
+monorepo, and `core/.gitignore` — which becomes the scaffolded project's `.gitignore` — must not
+gain them.
+
+## API Scope
+
+Catalyst is intended to work with the [BigCommerce Storefront GraphQL API](https://developer.bigcommerce.com/docs/storefront/graphql) and not directly integrate out of the box with the [REST Management API](https://developer.bigcommerce.com/docs/rest-management).
+
+You're welcome to integrate the REST Management API in your own fork, but we will not accept pull requests that incorporate or depend on the REST Management API. If your contribution requires Management API functionality, it is out of scope for this project.
+
 ## Makeswift Integration
 
 In addition to `canary`, we also maintain the `integrations/makeswift` branch, which contains additional code required to integrate with [Makeswift](https://www.makeswift.com).
@@ -26,25 +51,21 @@ Except for the additional code required to integrate with Makeswift, the `integr
 
 In order to complete the following steps, you will need to have met the following prerequisites:
 
-- You have a remote named `origin` pointing to the [`bigcommerce/catalyst` repository on GitHub](https://github.com/bigcommerce/catalyst). If you do not, you can add it with `git remote add origin ssh://git@github.com/bigcommerce/catalyst.git`, or if you are not using SSH, you can use `git remote add origin https://github.com/bigcommerce/catalyst.git`.
+- You have a remote named `origin` pointing to the [`bigcommerce/catalyst` repository on GitHub](https://github.com/bigcommerce/catalyst).
 - You have rights to push to the `integrations/makeswift` branch on GitHub.
 
 #### Steps
 
-To pull the latest code from `canary` into `integrations/makeswift`, follow the steps below:
-
-1. Ensure your local `canary` branch is synchronized with the remote `canary` branch:
+1. Fetch latest from `origin`
 
    ```bash
    git fetch origin
-   git checkout canary
-   git reset --hard origin/canary
    ```
 
-2. Fetch the latest code from `integrations/makeswift`:
+2. Create a branch to perform a merge from `canary`
 
    ```bash
-   git checkout -B integrations/makeswift origin/integrations/makeswift
+   git checkout -B sync-integrations-makeswift origin/integrations/makeswift
    ```
 
 > [!TIP]
@@ -53,72 +74,153 @@ To pull the latest code from `canary` into `integrations/makeswift`, follow the 
 > - If the local branch doesn't exist, it creates it from `origin/integrations/makeswift`
 > - If the local branch exists, it resets it to match `origin/integrations/makeswift`
 
-3. Checkout a new branch from `integrations/makeswift`:
-
-   ```bash
-   git checkout -b {new-branch-name}
-   ```
-
-4. Merge `canary` into `{new-branch-name}`, and resolve merge conflicts, if necessary:
+3. Merge `canary` and resolve merge conflicts, if necessary:
 
    ```bash
    git merge canary
    ```
 
 > [!WARNING]
-> There are a number of "gotchas" that you need to be aware of when merging `canary` into `integrations/makeswift`:
+> **Gotchas when merging canary into integrations/makeswift:**
 >
 > - The `name` field in `core/package.json` should remain `@bigcommerce/catalyst-makeswift`
 > - The `version` field in `core/package.json` should remain whatever the latest published `@bigcommerce/catalyst-makeswift` version was
-> - The `.changeset/` directory should not include any files that reference the `"@bigcommerce/catalyst-core"` package. If these files are merged into `integrations/makeswift`, they will cause the `Changesets Release` GitHub Action in `.github/workflows/changesets-release.yml` to fail with the error: `Error: Found changeset for package @bigcommerce/catalyst-core which is not in the workspace`
->
-> _Note: A [GitHub Action is in place](.github/workflows/prevent-invalid-changesets.yml) to help prevent invalid changesets from being merged into `integrations/makeswift`. Do not merge your PR if this GitHub Action fails._
+> - The latest release in `core/CHANGELOG.md` should remain whatever the latest published `@bigcommerce/catalyst-makeswift` version was
 
-5. After resolving any merge conflicts, open a new PR in GitHub to merge your `{new-branch-name}` into `integrations/makeswift`. This PR should be code reviewed and approved before the next steps.
+4. After resolving any merge conflicts, open a new PR in GitHub to merge your `sync-integrations-makeswift` into `integrations/makeswift`. This PR should be code reviewed and approved before the next steps.
 
-6. Once your PR is approved, the next step is to incorporate the merge commit from `{new-branch-name}` into `integrations/makeswift`. Do not use the merge button in the GitHub UI to merge your PR. Instead, you'll want to run the following command locally:
+5. Rebase `integrations/makeswift` to establish new merge base
 
    ```bash
-   git checkout integrations/makeswift
-   git rebase {new-branch-name}
+   git checkout -B integrations/makeswift origin/integrations/makeswift
+   git rebase sync-integrations-makeswift
    ```
 
-> [!IMPORTANT]
-> We have added a GitHub Ruleset to protect against this, but it's worth explicitly documenting here for posterity: It is very important that we do not "Squash and merge" or "Rebase and merge" our changes onto `integrations/makeswift`. Instead, we should either merge the PR with a traditional merge commit (the button in the GitHub PR UI should say "Merge pull request"), or locally rebase the `integrations/makeswift` branch onto the `{new-branch-name}` branch (as illustrated in the step above). Either of these options will correctly preserve the merge commit from step 4 in the history of the `integrations/makeswift` branch, which will then set the new merge base for future merges from `canary` into `integrations/makeswift`.
->
-> If you are unsure whether or not you've done this correctly, you can run `git merge canary` from `integrations/makeswift` after rebasing in the step above; if you see "Already up to date.", you followed the steps correctly (with one caveat: in the case that new commits have been pushed to `canary` since the last time you merged, then you may see a new merge commit/potential conflicts for only those new commits).
-
-7. Push the changes up to GitHub, which will automatically close the open PR from step 5.
+6. Push the changes up to GitHub:
 
    ```bash
    git push origin integrations/makeswift
    ```
 
-## Cutting new releases
+This should close the PR in GitHub automatically.
 
-This repository uses [Changesets](https://github.com/changesets/changesets) to manage version bumps, changelogs, and publishing to the NPM registry. Whenever you create a pull request, you should think about whether the changes you are making warrant a version bump or a changelog entry.
+> [!IMPORTANT]
+> Do not squash or rebase-and-merge PRs into `integrations/makeswift`. Always use a true merge commit or rebase locally (as shown below). This is to preserve the merge commit and establish a new merge base between `canary` and `integrations/makeswift`.
 
-If you are not sure, you can ask in the PR. Here are some examples:
+## B2B Integration
 
-- If your pull request introduces changes to the root `README.md`: _Likely does not warrant a version bump or changelog entry, therefore your PR does not need to include a Changeset._
-- If your pull request introduces changes to `core/`, e.g., `core/app/`, or any of the packages in `packages/`: _Likely warrants a version bump and changelog entry, therefore your PR should include a Changeset._
+In addition to `integrations/makeswift`, we also maintain the `integrations/b2b-makeswift` branch, which layers B2B Edition + Buyer Portal integration code on top of the Makeswift integration.
 
-You can run the following command to create a new version bump and changelog entry:
+To contribute to the `integrations/b2b-makeswift` branch, you can create a new branch off of `integrations/b2b-makeswift` and submit a PR against that branch.
 
-```bash
-pnpm changeset
-```
+### Keeping `integrations/b2b-makeswift` in sync with `integrations/makeswift`
 
-An interactive prompt will take you through the process of [adding your changeset](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md).
+Except for the additional code required for the B2B integration, the `integrations/b2b-makeswift` branch is a mirror of `integrations/makeswift` (not `canary` directly, since the B2B code builds on top of the Makeswift components/config). This means `integrations/b2b-makeswift` should be kept in sync with `integrations/makeswift` as much as possible.
 
-Once you've completed the interactive prompt, you'll see a new file in the `.changeset/` directory. This file contains the version bump and changelog entry for your changes. You should commit this file to the branch associated with your PR.
+The Claude Code skill `/sync-integration-branch` automates this process (target `integrations/b2b-makeswift`). The steps below describe what that skill does, for reference or for syncing manually.
 
-Once your PR is merged, our [GitHub Action](.github/workflows/changesets-release.yml) will handle the process of versioning and updating the changelog, (and in the case of `packages/`, publishing your changes to NPM). No further action is needed from you.
+#### Prerequisites
+
+In order to complete the following steps, you will need to have met the following prerequisites:
+
+- You have a remote named `origin` pointing to the [`bigcommerce/catalyst` repository on GitHub](https://github.com/bigcommerce/catalyst).
+- You have rights to push to the `integrations/b2b-makeswift` branch on GitHub.
+
+#### Steps
+
+1. Fetch latest from `origin`
+
+   ```bash
+   git fetch origin
+   ```
+
+2. Create a branch to perform a merge from `integrations/makeswift`
+
+   ```bash
+   git checkout -B sync-integrations-b2b-makeswift origin/integrations/b2b-makeswift
+   ```
+
+3. Merge `integrations/makeswift` and resolve merge conflicts, if necessary:
+
+   ```bash
+   git merge origin/integrations/makeswift
+   ```
 
 > [!WARNING]
-> It is very important that `.changeset/*.md` files targeting packages in `packages/` are not merged into the `integrations/makeswift` branch. While it is technically feasible to release packages from `integrations/makeswift`, we never want to do this. If we did this, we would need to sync the branches in the opposite direction, which was never intended to happen.
+> **Gotchas when merging `integrations/makeswift` into `integrations/b2b-makeswift`:**
 >
-> _Note: A [GitHub Action is in place](.github/workflows/prevent-invalid-changesets.yml) to help prevent invalid changesets from being merged into `integrations/makeswift`. Do not merge your PR if this GitHub Action fails._
+> - The `name` field in `core/package.json` should remain `@bigcommerce/catalyst-b2b-makeswift`
+> - The `version` field in `core/package.json` should remain whatever the latest published `@bigcommerce/catalyst-b2b-makeswift` version was
+> - The `.changeset/` directory should only include files that reference the `"@bigcommerce/catalyst-b2b-makeswift"` package (not `"@bigcommerce/catalyst-core"` or `"@bigcommerce/catalyst-makeswift"`). If files referencing other packages are merged into `integrations/b2b-makeswift`, they will cause the `Changesets Release` GitHub Action in `.github/workflows/changesets-release.yml` to fail with an error like: `Error: Found changeset for package @bigcommerce/catalyst-core which is not in the workspace`
+>
+> _Note: A [GitHub Action is in place](.github/workflows/prevent-invalid-changesets.yml) to help prevent invalid changesets from being merged into `integrations/b2b-makeswift`. Do not merge your PR if this GitHub Action fails._
+
+4. After resolving any merge conflicts, open a new PR in GitHub to merge your `sync-integrations-b2b-makeswift` into `integrations/b2b-makeswift`. This PR should be code reviewed and approved before the next steps.
+
+5. Rebase `integrations/b2b-makeswift` to establish new merge base
+
+   ```bash
+   git checkout -B integrations/b2b-makeswift origin/integrations/b2b-makeswift
+   git rebase sync-integrations-b2b-makeswift
+   ```
+
+6. Push the changes up to GitHub:
+
+   ```bash
+   git push origin integrations/b2b-makeswift
+   ```
+
+This should close the PR in GitHub automatically.
+
+> [!IMPORTANT]
+> Do not squash or rebase-and-merge PRs into `integrations/b2b-makeswift`. Always use a true merge commit or rebase locally (as shown below). This is to preserve the merge commit and establish a new merge base between `integrations/makeswift` and `integrations/b2b-makeswift`.
+
+## Cutting New Releases
+
+Catalyst uses [Changesets](https://github.com/changesets/changesets) to manage version bumps, changelogs, and publishing. Releases happen in **two stages**:
+
+1. Cut a release from `canary`
+2. Sync that release into `integrations/makeswift` and cut again
+
+This ensures `integrations/makeswift` remains a faithful mirror of `canary` while including its additional integration code.
+
+#### Stage 1: Cut a release from `canary`
+
+1. Begin the release process by merging the **Version Packages (`canary`)** PR. When `.changeset/` files exist on `canary`, a GitHub Action opens a **Version Packages (`canary`)** PR. This PR consolidates pending changesets, bumps versions, and updates changelogs. Merging this PR should publish new tags to GitHub, and optionally publish new package versions to NPM.
+
+#### Stage 2: Sync and Release `integrations/makeswift`
+
+2. Follow steps 1-6 under "[Keeping `integrations/makeswift` in sync with `canary`](#keeping-integrationsmakeswift-in-sync-with-canary)", with one addition: **include a changeset for `@bigcommerce/catalyst-makeswift` in the sync merge commit** rather than opening a separate PR for it afterwards.
+
+   - Match the bump type from Stage 1 (e.g., if `@bigcommerce/catalyst-core` went from `1.4.2` to `1.5.0`, use `minor`)
+   - Create a changeset file in `.changeset/` (e.g., `.changeset/sync-canary-1-5-0.md`):
+
+     ```
+     ---
+     "@bigcommerce/catalyst-makeswift": minor
+     ---
+
+     Pulls in changes from the `@bigcommerce/catalyst-core@1.5.0` release. For more information, see the [changelog entry](https://github.com/bigcommerce/catalyst/blob/<canary-sha>/core/CHANGELOG.md#150).
+     ```
+
+   - Replace `<canary-sha>` with the merge commit SHA of the Version Packages PR on `canary` so the link remains stable
+   - Amend this changeset into the merge commit alongside any other sync changes (changeset cleanup, `core/package.json` and `core/CHANGELOG.md` fixes, etc.)
+
+3. Merge the **Version Packages (`integrations/makeswift`)** PR: After the sync lands, Changesets will open a PR (similar to Stage 1) bumping `@bigcommerce/catalyst-makeswift`. Merge it following the same process. This cuts a new release of the Makeswift variant.
+
+4. **Tags and Releases:** Confirm tags exist for both `@bigcommerce/catalyst-core` and `@bigcommerce/catalyst-makeswift`. Update `latest` tags to point to the new releases:
+
+   ```bash
+   git fetch origin --tags
+   git tag @bigcommerce/catalyst-core@latest @bigcommerce/catalyst-core@<version> -f
+   git tag @bigcommerce/catalyst-makeswift@latest @bigcommerce/catalyst-makeswift@<version> -f
+   git push origin @bigcommerce/catalyst-core@latest -f
+   git push origin @bigcommerce/catalyst-makeswift@latest -f
+   ```
+
+### Additional Notes
+
+- **Release cadence:** Teams typically review on Wednesdays whether to cut a release, but you may cut releases more frequently as needed.
 
 ## Other Ways to Contribute
 

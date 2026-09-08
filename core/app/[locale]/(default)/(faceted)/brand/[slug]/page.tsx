@@ -11,8 +11,10 @@ import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/fi
 import { getSessionCustomerAccessToken } from '~/auth';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
 import { pageInfoTransformer } from '~/data-transformers/page-info-transformer';
-import { pricesTransformer } from '~/data-transformers/prices-transformer';
+import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getPreferredCurrencyCode } from '~/lib/currency';
+import { getMakeswiftPageMetadata } from '~/lib/makeswift';
+import { getMetadataAlternates } from '~/lib/seo/canonical';
 
 import { MAX_COMPARE_LIMIT } from '../../../compare/page-data';
 import { getCompareProducts as getCompareProductsData } from '../../fetch-compare-products';
@@ -67,7 +69,10 @@ interface Props {
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-  const { slug } = await props.params;
+  const { slug, locale } = await props.params;
+
+  setRequestLocale(locale);
+
   const customerAccessToken = await getSessionCustomerAccessToken();
 
   const brandId = Number(slug);
@@ -78,12 +83,17 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     return notFound();
   }
 
+  const makeswiftMetadata = await getMakeswiftPageMetadata({ path: brand.path, locale });
+
   const { pageTitle, metaDescription, metaKeywords } = brand.seo;
 
   return {
-    title: pageTitle || brand.name,
-    description: metaDescription,
-    keywords: metaKeywords ? metaKeywords.split(',') : null,
+    title: makeswiftMetadata?.title || pageTitle || brand.name,
+    ...((makeswiftMetadata?.description || metaDescription) && {
+      description: makeswiftMetadata?.description || metaDescription,
+    }),
+    ...(metaKeywords && { keywords: metaKeywords.split(',') }),
+    ...(brand.path && { alternates: await getMetadataAlternates({ path: brand.path, locale }) }),
   };
 }
 
@@ -103,8 +113,12 @@ export default async function Brand(props: Props) {
     return notFound();
   }
 
+  const showRating = Boolean(settings?.reviews.enabled && settings.display.showProductRating);
+
   const productComparisonsEnabled =
     settings?.storefront.catalog?.productComparisonsEnabled ?? false;
+
+  const taxDisplay = settings?.tax?.plp;
 
   const streamableFacetedSearch = Streamable.from(async () => {
     const searchParams = await props.searchParams;
@@ -112,12 +126,14 @@ export default async function Brand(props: Props) {
 
     const loadSearchParams = await createBrandSearchParamsLoader(slug, customerAccessToken);
     const parsedSearchParams = loadSearchParams?.(searchParams) ?? {};
+    const sort = typeof searchParams.sort === 'string' ? searchParams.sort : 'featured';
 
     const search = await fetchFacetedSearch(
       {
         ...searchParams,
         ...parsedSearchParams,
         brand: [slug],
+        sort,
       },
       currencyCode,
       customerAccessToken,
@@ -132,16 +148,16 @@ export default async function Brand(props: Props) {
     const search = await streamableFacetedSearch;
     const products = search.products.items;
 
-    return products.map((product) => ({
-      id: product.entityId.toString(),
-      title: product.name,
-      href: product.path,
-      image: product.defaultImage
-        ? { src: product.defaultImage.url, alt: product.defaultImage.altText }
-        : undefined,
-      price: pricesTransformer(product.prices, format),
-      subtitle: product.brand?.name ?? undefined,
-    }));
+    const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
+      settings?.inventory ?? {};
+
+    return productCardTransformer(
+      products,
+      format,
+      showOutOfStockMessage ? defaultOutOfStockMessage : undefined,
+      showBackorderMessage,
+      taxDisplay,
+    );
   });
 
   const streamableTotalCount = Streamable.from(async () => {
@@ -221,6 +237,7 @@ export default async function Brand(props: Props) {
       removeLabel={t('Compare.remove')}
       resetFiltersLabel={t('FacetedSearch.resetFilters')}
       showCompare={productComparisonsEnabled}
+      showRating={showRating}
       sortDefaultValue="featured"
       sortLabel={t('Search.title')}
       sortOptions={[

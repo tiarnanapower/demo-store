@@ -43,7 +43,17 @@
             "newPassword": "Nowe hasło",
             "confirmPassword": "Potwierdź hasło",
             "passwordUpdated": "Hasło zostało pomyślnie zaktualizowane!",
-            "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później."
+            "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później.",
+            "FieldErrors": {
+                "passwordRequired": "Hasło jest wymagane",
+                "passwordTooSmall": "Password must be at least {minLength, plural, =1 {1 character} other {# characters}} long",
+                "passwordLowercaseRequired": "Password must contain at least one lowercase letter",
+                "passwordUppercaseRequired": "Password must contain at least one uppercase letter",
+                "passwordNumberRequired": "Password must contain at least {minNumbers, plural, =1 {one number} other {# numbers}}",
+                "passwordSpecialCharacterRequired": "Password must contain at least one special character",
+                "passwordsMustMatch": "The passwords do not match",
+                "confirmPasswordRequired": "Please confirm your password"
+            }
         },
         "Login": {
             "title": "Zaloguj się",
@@ -54,10 +64,18 @@
             "password": "Hasło",
             "invalidCredentials": "Twój adres e-mail lub hasło są nieprawidłowe. Spróbuj zalogować się ponownie lub zresetuj hasło",
             "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później.",
+            "passwordResetRequired": "Password reset required. Please check your email for instructions to reset your password.",
+            "invalidToken": "Your login link is invalid or has expired. Please try logging in again.",
+            "FieldErrors": {
+                "emailRequired": "Email is required",
+                "emailInvalid": "Please enter a valid email address",
+                "passwordRequired": "Hasło jest wymagane",
+                "invalidInput": "Please check your input and try again."
+            },
             "CreateAccount": {
                 "title": "Nowy klient?",
                 "accountBenefits": "Załóż u nas konto, a będziesz mógł:",
-                "fastCheckout": "Sprawdź szybciej",
+                "fastCheckout": "Do kasy szybciej",
                 "multipleAddresses": "Zapisz wiele adresów wysyłki",
                 "ordersHistory": "Dostęp do historii zamówień",
                 "ordersTracking": "Śledzenie nowych zamówień",
@@ -68,14 +86,37 @@
                 "title": "Nie pamiętam hasła",
                 "subtitle": "Podaj poniżej adres e-mail powiązany z Twoim kontem. Wyślemy Ci instrukcje resetowania hasła.",
                 "confirmResetPassword": "Jeśli adres e-mail {email} jest powiązany z kontem w naszym sklepie, otrzymasz wiadomość e-mail umożliwiającą zresetowanie hasła. Jeśli jej nie widzisz, sprawdź skrzynkę odbiorczą i folder ze spamem.",
-                "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później."
+                "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później.",
+                "FieldErrors": {
+                    "emailRequired": "Email is required",
+                    "emailInvalid": "Please enter a valid email address"
+                }
             }
         },
         "Register": {
             "title": "Zarejestruj konto",
             "heading": "Nowe konto",
             "cta": "Utwórz konto",
-            "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później."
+            "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później.",
+            "recaptchaRequired": "Please complete the reCAPTCHA verification.",
+            "FieldErrors": {
+                "firstNameRequired": "Imię jest wymagane",
+                "lastNameRequired": "Nazwisko jest wymagane",
+                "emailRequired": "Email is required",
+                "emailInvalid": "Please enter a valid email address",
+                "passwordRequired": "Hasło jest wymagane",
+                "passwordTooSmall": "Password must be at least {minLength, plural, =1 {1 character} other {# characters}} long",
+                "passwordLowercaseRequired": "Password must contain at least one lowercase letter",
+                "passwordUppercaseRequired": "Password must contain at least one uppercase letter",
+                "passwordNumberRequired": "Password must contain at least {minNumbers, plural, =1 {one number} other {# numbers}}",
+                "passwordSpecialCharacterRequired": "Password must contain at least one special character",
+                "passwordsMustMatch": "The passwords do not match",
+                "addressLine1Required": "Address line 1 is required",
+                "cityRequired": "Miasto jest wymagane",
+                "countryRequired": "Wymagany jest kraj",
+                "stateRequired": "Wymagany jest stan/prowincja",
+                "postalCodeRequired": "Kod pocztowy jest wymagany"
+            }
         }
     },
     "Faceted": {
@@ -103,7 +144,8 @@
             "Empty": {
                 "title": "Brak wyników dla „{term}”.",
                 "subtitle": "Spróbuj innego wyszukiwania."
-            }
+            },
+            "semanticSearchPlaceholder": "Describe what you're looking for"
         },
         "FacetedSearch": {
             "filters": "Filtry",
@@ -159,10 +201,19 @@
                 "summaryTotal": "Razem",
                 "destination": "Miejsce docelowe",
                 "destinationWithCount": "Miejsce docelowe {number, number}/{total, number}",
+                "digitalDelivery": "Digital delivery to {email}",
                 "subtotal": "Suma cząstkowa",
                 "shipping": "Wysyłka",
                 "tax": "Podatek",
-                "orderSummary": "Podsumowanie zamówienia"
+                "orderSummary": "Podsumowanie zamówienia",
+                "paymentMethodsLabel": "{count, plural, =1 {Payment method} other {Payment methods}}",
+                "paymentEndingInLabel": "ending in",
+                "PaymentMethods": {
+                    "creditCard": "Karta kredytowa",
+                    "giftCertificate": "Bon podarunkowy",
+                    "storeCredit": "Kredyt sklepowy",
+                    "other": "Inne"
+                }
             }
         },
         "Addresses": {
@@ -177,6 +228,15 @@
             "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później.",
             "EmptyState": {
                 "title": "You don't have any addresses"
+            },
+            "FieldErrors": {
+                "firstNameRequired": "Imię jest wymagane",
+                "lastNameRequired": "Nazwisko jest wymagane",
+                "addressLine1Required": "Address line 1 is required",
+                "cityRequired": "Miasto jest wymagane",
+                "countryRequired": "Wymagany jest kraj",
+                "stateRequired": "Wymagany jest stan/prowincja",
+                "postalCodeRequired": "Kod pocztowy jest wymagany"
             }
         },
         "Settings": {
@@ -188,7 +248,30 @@
             "currentPassword": "Aktualne hasło",
             "newPassword": "Nowe hasło",
             "confirmPassword": "Potwierdź hasło",
-            "cta": "Aktualizacja"
+            "cta": "Aktualizacja",
+            "NewsletterSubscription": {
+                "title": "Marketing preferences",
+                "label": "Zapisz się do naszego newslettera.",
+                "marketingPreferencesUpdated": "Marketing preferences have been updated successfully!",
+                "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później."
+            },
+            "FieldErrors": {
+                "firstNameRequired": "Imię jest wymagane",
+                "firstNameTooSmall": "First name must be at least 2 characters long",
+                "lastNameRequired": "Nazwisko jest wymagane",
+                "lastNameTooSmall": "Last name must be at least 2 characters long",
+                "emailRequired": "Email is required",
+                "emailInvalid": "Please enter a valid email address",
+                "currentPasswordRequired": "Wymagane jest aktualne hasło",
+                "passwordRequired": "Hasło jest wymagane",
+                "passwordTooSmall": "Password must be at least {minLength, plural, =1 {1 character} other {# characters}} long",
+                "passwordLowercaseRequired": "Password must contain at least one lowercase letter",
+                "passwordUppercaseRequired": "Password must contain at least one uppercase letter",
+                "passwordNumberRequired": "Password must contain at least {minNumbers, plural, =1 {one number} other {# numbers}}",
+                "passwordSpecialCharacterRequired": "Password must contain at least one special character",
+                "passwordsMustMatch": "The passwords do not match",
+                "confirmPasswordRequired": "Please confirm your password"
+            }
         }
     },
     "Wishlist": {
@@ -342,21 +425,29 @@
         "removeItem": "Usuń element",
         "cartCombined": "Zauważyliśmy, że w poprzednim koszyku były zapisane produkty, więc dodaliśmy je do bieżącego koszyka.",
         "cartRestored": "Dodano produkty do koszyka na innym urządzeniu. Przywróciliśmy koszyk tutaj, aby umożliwić kontynuowanie zakupów.",
+        "cartUpdateInProgress": "You have a cart update in progress. Are you sure you want to leave this page? Your changes may be lost.",
+        "originalPrice": "Original price was {price}.",
+        "currentPrice": "Current price is {price}.",
+        "quantityReadyToShip": "{quantity, number} ready to ship",
+        "quantityOnBackorder": "{quantity, number} will be backordered",
+        "partiallyAvailable": "Only {quantity, number} available",
         "CheckoutSummary": {
             "title": "Podsumowanie",
             "subTotal": "Suma cząstkowa",
             "discounts": "Rabaty",
             "tax": "Podatek",
+            "totalIncludesTax": "Includes {tax} tax",
             "total": "Razem",
             "CouponCode": {
                 "apply": "Zgłoś się na",
                 "couponCode": "Kod kuponu",
                 "removeCouponCode": "Usuń kod kuponu",
                 "invalidCouponCode": "Wprowadź prawidłowy kod kuponu",
-                "cartNotFound": "Nie znaleziono pliku cookie cartId."
+                "cartNotFound": "An error occurred when retrieving your cart"
             },
             "Shipping": {
                 "shipping": "Wysyłka",
+                "shippingExcludingTax": "Shipping (Ex. Tax)",
                 "add": "Dodaj",
                 "change": "Zmiana",
                 "cancel": "Anuluj",
@@ -370,9 +461,20 @@
                 "shippingOptions": "Opcje wysyłki",
                 "updateShipping": "Zaktualizuj wysyłkę",
                 "addShipping": "Dodaj wysyłkę",
-                "cartNotFound": "Nie znaleziono pliku cookie cartId.",
-                "noShippingOptions": "Brak dostępnych opcji wysyłki dla Państwa adresu"
+                "cartNotFound": "An error occurred when retrieving your cart",
+                "noShippingOptions": "Brak dostępnych opcji wysyłki dla Państwa adresu",
+                "countryRequired": "Wymagany jest kraj"
             }
+        },
+        "GiftCertificate": {
+            "giftCertificate": "Bon podarunkowy",
+            "giftCertificateCode": "Kod bonu upominkowego",
+            "removeGiftCertificate": "Remove gift certificate",
+            "apply": "Zgłoś się na",
+            "to": "Do",
+            "message": "Wiadomość",
+            "invalidGiftCertificate": "Please enter a valid gift certificate code",
+            "cartNotFound": "An error occurred when retrieving your cart"
         },
         "Empty": {
             "title": "Twój koszyk jest pusty.",
@@ -380,7 +482,7 @@
             "cta": "Kontynuuj zakupy"
         },
         "Errors": {
-            "cartNotFound": "Nie znaleziono pliku cookie cartId.",
+            "cartNotFound": "An error occurred when retrieving your cart",
             "lineItemNotFound": "Nie znaleziono pozycji.",
             "failedToUpdateQuantity": "Nie udało się zaktualizować liczby sztuk.",
             "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później."
@@ -401,6 +503,8 @@
         "otherDetails": "Inne szczegóły",
         "noOtherDetails": "Brak innych szczegółów.",
         "viewOptions": "Wyświetl opcje",
+        "showMore": "Pokaż więcej",
+        "showLess": "Pokaż mniej",
         "successMessage": "Dodano {cartItems, plural, =1 {1 produkt} other {# produkty(-ów)}} <cartLink>do koszyka</cartLink>",
         "missingCart": "Nie znaleziono koszyka. Spróbuj ponownie później.",
         "unknownError": "Nieznany błąd. Spróbuj ponownie później."
@@ -419,6 +523,16 @@
             "decreaseNumber": "Zmniejsz liczbę",
             "thumbnail": "Wyświetl numer obrazu",
             "additionalInformation": "Informacje dodatkowe",
+            "currentStock": "{quantity, number} in stock",
+            "backorderQuantity": "{quantity, number} will be on backorder",
+            "maxPurchasableQuantity": "The maximum purchasable quantity is {quantity, number}. Please adjust and try again.",
+            "loadingMoreImages": "Loading more images",
+            "imagesLoaded": "{count, plural, =1 {1 more image loaded} other {# more images loaded}}",
+            "playVideo": "Play video",
+            "viewVideo": "View video",
+            "videosTitle": "Wideo",
+            "hideVideos": "Hide videos",
+            "showVideos": "Show videos",
             "Submit": {
                 "addToCart": "Dodaj do koszyka",
                 "outOfStock": "Brak w magazynie",
@@ -446,7 +560,31 @@
             "title": "Opinie",
             "empty": "Nie dodano żadnych opinii dla tego produktu.",
             "previous": "Poprzednie recenzje",
-            "next": "Następne opinie"
+            "next": "Następne opinie",
+            "Form": {
+                "button": "Write a review",
+                "title": "Write a review",
+                "submit": "Wyślij",
+                "cancel": "Anuluj",
+                "ratingLabel": "Ocena",
+                "titleLabel": "Tytuł",
+                "reviewLabel": "Przegląd",
+                "nameLabel": "Nazwa",
+                "emailLabel": "Email",
+                "successMessage": "Your review has been submitted successfully!",
+                "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później.",
+                "recaptchaRequired": "Please complete the reCAPTCHA verification.",
+                "FieldErrors": {
+                    "titleRequired": "Title is required",
+                    "authorRequired": "Nazwa jest wymagana",
+                    "emailRequired": "Email is required",
+                    "emailInvalid": "Please enter a valid email address",
+                    "textRequired": "Review is required",
+                    "ratingRequired": "Rating is required",
+                    "ratingTooSmall": "Rating must be at least 1",
+                    "ratingTooLarge": "Rating must be at most 5"
+                }
+            }
         }
     },
     "WebPages": {
@@ -466,7 +604,8 @@
                 "email": "Email",
                 "comments": "Uwagi/pytania",
                 "cta": "Prześlij formularz",
-                "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później."
+                "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później.",
+                "recaptchaRequired": "Please complete the reCAPTCHA verification."
             }
         }
     },
@@ -487,13 +626,17 @@
         "search": "Szukaj na stronie"
     },
     "Components": {
+        "ProductCard": {
+            "moreOffers": "+{count, plural, =1 {# more offer} other {# more offers}}"
+        },
         "Header": {
             "home": "Strona główna",
             "toggleNavigation": "Przełącz nawigację",
             "Icons": {
                 "account": "Profil",
                 "cart": "Koszyk",
-                "search": "Otwórz wyskakujące okienko wyszukiwania"
+                "search": "Otwórz wyskakujące okienko wyszukiwania",
+                "giftCertificates": "Bony upominkowe"
             },
             "SwitchCurrency": {
                 "label": "Switch currency",
@@ -517,13 +660,132 @@
             "socialMediaLinks": "Linki do mediów społecznościowych",
             "categories": "Kategorie",
             "brands": "Marki",
-            "navigate": "Nawiguj po stronie"
+            "navigate": "Nawiguj po stronie",
+            "giftCertificates": "Bony upominkowe"
         },
         "Subscribe": {
             "title": "Zapisz się do naszego newslettera",
             "placeholder": "Wpisz swój adres e-mail",
             "description": "Bądź na bieżąco z najnowszymi informacjami i ofertami naszego sklepu.",
-            "success": "Dziękujemy za Państwa zainteresowanie! Funkcja newslettera wkrótce będzie dostępna!"
+            "subscribedToNewsletter": "You have been subscribed to our newsletter!",
+            "Errors": {
+                "emailRequired": "Email is required",
+                "invalidEmail": "Please enter a valid email address",
+                "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później."
+            }
+        },
+        "ConsentManager": {
+            "Common": {
+                "rejectAll": "Reject All",
+                "acceptAll": "Accept All",
+                "customize": "Dostosuj",
+                "save": "Zapisz ustawienia"
+            },
+            "CookieBanner": {
+                "title": "We value your privacy",
+                "description": "This site uses cookies to improve your browsing experience, analyze site traffic, and show personalized content.",
+                "privacyPolicy": "Polityka prywatności"
+            },
+            "Dialog": {
+                "title": "Privacy Settings",
+                "description": "Customize your privacy settings here. You can choose which types of cookies and tracking technologies you would like to allow."
+            },
+            "ConsentTypes": {
+                "necessary": {
+                    "title": "Strictly Necessary",
+                    "description": "These cookies are essential for the website to function properly and cannot be disabled."
+                },
+                "functionality": {
+                    "title": "Functionality",
+                    "description": "These cookies enable enhanced functionality and personalization of the website."
+                },
+                "marketing": {
+                    "title": "Marketing",
+                    "description": "These cookies are used to deliver relevant advertisements and track their effectiveness."
+                },
+                "measurement": {
+                    "title": "Analityka",
+                    "description": "These cookies help us understand how visitors interact with the website and improve its performance."
+                },
+                "experience": {
+                    "title": "Doświadczenie",
+                    "description": "These cookies help us provide a better user experience and test new features."
+                }
+            }
+        },
+        "Price": {
+            "originalPrice": "Original price was {price}.",
+            "currentPrice": "Current price is {price}.",
+            "range": "Price from {minValue} to {maxValue}.",
+            "includingTax": "(Inc. Tax)",
+            "excludingTax": "(Ex. Tax)",
+            "includingTaxFull": "Z uwzględnieniem podatku",
+            "excludingTaxFull": "Bez podatku"
+        }
+    },
+    "GiftCertificates": {
+        "title": "Bony upominkowe",
+        "description": "Give the perfect gift that never goes out of style. Let friends and loved ones choose exactly what they want from our entire collection.",
+        "purchaseLabel": "Kup teraz",
+        "checkBalanceLabel": "Check balance",
+        "expiresAtLabel": "Valid thru",
+        "CheckBalance": {
+            "title": "Check balance",
+            "description": "You can check the balance and get the information about your gift certificate by typing the code in the box below.",
+            "inputLabel": "Kod",
+            "inputPlaceholder": "xxx-xxx-xxx-xxx",
+            "purchasedDateLabel": "Zakupione",
+            "senderLabel": "Ze strony",
+            "Errors": {
+                "invalidCode": "The gift certificate code you entered is invalid. Please check the code and try again.",
+                "codeRequired": "Wpisz kod bonu upominkowego.",
+                "somethingWentWrong": "Coś poszło nie tak. Proszę spróbować później."
+            }
+        },
+        "Purchase": {
+            "breadcrumbTitle": "Purchase a gift certificate",
+            "title": "Digital gift certificate",
+            "description": "Explore our gift certificates, perfect for any occasion. Choose the amount and personalize your message.",
+            "successMessage": "Gift certificate has been added to <cartLink> your cart</cartLink>",
+            "missingCart": "Nie znaleziono koszyka. Spróbuj ponownie później.",
+            "unknownError": "Nieznany błąd. Spróbuj ponownie później.",
+            "Form": {
+                "amountLabel": "Kwota",
+                "customAmountLabel": "Amount (between {minAmount} and {maxAmount})",
+                "selectAmountPlaceholder": "Select an amount",
+                "customAmountPlaceholder": "Enter custom amount",
+                "senderNameLabel": "Your name",
+                "senderEmailLabel": "Your email",
+                "recipientNameLabel": "Recipient's name",
+                "recipientEmailLabel": "Recipient's email",
+                "namePlaceholder": "Enter name",
+                "emailPlaceholder": "Wprowadź adres e-mail",
+                "messageLabel": "Wiadomość",
+                "messagePlaceholder": "Enter your message (optional)",
+                "nonRefundableCheckboxLabel": "I agree that Gift Certificates are non-refundable",
+                "expiryCheckboxLabel": "I acknowledge that this Gift Certificate will expire on {expiryDate}",
+                "ctaLabel": "Dodaj do koszyka",
+                "Errors": {
+                    "amountRequired": "Please select or enter a gift certificate amount",
+                    "amountInvalid": "Please select a valid gift certificate amount",
+                    "amountOutOfRange": "Please enter an amount between {minAmount} and {maxAmount}",
+                    "unexpectedSettingsError": "An unexpected error occurred while retrieving gift certificate settings. Please try again later.",
+                    "senderNameRequired": "Your name is required",
+                    "senderEmailRequired": "Your email is required",
+                    "recipientNameRequired": "Recipient's name is required",
+                    "recipientEmailRequired": "Recipient's email is required",
+                    "emailInvalid": "Please enter a valid email address",
+                    "checkboxRequired": "You must check this box to continue"
+                }
+            }
+        }
+    },
+    "Form": {
+        "optional": "opcjonalne",
+        "recaptchaRequired": "Please complete the reCAPTCHA verification.",
+        "Errors": {
+            "invalidInput": "Please check your input and try again",
+            "invalidFormat": "The value entered does not match the required format"
         }
     }
 }

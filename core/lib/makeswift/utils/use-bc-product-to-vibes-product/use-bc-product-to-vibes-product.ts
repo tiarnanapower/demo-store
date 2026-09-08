@@ -27,18 +27,21 @@ export const BcProductSchema = z.object({
   defaultImage: z.object({ altText: z.string(), url: string() }).nullable(),
   brand: z.object({ name: z.string(), path: z.string() }).nullable(),
   path: z.string(),
-  prices: PricesSchema,
+  pricesIncludingTax: PricesSchema.nullable(),
+  pricesExcludingTax: PricesSchema.nullable(),
 });
 
 export type BcProductSchema = z.infer<typeof BcProductSchema>;
+
+export type { Product };
 
 export function useBcProductToVibesProduct(): (product: BcProductSchema) => Product {
   const format = useFormatter();
 
   return useCallback(
     (product) => {
-      const { entityId, name, defaultImage, brand, path, prices } = product;
-      const price = pricesTransformer(prices, format);
+      const { entityId, name, defaultImage, brand, path } = product;
+      const price = pricesTransformer(product, format);
 
       return {
         id: entityId.toString(),

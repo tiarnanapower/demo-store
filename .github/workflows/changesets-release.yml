@@ -5,16 +5,32 @@ on:
     branches:
       - canary
       - integrations/makeswift
+      - integrations/b2b-makeswift
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+  pull-requests: write
 
 jobs:
   changesets-release:
     name: Changesets Release
     runs-on: ubuntu-latest
+    env:
+      # Linear access keys are per-pipeline, so each branch's package maps to
+      # its own pipeline: canary -> @bigcommerce/catalyst-core, the integration
+      # branches -> their makeswift packages. An unset key skips the Linear
+      # steps for that branch.
+      LINEAR_ACCESS_KEY: ${{ secrets[github.ref_name == 'integrations/makeswift' && 'LINEAR_ACCESS_KEY_MAKESWIFT' || github.ref_name == 'integrations/b2b-makeswift' && 'LINEAR_ACCESS_KEY_B2B_MAKESWIFT' || 'LINEAR_ACCESS_KEY'] }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          # Full history required for linear-release-action to scan commits.
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -33,13 +49,75 @@ jobs:
         env:
           CLI_SEGMENT_WRITE_KEY: ${{ secrets.CLI_SEGMENT_WRITE_KEY }}
 
+      - name: Sync Linear release
+        if: env.LINEAR_ACCESS_KEY != ''
+        uses: linear/linear-release-action@v0
+        with:
+          access_key: ${{ env.LINEAR_ACCESS_KEY }}
+          command: sync
+          # Only the storefront package ships as its own release; changes to
+          # other workspace packages (client, create-catalyst, the CLI) are
+          # released separately and shouldn't count toward this pipeline.
+          include_paths: core/**
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
+          # Runs `changeset version`, then syncs core/package.json's `catalyst`
+          # field (version + git ref) to the freshly-bumped version.
+          version: pnpm changeset:version
           publish: pnpm exec changeset publish
           title: "Version Packages (`${{ github.ref_name }}`)"
           commit: "Version Packages (`${{ github.ref_name }}`)"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Resolve headline package
+        id: headline
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          PACKAGE_NAME="@bigcommerce/catalyst-core"
+          if [ "${{ github.ref_name }}" = "integrations/makeswift" ]; then
+            PACKAGE_NAME="@bigcommerce/catalyst-makeswift"
+          elif [ "${{ github.ref_name }}" = "integrations/b2b-makeswift" ]; then
+            PACKAGE_NAME="@bigcommerce/catalyst-b2b-makeswift"
+          fi
+          VERSION=$(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r --arg name "$PACKAGE_NAME" '.[] | select(.name == $name) | .version')
+          if [ -z "$VERSION" ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "tag=$PACKAGE_NAME@$VERSION" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch release notes
+        if: steps.headline.outputs.found == 'true'
+        run: gh release view "${{ steps.headline.outputs.tag }}" --json body -q .body > /tmp/release-notes.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # The accumulating sync steps above run unversioned, so before completing
+      # we stamp the started release with its final version via one more sync
+      # (base_ref=HEAD scans no new commits). `complete` then targets that same
+      # version. Per Linear support, this versioned sync-then-complete pair is
+      # required for pipelines with no natural labeling moment.
+      - name: Version Linear release
+        if: steps.headline.outputs.found == 'true' && env.LINEAR_ACCESS_KEY != ''
+        uses: linear/linear-release-action@v0
+        with:
+          access_key: ${{ env.LINEAR_ACCESS_KEY }}
+          command: sync
+          base_ref: HEAD
+          version: ${{ steps.headline.outputs.tag }}
+          name: ${{ steps.headline.outputs.tag }}
+
+      - name: Complete Linear release
+        if: steps.headline.outputs.found == 'true' && env.LINEAR_ACCESS_KEY != ''
+        uses: linear/linear-release-action@v0
+        with:
+          access_key: ${{ env.LINEAR_ACCESS_KEY }}
+          command: complete
+          version: ${{ steps.headline.outputs.tag }}
+          name: ${{ steps.headline.outputs.tag }}
+          release_notes: /tmp/release-notes.md

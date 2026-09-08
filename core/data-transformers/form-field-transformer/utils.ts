@@ -23,17 +23,21 @@ export enum FieldNameToFieldId {
   exclusiveOffers = 25,
 }
 
-export enum FieldTypeToFieldInput {
-  'CheckboxesFormField' = 'checkboxes',
-  'DateFormField' = 'dates',
-  'NumberFormField' = 'numbers',
-  'PasswordFormField' = 'passwords',
-  'TextFormField' = 'texts',
-  'RadioButtonsFormField' = 'multipleChoices',
-  'MultilineTextFormField' = 'multilineTexts',
-}
-
 export const CUSTOMER_FIELDS_TO_EXCLUDE = [FieldNameToFieldId.currentPassword];
+
+/* Account Settings only manages the fields below directly; anything else returned by
+ site.settings.formFields.customer is a genuinely merchant-defined custom field. */
+export const ACCOUNT_SETTINGS_FIELDS_TO_EXCLUDE = [
+  FieldNameToFieldId.email,
+  FieldNameToFieldId.password,
+  FieldNameToFieldId.confirmPassword,
+  FieldNameToFieldId.currentPassword,
+  FieldNameToFieldId.firstName,
+  FieldNameToFieldId.lastName,
+  FieldNameToFieldId.company,
+  FieldNameToFieldId.phone,
+  FieldNameToFieldId.exclusiveOffers,
+];
 
 export const REGISTER_CUSTOMER_FORM_LAYOUT = [
   [FieldNameToFieldId.firstName, FieldNameToFieldId.lastName],
@@ -57,35 +61,6 @@ export const ADDRESS_FORM_LAYOUT = [
   [FieldNameToFieldId.city, FieldNameToFieldId.stateOrProvince],
   [FieldNameToFieldId.postalCode, FieldNameToFieldId.countryCode],
 ];
-
-export const getPreviouslySubmittedValue = (fieldValue?: FormFieldValue) => {
-  if (!fieldValue) {
-    return {};
-  }
-
-  switch (fieldValue.__typename) {
-    case 'TextFormFieldValue':
-      return { TextFormField: fieldValue.text };
-
-    case 'NumberFormFieldValue':
-      return { NumberFormField: fieldValue.number };
-
-    case 'MultilineTextFormFieldValue':
-      return { MultilineTextFormField: fieldValue.multilineText };
-
-    case 'DateFormFieldValue':
-      return { DateFormField: fieldValue.date.utc };
-
-    case 'MultipleChoiceFormFieldValue':
-      return { MultipleChoiceFormField: fieldValue.valueEntityId.toString() };
-
-    case 'CheckboxesFormFieldValue':
-      return { CheckboxesFormField: fieldValue.valueEntityIds };
-
-    case 'PasswordFormFieldValue':
-      return { PasswordFormField: fieldValue.password };
-  }
-};
 
 export const mapFormFieldValueToName = (field: FormFieldValue): Record<string, unknown> => {
   switch (field.__typename) {

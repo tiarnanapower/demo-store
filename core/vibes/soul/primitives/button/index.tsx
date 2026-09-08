@@ -37,7 +37,7 @@ export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
  *   --button-loader-icon: hsl(var(--foreground));
  *   --button-danger-background: color-mix(in oklab, hsl(var(--error)), white 30%);
  *   --button-danger-background-hover: color-mix(in oklab, hsl(var(--error)), white 75%);
- *   --button-danger-foreground: hsl(var(--foreground));
+ *   --button-danger-text: hsl(var(--foreground));
  *   --button-danger-border: color-mix(in oklab, hsl(var(--error)), white 30%);
  * }
  * ```
@@ -69,7 +69,7 @@ export function Button({
           ghost:
             'border-[var(--button-ghost-border,transparent)] bg-[var(--button-ghost-background,transparent)] text-[var(--button-ghost-text,hsl(var(--foreground)))] after:bg-[var(--button-ghost-background-hover,hsl(var(--foreground)/5%))]',
           danger:
-            'border-[var(--button-danger-border,color-mix(in_oklab,hsl(var(--error)),white_30%))] bg-[var(--button-danger-background,color-mix(in_oklab,hsl(var(--error)),white_30%))] text-[var(--button-danger-foreground)] after:bg-[var(--button-danger-background-hover,color-mix(in_oklab,hsl(var(--error)),white_75%))]',
+            'border-[var(--button-danger-border,color-mix(in_oklab,hsl(var(--error)),white_30%))] bg-[var(--button-danger-background,color-mix(in_oklab,hsl(var(--error)),white_30%))] text-[var(--button-danger-text)] after:bg-[var(--button-danger-background-hover,color-mix(in_oklab,hsl(var(--error)),white_75%))]',
         }[variant],
         {
           pill: 'rounded-full after:rounded-full',

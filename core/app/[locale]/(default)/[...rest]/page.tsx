@@ -1,38 +1,33 @@
-import { defaultLocale, locales } from '~/i18n/locales';
-import { client, Page } from '~/lib/makeswift';
+import { Metadata } from 'next';
+
+import { getMakeswiftPageMetadata, Page } from '~/lib/makeswift';
 
 interface PageParams {
   locale: string;
   rest: string[];
 }
 
-export async function generateStaticParams(): Promise<PageParams[]> {
-  const pages = await client.getPages().toArray();
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<PageParams>;
+}): Promise<Metadata> {
+  const { rest, locale } = await params;
+  const path = `/${rest.join('/')}`;
 
-  const params = pages
-    .filter((page) => page.path !== '/')
-    .flatMap((page) => localesFanOut(page.path));
+  const metadata = await getMakeswiftPageMetadata({ path, locale });
 
-  // Next.js requires providing at least one value in `generateStaticParams`.
-  //
-  // See https://github.com/vercel/next.js/pull/73933
-  if (params.length === 0) {
-    return [{ rest: ['dev', 'null'], locale: defaultLocale }];
-  }
-
-  return params;
+  return metadata ?? {};
 }
+
+// Intentionally no `generateStaticParams`: the locale list is resolved at runtime now, and every
+// route under `[locale]` already renders on demand because the tree reads cookies, so fanning
+// Makeswift page paths out over locales would only reintroduce a build-time dependency on the
+// locale list without prerendering anything.
 
 export default async function CatchAllPage({ params }: { params: Promise<PageParams> }) {
   const { rest, locale } = await params;
   const path = `/${rest.join('/')}`;
 
   return <Page locale={locale} path={path} />;
-}
-
-function localesFanOut(path: string): PageParams[] {
-  return locales.map((locale) => ({
-    rest: path.split('/').filter((segment) => segment !== ''),
-    locale,
-  }));
 }

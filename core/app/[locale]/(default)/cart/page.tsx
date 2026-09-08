@@ -2,32 +2,82 @@ import { Metadata } from 'next';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Streamable } from '@/vibes/soul/lib/streamable';
+import { Price } from '@/vibes/soul/primitives/price-label';
 import { Cart as CartComponent, CartEmptyState } from '@/vibes/soul/sections/cart';
 import { CartAnalyticsProvider } from '~/app/[locale]/(default)/cart/_components/cart-analytics-provider';
+import { ClientWalletButtons } from '~/components/wallet-buttons';
+import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { getCartId } from '~/lib/cart';
+import { getPreferredCurrencyCode } from '~/lib/currency';
+import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { Slot } from '~/lib/makeswift/slot';
 import { exists } from '~/lib/utils';
 
-import { redirectToCheckout } from './_actions/redirect-to-checkout';
 import { updateCouponCode } from './_actions/update-coupon-code';
+import { updateGiftCertificate } from './_actions/update-gift-certificate';
 import { updateLineItem } from './_actions/update-line-item';
 import { updateShippingInfo } from './_actions/update-shipping-info';
 import { CartViewed } from './_components/cart-viewed';
-import { getCart, getShippingCountries } from './page-data';
+import { CheckoutPreconnect } from './_components/checkout-preconnect';
+import {
+  getCart,
+  getCurrencyData,
+  getPaymentWallets,
+  getPaymentWalletWithInitializationData,
+  getShippingCountries,
+} from './page-data';
 
 interface Props {
   params: Promise<{ locale: string }>;
 }
 
+const CHECKOUT_URL = process.env.TRAILING_SLASH !== 'false' ? '/checkout/' : '/checkout';
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
 
   const t = await getTranslations({ locale, namespace: 'Cart' });
+  const makeswiftMetadata = await getMakeswiftPageMetadata({ path: '/cart', locale });
 
   return {
-    title: t('title'),
+    title: makeswiftMetadata?.title || t('title'),
+    description: makeswiftMetadata?.description || undefined,
   };
 }
+
+const createWalletButtonsInitOptions = async (
+  walletButtons: string[],
+  cart: {
+    entityId: string;
+    currencyCode: string;
+    amount: {
+      value: number;
+    };
+  },
+) => {
+  const currencyData = await getCurrencyData(cart.currencyCode);
+
+  return Promise.all(
+    walletButtons.map(async (entityId) => {
+      const initData = await getPaymentWalletWithInitializationData(entityId, cart.entityId);
+      const methodId = entityId.split('.').join('');
+
+      return {
+        methodId,
+        containerId: `${methodId}-button`,
+        [methodId]: {
+          cartId: cart.entityId,
+          currency: {
+            code: currencyData?.code,
+            decimalPlaces: currencyData?.display.decimalPlaces,
+          },
+          amount: cart.amount.value,
+          ...initData,
+        },
+      };
+    }),
+  );
+};
 
 const getAnalyticsData = async (cartId: string) => {
   const data = await getCart({ cartId });
@@ -38,7 +88,9 @@ const getAnalyticsData = async (cartId: string) => {
     return [];
   }
 
-  const lineItems = [...cart.lineItems.physicalItems, ...cart.lineItems.digitalItems];
+  const lineItems = [...cart.lineItems.physicalItems, ...cart.lineItems.digitalItems].filter(
+    (item) => !item.parentEntityId, // Only include top-level items
+  );
 
   return lineItems.map((item) => {
     return {
@@ -61,6 +113,7 @@ export default async function Cart({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('Cart');
+  const tGiftCertificates = await getTranslations('GiftCertificates');
   const format = await getFormatter();
   const cartId = await getCartId();
 
@@ -80,56 +133,170 @@ export default async function Cart({ params }: Props) {
     return emptyState;
   }
 
-  const data = await getCart({ cartId });
+  const currencyCode = await getPreferredCurrencyCode();
+  const data = await getCart({ cartId, currencyCode });
 
   const cart = data.site.cart;
   const checkout = data.site.checkout;
+  const giftCertificatesEnabled = data.site.settings?.giftCertificates?.isEnabled ?? false;
 
   if (!cart) {
     return emptyState;
   }
 
-  const lineItems = [...cart.lineItems.physicalItems, ...cart.lineItems.digitalItems];
+  const taxIncluded = cart.isTaxIncluded;
 
-  const formattedLineItems = lineItems.map((item) => ({
-    id: item.entityId,
-    quantity: item.quantity,
-    price: format.number(item.listPrice.value, {
-      style: 'currency',
-      currency: item.listPrice.currencyCode,
-    }),
-    subtitle: item.selectedOptions
-      .map((option) => {
-        switch (option.__typename) {
-          case 'CartSelectedMultipleChoiceOption':
-          case 'CartSelectedCheckboxOption':
-            return `${option.name}: ${option.value}`;
+  const walletButtonsInitOptions = Streamable.from(async () => {
+    try {
+      const walletButtons = await getPaymentWallets({
+        filters: {
+          cartEntityId: cartId,
+        },
+      });
 
-          case 'CartSelectedNumberFieldOption':
-            return `${option.name}: ${option.number}`;
+      return await createWalletButtonsInitOptions(walletButtons, cart);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
 
-          case 'CartSelectedMultiLineTextFieldOption':
-          case 'CartSelectedTextFieldOption':
-            return `${option.name}: ${option.text}`;
+      return [];
+    }
+  });
 
-          case 'CartSelectedDateFieldOption':
-            return `${option.name}: ${format.dateTime(new Date(option.date.utc))}`;
+  const lineItems = [
+    ...cart.lineItems.giftCertificates,
+    ...cart.lineItems.physicalItems,
+    ...cart.lineItems.digitalItems,
+  ].filter((item) => !('parentEntityId' in item) || !item.parentEntityId);
 
-          default:
-            return '';
-        }
-      })
-      .join(', '),
-    title: item.name,
-    image: { src: item.image?.url || '', alt: item.name },
-    href: new URL(item.url).pathname,
-    selectedOptions: item.selectedOptions,
-    productEntityId: item.productEntityId,
-    variantEntityId: item.variantEntityId,
-  }));
+  const formattedLineItems = lineItems.map((item) => {
+    if (item.__typename === 'CartGiftCertificate') {
+      return {
+        typename: item.__typename,
+        id: item.entityId,
+        title: t('GiftCertificate.giftCertificate'),
+        subtitle: `${t('GiftCertificate.to')}: ${item.recipient.name} (${item.recipient.email})${item.message ? `, ${t('GiftCertificate.message')}: ${item.message}` : ''}`,
+        quantity: 1,
+        price: format.number(item.amount.value, {
+          style: 'currency',
+          currency: item.amount.currencyCode,
+        }),
+        sender: item.sender,
+        recipient: item.recipient,
+        message: item.message,
+        href: undefined,
+        selectedOptions: [],
+        productEntityId: 0,
+        variantEntityId: 0,
+      };
+    }
+
+    let inventoryMessages;
+
+    if (item.__typename === 'CartPhysicalItem') {
+      if (item.stockPosition?.quantityOutOfStock === item.quantity) {
+        inventoryMessages = {
+          outOfStockMessage: data.site.settings?.inventory?.showOutOfStockMessage
+            ? data.site.settings.inventory.defaultOutOfStockMessage
+            : undefined,
+        };
+      } else {
+        inventoryMessages = {
+          quantityReadyToShipMessage:
+            data.site.settings?.inventory?.showQuantityOnHand &&
+            !!item.stockPosition?.quantityOnHand &&
+            !!item.stockPosition.quantityBackordered
+              ? t('quantityReadyToShip', {
+                  quantity: Number(item.stockPosition.quantityOnHand),
+                })
+              : undefined,
+          quantityBackorderedMessage:
+            data.site.settings?.inventory?.showQuantityOnBackorder &&
+            !!item.stockPosition?.quantityBackordered
+              ? t('quantityOnBackorder', {
+                  quantity: Number(item.stockPosition.quantityBackordered),
+                })
+              : undefined,
+          quantityOutOfStockMessage:
+            data.site.settings?.inventory?.showOutOfStockMessage &&
+            !!item.stockPosition?.quantityOutOfStock
+              ? t('partiallyAvailable', {
+                  quantity: item.quantity - Number(item.stockPosition.quantityOutOfStock),
+                })
+              : undefined,
+          backorderMessage:
+            data.site.settings?.inventory?.showBackorderMessage &&
+            !!item.stockPosition?.quantityBackordered
+              ? (item.stockPosition.backorderMessage ?? undefined)
+              : undefined,
+        };
+      }
+    }
+
+    const catalogProduct = item.catalogProductWithOptionSelections;
+    const price: Price =
+      (catalogProduct && pricesTransformer(catalogProduct, format, taxIncluded ? 'INC' : 'EX')) ??
+      format.number(item.listPrice.value, {
+        style: 'currency',
+        currency: item.listPrice.currencyCode,
+      });
+
+    return {
+      typename: item.__typename,
+      id: item.entityId,
+      quantity: item.quantity,
+      price,
+      subtitle: item.selectedOptions
+        .map((option) => {
+          switch (option.__typename) {
+            case 'CartSelectedMultipleChoiceOption':
+            case 'CartSelectedCheckboxOption':
+              return `${option.name}: ${option.value}`;
+
+            case 'CartSelectedNumberFieldOption':
+              return `${option.name}: ${option.number}`;
+
+            case 'CartSelectedMultiLineTextFieldOption':
+            case 'CartSelectedTextFieldOption':
+              return `${option.name}: ${option.text}`;
+
+            case 'CartSelectedDateFieldOption':
+              return `${option.name}: ${format.dateTime(new Date(option.date.utc))}`;
+
+            default:
+              return '';
+          }
+        })
+        .join(', '),
+      title: item.name,
+      image: item.image?.url ? { src: item.image.url, alt: item.name } : undefined,
+      href: new URL(item.url).pathname,
+      selectedOptions: item.selectedOptions,
+      productEntityId: item.productEntityId,
+      variantEntityId: item.variantEntityId,
+      inventoryMessages,
+    };
+  });
 
   const totalCouponDiscount =
     checkout?.coupons.reduce((sum, coupon) => sum + coupon.discountedAmount.value, 0) ?? 0;
+
+  const totalLineItemDiscount = [
+    ...cart.lineItems.physicalItems,
+    ...cart.lineItems.digitalItems,
+  ].reduce((sum, item) => sum + item.discountedAmount.value, 0);
+
+  const totalDiscount = cart.discountedAmount.value + totalLineItemDiscount;
+
+  const giftCertificatesSummary =
+    checkout?.giftCertificates.reduce<Array<{ code: string; used: number }>>((acc, c) => {
+      acc.push({
+        code: c.code,
+        used: c.used.value,
+      });
+
+      return acc;
+    }, []) ?? [];
 
   const shippingConsignment =
     checkout?.shippingConsignments?.find((consignment) => consignment.selectedShippingOption) ||
@@ -142,21 +309,35 @@ export default async function Cart({ params }: Props) {
     label: country.name,
   }));
 
+  // These US states share the same abbreviation (AE), which causes issues:
+  // 1. The shipping API uses abbreviations, so it can't distinguish between them
+  // 2. React select dropdowns require unique keys, causing duplicate key warnings
+  const blacklistedUSStates = new Set([
+    'Armed Forces Africa',
+    'Armed Forces Canada',
+    'Armed Forces Middle East',
+  ]);
+
   const statesOrProvinces = shippingCountries.map((country) => ({
     country: country.code,
-    states: country.statesOrProvinces.map((state) => ({
-      value: state.entityId.toString(),
-      label: state.name,
-    })),
+    states: country.statesOrProvinces
+      .filter((state) => country.code !== 'US' || !blacklistedUSStates.has(state.name))
+      .map((state) => ({
+        value: state.abbreviation,
+        label: state.name,
+      })),
   }));
 
   const showShippingForm =
     shippingConsignment?.address && !shippingConsignment.selectedShippingOption;
 
+  const checkoutUrl = data.site.settings?.url.checkoutUrl;
+
   return (
     <>
       <Slot label="Cart top content" snapshotId="cart-top-content" />
       <CartAnalyticsProvider data={Streamable.from(() => getAnalyticsData(cartId))}>
+        {checkoutUrl ? <CheckoutPreconnect url={checkoutUrl} /> : null}
         <CartComponent
           cart={{
             id: cartId,
@@ -166,6 +347,15 @@ export default async function Cart({ params }: Props) {
               currency: cart.currencyCode,
             }),
             totalLabel: t('CheckoutSummary.total'),
+            totalSubtitle:
+              taxIncluded && checkout?.taxTotal
+                ? t('CheckoutSummary.totalIncludesTax', {
+                    tax: format.number(checkout.taxTotal.value, {
+                      style: 'currency',
+                      currency: cart.currencyCode,
+                    }),
+                  })
+                : undefined,
             summaryItems: [
               {
                 label: t('CheckoutSummary.subTotal'),
@@ -174,10 +364,10 @@ export default async function Cart({ params }: Props) {
                   currency: cart.currencyCode,
                 }),
               },
-              cart.discountedAmount.value > 0
+              totalDiscount > 0
                 ? {
                     label: t('CheckoutSummary.discounts'),
-                    value: `-${format.number(cart.discountedAmount.value, {
+                    value: `-${format.number(totalDiscount, {
                       style: 'currency',
                       currency: cart.currencyCode,
                     })}`,
@@ -192,16 +382,25 @@ export default async function Cart({ params }: Props) {
                     })}`,
                   }
                 : null,
-              checkout?.taxTotal && {
-                label: t('CheckoutSummary.tax'),
-                value: format.number(checkout.taxTotal.value, {
+              ...giftCertificatesSummary.map((gc) => ({
+                label: `${t('GiftCertificate.giftCertificate')} (${gc.code})`,
+                value: `-${format.number(gc.used, {
                   style: 'currency',
                   currency: cart.currencyCode,
-                }),
-              },
+                })}`,
+              })),
+              !taxIncluded && checkout?.taxTotal
+                ? {
+                    label: t('CheckoutSummary.tax'),
+                    value: format.number(checkout.taxTotal.value, {
+                      style: 'currency',
+                      currency: cart.currencyCode,
+                    }),
+                  }
+                : null,
             ].filter(exists),
           }}
-          checkoutAction={redirectToCheckout}
+          checkoutAction={CHECKOUT_URL}
           checkoutLabel={t('proceedToCheckout')}
           couponCode={{
             action: updateCouponCode,
@@ -217,9 +416,24 @@ export default async function Cart({ params }: Props) {
             subtitle: t('Empty.subtitle'),
             cta: { label: t('Empty.cta'), href: '/shop-all' },
           }}
+          giftCertificate={
+            giftCertificatesEnabled
+              ? {
+                  action: updateGiftCertificate,
+                  giftCertificateCodes: checkout?.giftCertificates.map((gc) => gc.code) ?? [],
+                  ctaLabel: t('GiftCertificate.apply'),
+                  label: t('GiftCertificate.giftCertificateCode'),
+                  placeholder: tGiftCertificates('CheckBalance.inputPlaceholder'),
+                  removeLabel: t('GiftCertificate.removeGiftCertificate'),
+                }
+              : undefined
+          }
           incrementLineItemLabel={t('increment')}
-          key={`${cart.entityId}-${cart.version}`}
+          // Keyed by entityId only; keying by version too would remount the section on
+          // every mutation (see the pending-intent dispatcher notes in the Cart section).
+          key={cart.entityId}
           lineItemAction={updateLineItem}
+          lineItemActionPendingLabel={t('cartUpdateInProgress')}
           shipping={{
             action: updateShippingInfo,
             countries,
@@ -262,7 +476,9 @@ export default async function Cart({ params }: Props) {
                 }
               : undefined,
             showShippingForm,
-            shippingLabel: t('CheckoutSummary.Shipping.shipping'),
+            shippingLabel: taxIncluded
+              ? t('CheckoutSummary.Shipping.shippingExcludingTax')
+              : t('CheckoutSummary.Shipping.shipping'),
             addLabel: t('CheckoutSummary.Shipping.add'),
             changeLabel: t('CheckoutSummary.Shipping.change'),
             countryLabel: t('CheckoutSummary.Shipping.country'),
@@ -280,6 +496,12 @@ export default async function Cart({ params }: Props) {
           }}
           summaryTitle={t('CheckoutSummary.title')}
           title={t('title')}
+          walletButtons={
+            <ClientWalletButtons
+              graphQLEndpoint={process.env.TRAILING_SLASH !== 'false' ? 'graphql/' : 'graphql'}
+              walletButtonsInitOptions={walletButtonsInitOptions}
+            />
+          }
         />
       </CartAnalyticsProvider>
       <Slot label="Cart bottom content" snapshotId="cart-bottom-content" />

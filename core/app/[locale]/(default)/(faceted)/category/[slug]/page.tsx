@@ -12,9 +12,11 @@ import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/fi
 import { getSessionCustomerAccessToken } from '~/auth';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
 import { pageInfoTransformer } from '~/data-transformers/page-info-transformer';
-import { pricesTransformer } from '~/data-transformers/prices-transformer';
+import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getPreferredCurrencyCode } from '~/lib/currency';
+import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { Slot } from '~/lib/makeswift/slot';
+import { getMetadataAlternates } from '~/lib/seo/canonical';
 
 import { MAX_COMPARE_LIMIT } from '../../../compare/page-data';
 import { getCompareProducts } from '../../fetch-compare-products';
@@ -70,7 +72,10 @@ interface Props {
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-  const { slug } = await props.params;
+  const { slug, locale } = await props.params;
+
+  setRequestLocale(locale);
+
   const customerAccessToken = await getSessionCustomerAccessToken();
 
   const categoryId = Number(slug);
@@ -81,12 +86,22 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     return notFound();
   }
 
+  const makeswiftMetadata = await getMakeswiftPageMetadata({ path: category.path, locale });
+
   const { pageTitle, metaDescription, metaKeywords } = category.seo;
 
+  const breadcrumbs = removeEdgesAndNodes(category.breadcrumbs);
+  const categoryPath = breadcrumbs[breadcrumbs.length - 1]?.path;
+
   return {
-    title: pageTitle || category.name,
-    description: metaDescription,
-    keywords: metaKeywords ? metaKeywords.split(',') : null,
+    title: makeswiftMetadata?.title || pageTitle || category.name,
+    ...((makeswiftMetadata?.description || metaDescription) && {
+      description: makeswiftMetadata?.description || metaDescription,
+    }),
+    ...(metaKeywords && { keywords: metaKeywords.split(',') }),
+    ...(categoryPath && {
+      alternates: await getMetadataAlternates({ path: categoryPath, locale }),
+    }),
   };
 }
 
@@ -114,8 +129,17 @@ export default async function Category(props: Props) {
     href: path ?? '#',
   }));
 
+  const showRating = Boolean(settings?.reviews.enabled && settings.display.showProductRating);
+
   const productComparisonsEnabled =
     settings?.storefront.catalog?.productComparisonsEnabled ?? false;
+
+  const taxDisplay = settings?.tax?.plp;
+
+  const categoryDefaultSort =
+    category.defaultProductSort && category.defaultProductSort !== 'DEFAULT'
+      ? category.defaultProductSort.toLowerCase()
+      : 'featured';
 
   const streamableFacetedSearch = Streamable.from(async () => {
     const searchParams = await props.searchParams;
@@ -126,12 +150,14 @@ export default async function Category(props: Props) {
       customerAccessToken,
     );
     const parsedSearchParams = loadSearchParams?.(searchParams) ?? {};
+    const sort = typeof searchParams.sort === 'string' ? searchParams.sort : categoryDefaultSort;
 
     const search = await fetchFacetedSearch(
       {
         ...searchParams,
         ...parsedSearchParams,
         category: categoryId,
+        sort,
       },
       currencyCode,
       customerAccessToken,
@@ -146,16 +172,16 @@ export default async function Category(props: Props) {
     const search = await streamableFacetedSearch;
     const products = search.products.items;
 
-    return products.map((product) => ({
-      id: product.entityId.toString(),
-      title: product.name,
-      href: product.path,
-      image: product.defaultImage
-        ? { src: product.defaultImage.url, alt: product.defaultImage.altText }
-        : undefined,
-      price: pricesTransformer(product.prices, format),
-      subtitle: product.brand?.name ?? undefined,
-    }));
+    const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
+      settings?.inventory ?? {};
+
+    return productCardTransformer(
+      products,
+      format,
+      showOutOfStockMessage ? defaultOutOfStockMessage : undefined,
+      showBackorderMessage,
+      taxDisplay,
+    );
   });
 
   const streamableTotalCount = Streamable.from(async () => {
@@ -262,7 +288,8 @@ export default async function Category(props: Props) {
         removeLabel={t('Compare.remove')}
         resetFiltersLabel={t('FacetedSearch.resetFilters')}
         showCompare={productComparisonsEnabled}
-        sortDefaultValue="featured"
+        showRating={showRating}
+        sortDefaultValue={categoryDefaultSort}
         sortLabel={t('SortBy.sortBy')}
         sortOptions={[
           { value: 'featured', label: t('SortBy.featuredItems') },
@@ -284,7 +311,13 @@ export default async function Category(props: Props) {
         snapshotId={`category-${categoryId}-bottom-content`}
       />
       <Stream value={streamableFacetedSearch}>
-        {(search) => <CategoryViewed category={category} products={search.products.items} />}
+        {(search) => (
+          <CategoryViewed
+            category={category}
+            products={search.products.items}
+            taxDisplay={taxDisplay}
+          />
+        )}
       </Stream>
     </>
   );

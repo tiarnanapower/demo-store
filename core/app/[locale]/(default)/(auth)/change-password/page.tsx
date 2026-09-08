@@ -3,7 +3,8 @@ import { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { ResetPasswordSection } from '@/vibes/soul/sections/reset-password-section';
-import { redirect } from '~/i18n/routing';
+import { getChangePasswordQuery } from '~/app/[locale]/(default)/(auth)/change-password/page-data';
+import { redirect } from '~/i18n/navigation-server';
 
 import { changePassword } from './_actions/change-password';
 
@@ -34,14 +35,17 @@ export default async function ChangePassword({ params, searchParams }: Props) {
   const t = await getTranslations('Auth.ChangePassword');
 
   if (!customerEntityId || !token) {
-    return redirect({ href: '/login', locale });
+    return await redirect({ href: '/login', locale });
   }
+
+  const { passwordComplexitySettings } = await getChangePasswordQuery();
 
   return (
     <ResetPasswordSection
       action={changePassword.bind(null, { customerEntityId, token })}
       confirmPasswordLabel={t('confirmPassword')}
       newPasswordLabel={t('newPassword')}
+      passwordComplexitySettings={passwordComplexitySettings}
       title={t('title')}
     />
   );

@@ -1,5 +1,68 @@
 # Changelog
 
+## 2.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`9990a87`](https://github.com/bigcommerce/catalyst/commit/9990a872931d95b38fc8c66cd216ccb0be041bf3), [`eef0c18`](https://github.com/bigcommerce/catalyst/commit/eef0c186544315c68f201ce9bdeccd563f4619aa), [`382bdf5`](https://github.com/bigcommerce/catalyst/commit/382bdf594bcc07425f6f82729659bfe9eaf9696c), [`2ec54df`](https://github.com/bigcommerce/catalyst/commit/2ec54df10b80ee3768fdfa2c611d707ff1e69fc6), [`391f96c`](https://github.com/bigcommerce/catalyst/commit/391f96c159ea482c1e09a519148ec1463d56ea39), [`ce7d1b2`](https://github.com/bigcommerce/catalyst/commit/ce7d1b23ca2b352e9aad2d3f4b112513574156c2), [`5f7e630`](https://github.com/bigcommerce/catalyst/commit/5f7e6306761ab459224638bfd6fd7ede568b0079), [`a78f93c`](https://github.com/bigcommerce/catalyst/commit/a78f93cf72999de13fadd98cb144f1e1c5bc5bb1), [`d263871`](https://github.com/bigcommerce/catalyst/commit/d263871a7aab465be3bffad05c77c5649ac9afaf)]:
+  - @bigcommerce/catalyst@1.3.0
+
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`bb04eca`](https://github.com/bigcommerce/catalyst/commit/bb04ecab9e0e905efd04da10536083479f9e8ed3)]:
+  - @bigcommerce/catalyst@1.2.0
+
+## 2.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`bd72110`](https://github.com/bigcommerce/catalyst/commit/bd721106dbded48e823acad6548019d1210258f6)]:
+  - @bigcommerce/catalyst@1.1.1
+
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`552cfb5`](https://github.com/bigcommerce/catalyst/commit/552cfb5c59a1e69b92f7018c2ddc3c9b3c5f0c61), [`9565d76`](https://github.com/bigcommerce/catalyst/commit/9565d7636de95327651af0a90ced37a352241be7), [`fea7b30`](https://github.com/bigcommerce/catalyst/commit/fea7b30bab0d1b09dc5bddbe3884317968264760), [`5ca4c61`](https://github.com/bigcommerce/catalyst/commit/5ca4c615ead79bc3bf1b7b1bc3ce1743fddeb12b), [`27373e8`](https://github.com/bigcommerce/catalyst/commit/27373e8a50c9bd0703f474364a7c269947d56179), [`b4e5952`](https://github.com/bigcommerce/catalyst/commit/b4e595210b2a38e24aac98c656581dfbd67a1c8f), [`e3e5ab2`](https://github.com/bigcommerce/catalyst/commit/e3e5ab2e3cae414e6067017b1a8939f472fa1456), [`aadaf27`](https://github.com/bigcommerce/catalyst/commit/aadaf27b72cbbf0889262a26ca44daec54bdbbb4), [`8d9f9a9`](https://github.com/bigcommerce/catalyst/commit/8d9f9a92da07d65ec8c9cc9a45ec1ffb582d96c7), [`0d42b12`](https://github.com/bigcommerce/catalyst/commit/0d42b12a59157eceba1397411de504767d7a309d), [`c1d0f3d`](https://github.com/bigcommerce/catalyst/commit/c1d0f3df789f304f8ce1aa07225cdcc5a110dfa3), [`bf58b13`](https://github.com/bigcommerce/catalyst/commit/bf58b134cd870e04ec585eec465e93ce9481d13b), [`05f600a`](https://github.com/bigcommerce/catalyst/commit/05f600a5fcee8c17927b2b56343f942a2e6d4b2c), [`ce03afb`](https://github.com/bigcommerce/catalyst/commit/ce03afb8e7ef27e4821e99f8fd4e4d94a7654922), [`07cd41c`](https://github.com/bigcommerce/catalyst/commit/07cd41cd5867fd3fc520a7a3fda752f059bf0c5a)]:
+  - @bigcommerce/catalyst@1.1.0
+
+## 2.0.0
+
+### Major Changes
+
+- [#3077](https://github.com/bigcommerce/catalyst/pull/3077) [`a45ab43`](https://github.com/bigcommerce/catalyst/commit/a45ab4346c27e8cc60d6ce64fb597f22dbde2243) Thanks [@jorgemoya](https://github.com/jorgemoya)! - Reduce `create-catalyst` to a thin wrapper that delegates to `catalyst create`. `pnpm create catalyst` / `npx create-catalyst` still scaffold a project — now by invoking `@bigcommerce/catalyst` under the hood — so the scaffolding UX is unchanged. The standalone `init`, `integration`, and `telemetry` subcommands are removed; use `catalyst channel link` and `catalyst telemetry` from the consolidated CLI instead.
+
+### Patch Changes
+
+- Updated dependencies [[`a45ab43`](https://github.com/bigcommerce/catalyst/commit/a45ab4346c27e8cc60d6ce64fb597f22dbde2243)]:
+  - @bigcommerce/catalyst@1.0.0
+
+## 1.1.0
+
+### Minor Changes
+
+- [#3055](https://github.com/bigcommerce/catalyst/pull/3055) [`854aab5`](https://github.com/bigcommerce/catalyst/commit/854aab54d530c71a07360c753cc687fd3944325b) Thanks [@jorgemoya](https://github.com/jorgemoya)! - Deprecate the `create-catalyst integration` command. It now prints a deprecation warning when invoked and is hidden from `--help`. The command builds integration patches by diffing git tags, which won't work once Catalyst projects are distributed as tarballs (no git history) — it will be replaced by the forthcoming `catalyst upgrade` command. The command still functions for now; full removal will follow in a future major version.
+
+## 1.0.3
+
+### Patch Changes
+
+- [#2993](https://github.com/bigcommerce/catalyst/pull/2993) [`ed76224`](https://github.com/bigcommerce/catalyst/commit/ed7622453edc667a3582646074e0ccb72eb7b714) Thanks [@chanceaclark](https://github.com/chanceaclark)! - Update the client id to the new one.
+
+## 1.0.2
+
+### Patch Changes
+
+- [#2940](https://github.com/bigcommerce/catalyst/pull/2940) [`a4b614d`](https://github.com/bigcommerce/catalyst/commit/a4b614d99a208f21b4d4ee1462666581f21335d8) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Align Node.js engine requirement with v24. The `engines.node` field in `create-catalyst` now matches the runtime version gate (`^24.0.0`), ensuring `pnpm create @bigcommerce/catalyst` correctly rejects unsupported Node versions before installation begins.
+
+## 1.0.1
+
+### Patch Changes
+
+- [#2591](https://github.com/bigcommerce/catalyst/pull/2591) [`f791fef`](https://github.com/bigcommerce/catalyst/commit/f791fef1283e1d5a0fabf81fa64140317e99c84e) Thanks [@matthewvolk](https://github.com/matthewvolk)! - Removes `chalk` dependency in favor of `consola` "colorize" utility function (which only depends on `node:tty`)
+
 ## 1.0.0
 
 ### Major Changes

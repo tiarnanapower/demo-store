@@ -1,7 +1,10 @@
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
+import { Button } from '@/vibes/soul/primitives/button';
 import { CursorPagination, CursorPaginationInfo } from '@/vibes/soul/primitives/cursor-pagination';
 import { Rating } from '@/vibes/soul/primitives/rating';
 import { StickySidebarLayout } from '@/vibes/soul/sections/sticky-sidebar-layout';
+
+import { ReviewForm, SubmitReviewAction } from './review-form';
 
 interface Review {
   id: string;
@@ -14,15 +17,34 @@ interface Review {
 interface Props {
   reviews: Streamable<Review[]>;
   averageRating: Streamable<number>;
-  totalCount?: Streamable<string>;
+  totalCount?: Streamable<number>;
   paginationInfo?: Streamable<CursorPaginationInfo>;
   nextLabel?: Streamable<string>;
   previousLabel?: Streamable<string>;
   emptyStateMessage?: string;
   reviewsLabel?: string;
+  productId: number;
+  action: SubmitReviewAction;
+  formButtonLabel?: string;
+  formModalTitle?: string;
+  formSubmitLabel?: string;
+  formCancelLabel?: string;
+  formRatingLabel?: string;
+  formTitleLabel?: string;
+  formReviewLabel?: string;
+  formNameLabel?: string;
+  formEmailLabel?: string;
+  streamableImages: Streamable<{
+    images: Array<{ src: string; alt: string }>;
+    pageInfo?: { hasNextPage: boolean; endCursor: string | null };
+  }>;
+  streamableProduct: Streamable<{ name: string }>;
+  streamableUser: Streamable<{ email: string; name: string }>;
+  recaptchaSiteKey?: string;
 }
 
 export function Reviews({
+  productId,
   reviews: streamableReviews,
   averageRating: streamableAverageRating,
   totalCount: streamableTotalCount,
@@ -31,12 +53,46 @@ export function Reviews({
   previousLabel,
   emptyStateMessage,
   reviewsLabel = 'Reviews',
+  action,
+  formButtonLabel = 'Write a review',
+  formModalTitle,
+  formSubmitLabel,
+  formCancelLabel,
+  formRatingLabel,
+  formTitleLabel,
+  formReviewLabel,
+  formNameLabel,
+  formEmailLabel,
+  streamableProduct,
+  streamableImages,
+  streamableUser,
+  recaptchaSiteKey,
 }: Readonly<Props>) {
   return (
     <Stream fallback={<ReviewsSkeleton reviewsLabel={reviewsLabel} />} value={streamableReviews}>
       {(reviews) => {
         if (reviews.length === 0)
-          return <ReviewsEmptyState message={emptyStateMessage} reviewsLabel={reviewsLabel} />;
+          return (
+            <ReviewsEmptyState
+              action={action}
+              formButtonLabel={formButtonLabel}
+              formCancelLabel={formCancelLabel}
+              formEmailLabel={formEmailLabel}
+              formModalTitle={formModalTitle}
+              formNameLabel={formNameLabel}
+              formRatingLabel={formRatingLabel}
+              formReviewLabel={formReviewLabel}
+              formSubmitLabel={formSubmitLabel}
+              formTitleLabel={formTitleLabel}
+              message={emptyStateMessage}
+              productId={productId}
+              recaptchaSiteKey={recaptchaSiteKey}
+              reviewsLabel={reviewsLabel}
+              streamableImages={streamableImages}
+              streamableProduct={streamableProduct}
+              streamableUser={streamableUser}
+            />
+          );
 
         return (
           <StickySidebarLayout
@@ -70,12 +126,32 @@ export function Reviews({
                   {(averageRating) => (
                     <>
                       <div className="mb-2 font-heading text-5xl leading-none tracking-tighter @2xl:text-6xl">
-                        {averageRating}
+                        {parseFloat(averageRating.toFixed(1))}
                       </div>
                       <Rating rating={averageRating} showRating={false} />
                     </>
                   )}
                 </Stream>
+                <ReviewForm
+                  action={action}
+                  formEmailLabel={formEmailLabel}
+                  formModalTitle={formModalTitle}
+                  formNameLabel={formNameLabel}
+                  formRatingLabel={formRatingLabel}
+                  formReviewLabel={formReviewLabel}
+                  formSubmitLabel={formSubmitLabel}
+                  formTitleLabel={formTitleLabel}
+                  productId={productId}
+                  recaptchaSiteKey={recaptchaSiteKey}
+                  streamableImages={streamableImages}
+                  streamableProduct={streamableProduct}
+                  streamableUser={streamableUser}
+                  trigger={
+                    <Button className="mx-auto mt-8" size="small" variant="tertiary">
+                      {formButtonLabel}
+                    </Button>
+                  }
+                />
               </>
             }
             sidebarSize="medium"
@@ -115,9 +191,42 @@ export function Reviews({
 export function ReviewsEmptyState({
   message = 'No reviews have been added for this product',
   reviewsLabel = 'Reviews',
+  productId,
+  action,
+  formButtonLabel = 'Write a review',
+  formModalTitle,
+  formSubmitLabel,
+  formCancelLabel,
+  formRatingLabel,
+  formTitleLabel,
+  formReviewLabel,
+  formNameLabel,
+  formEmailLabel,
+  streamableProduct,
+  streamableImages,
+  streamableUser,
+  recaptchaSiteKey,
 }: {
   message?: string;
   reviewsLabel?: string;
+  productId: number;
+  action: SubmitReviewAction;
+  formButtonLabel?: string;
+  formModalTitle?: string;
+  formSubmitLabel?: string;
+  formCancelLabel?: string;
+  formRatingLabel?: string;
+  formTitleLabel?: string;
+  formReviewLabel?: string;
+  formNameLabel?: string;
+  formEmailLabel?: string;
+  streamableImages: Streamable<{
+    images: Array<{ src: string; alt: string }>;
+    pageInfo?: { hasNextPage: boolean; endCursor: string | null };
+  }>;
+  streamableProduct: Streamable<{ name: string }>;
+  streamableUser: Streamable<{ email: string; name: string }>;
+  recaptchaSiteKey?: string;
 }) {
   return (
     <StickySidebarLayout
@@ -129,13 +238,34 @@ export function ReviewsEmptyState({
           <div className="mb-2 font-heading text-5xl leading-none tracking-tighter @2xl:text-6xl">
             0
           </div>
-          <Rating rating={0} />
+          <Rating rating={0} showRating={false} />
         </>
       }
       sidebarSize="medium"
     >
-      <div className="flex-1 border-t border-contrast-100 py-12">
+      <div className="flex flex-1 flex-col border-t border-contrast-100 py-12">
         <p className="text-center">{message}</p>
+        <ReviewForm
+          action={action}
+          formCancelLabel={formCancelLabel}
+          formEmailLabel={formEmailLabel}
+          formModalTitle={formModalTitle}
+          formNameLabel={formNameLabel}
+          formRatingLabel={formRatingLabel}
+          formReviewLabel={formReviewLabel}
+          formSubmitLabel={formSubmitLabel}
+          formTitleLabel={formTitleLabel}
+          productId={productId}
+          recaptchaSiteKey={recaptchaSiteKey}
+          streamableImages={streamableImages}
+          streamableProduct={streamableProduct}
+          streamableUser={streamableUser}
+          trigger={
+            <Button className="mx-auto mt-8" size="small" variant="tertiary">
+              {formButtonLabel}
+            </Button>
+          }
+        />
       </div>
     </StickySidebarLayout>
   );

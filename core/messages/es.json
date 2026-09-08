@@ -43,7 +43,17 @@
             "newPassword": "Nueva contraseña",
             "confirmPassword": "Confirmar contraseña",
             "passwordUpdated": "La contraseña se ha actualizado correctamente.",
-            "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde."
+            "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde.",
+            "FieldErrors": {
+                "passwordRequired": "Se requiere la contraseña",
+                "passwordTooSmall": "La contraseña debe tener al menos {minLength, plural, =1 {1 carácter} other {# caracteres}}",
+                "passwordLowercaseRequired": "La contraseña debe contener al menos una letra minúscula",
+                "passwordUppercaseRequired": "La contraseña debe contener al menos una letra mayúscula",
+                "passwordNumberRequired": "La contraseña debe contener al menos {minNumbers, plural, =1 {un número} other {# números}}",
+                "passwordSpecialCharacterRequired": "La contraseña debe contener al menos un carácter especial",
+                "passwordsMustMatch": "Las contraseñas no coinciden",
+                "confirmPasswordRequired": "Confirma tu contraseña"
+            }
         },
         "Login": {
             "title": "Iniciar sesión",
@@ -54,6 +64,14 @@
             "password": "Contraseña",
             "invalidCredentials": "Tu dirección de correo electrónico o contraseña son incorrectas. Intenta iniciar sesión de nuevo o restablece tu contraseña",
             "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde.",
+            "passwordResetRequired": "Es necesario restablecer la contraseña. Consulta tu correo electrónico para recibir instrucciones sobre cómo restablecer tu contraseña.",
+            "invalidToken": "Tu enlace de inicio de sesión no es válido o ha caducado. Intenta conectarte de nuevo.",
+            "FieldErrors": {
+                "emailRequired": "Se requiere un correo electrónico",
+                "emailInvalid": "Introduce una dirección de correo electrónico válida",
+                "passwordRequired": "Se requiere la contraseña",
+                "invalidInput": "Comprueba lo que has escrito e inténtalo de nuevo."
+            },
             "CreateAccount": {
                 "title": "¿Cliente nuevo?",
                 "accountBenefits": "Cree una cuenta con nosotros y podrá:",
@@ -68,14 +86,37 @@
                 "title": "Olvidé mi contraseña",
                 "subtitle": "Introduce a continuación la dirección de correo electrónico asociada a tu cuenta. Te enviaremos instrucciones para restablecer tu contraseña.",
                 "confirmResetPassword": "Si la dirección de correo electrónico {email} está vinculada a una cuenta en nuestra tienda, te hemos enviado un correo electrónico de restablecimiento de contraseña. Comprueba tu bandeja de entrada y tu carpeta de correo no deseado si no lo ves.",
-                "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde."
+                "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde.",
+                "FieldErrors": {
+                    "emailRequired": "Se requiere un correo electrónico",
+                    "emailInvalid": "Introduce una dirección de correo electrónico válida"
+                }
             }
         },
         "Register": {
             "title": "Registrar cuenta",
             "heading": "Cuenta nueva",
             "cta": "Crear cuenta",
-            "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde."
+            "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde.",
+            "recaptchaRequired": "Completa la verificación de reCAPTCHA.",
+            "FieldErrors": {
+                "firstNameRequired": "El campo Nombre es obligatorio.",
+                "lastNameRequired": "El campo Apellido(s) es obligatorio.",
+                "emailRequired": "Se requiere un correo electrónico",
+                "emailInvalid": "Introduce una dirección de correo electrónico válida",
+                "passwordRequired": "Se requiere la contraseña",
+                "passwordTooSmall": "La contraseña debe tener al menos {minLength, plural, =1 {1 carácter} other {# caracteres}}",
+                "passwordLowercaseRequired": "La contraseña debe contener al menos una letra minúscula",
+                "passwordUppercaseRequired": "La contraseña debe contener al menos una letra mayúscula",
+                "passwordNumberRequired": "La contraseña debe contener al menos {minNumbers, plural, =1 {un número} other {# números}}",
+                "passwordSpecialCharacterRequired": "La contraseña debe contener al menos un carácter especial",
+                "passwordsMustMatch": "Las contraseñas no coinciden",
+                "addressLine1Required": "El campo Línea de dirección 1 es obligatorio",
+                "cityRequired": "El campo Ciudad es obligatorio",
+                "countryRequired": "El campo de país es obligatorio.",
+                "stateRequired": "El campo de Estado/Provincia es obligatorio",
+                "postalCodeRequired": "El campo Código postal es obligatorio"
+            }
         }
     },
     "Faceted": {
@@ -103,7 +144,8 @@
             "Empty": {
                 "title": "Lo sentimos, no hay resultados para \"{term}\".",
                 "subtitle": "Intenta con otra búsqueda."
-            }
+            },
+            "semanticSearchPlaceholder": "Describe lo que buscas"
         },
         "FacetedSearch": {
             "filters": "Filtros",
@@ -159,10 +201,19 @@
                 "summaryTotal": "Total",
                 "destination": "Destino",
                 "destinationWithCount": "Destino {número, número}/{total, número}",
+                "digitalDelivery": "Entrega digital a {email}",
                 "subtotal": "Subtotal",
                 "shipping": "Envío",
                 "tax": "Impuesto",
-                "orderSummary": "Resumen del pedido"
+                "orderSummary": "Resumen del pedido",
+                "paymentMethodsLabel": "{count, plural, =1 {Método de pago} other {Métodos de pago}}",
+                "paymentEndingInLabel": "Termina en",
+                "PaymentMethods": {
+                    "creditCard": "Tarjeta de crédito",
+                    "giftCertificate": "Certificado de regalo",
+                    "storeCredit": "Crédito en tienda",
+                    "other": "Otro"
+                }
             }
         },
         "Addresses": {
@@ -177,6 +228,15 @@
             "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde.",
             "EmptyState": {
                 "title": "No tienes ninguna dirección"
+            },
+            "FieldErrors": {
+                "firstNameRequired": "El campo Nombre es obligatorio.",
+                "lastNameRequired": "El campo Apellido(s) es obligatorio.",
+                "addressLine1Required": "El campo Línea de dirección 1 es obligatorio",
+                "cityRequired": "El campo Ciudad es obligatorio",
+                "countryRequired": "El campo de país es obligatorio.",
+                "stateRequired": "El campo de Estado/Provincia es obligatorio",
+                "postalCodeRequired": "El campo Código postal es obligatorio"
             }
         },
         "Settings": {
@@ -188,7 +248,30 @@
             "currentPassword": "Contraseña actual",
             "newPassword": "Nueva contraseña",
             "confirmPassword": "Confirmar contraseña",
-            "cta": "Actualizar"
+            "cta": "Actualizar",
+            "NewsletterSubscription": {
+                "title": "Preferencias de marketing",
+                "label": "Suscríbase a nuestro boletín.",
+                "marketingPreferencesUpdated": "¡Las preferencias de marketing se han actualizado correctamente!",
+                "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde."
+            },
+            "FieldErrors": {
+                "firstNameRequired": "El campo Nombre es obligatorio.",
+                "firstNameTooSmall": "El nombre debe tener al menos 2 caracteres",
+                "lastNameRequired": "El campo Apellido(s) es obligatorio.",
+                "lastNameTooSmall": "El apellido debe tener al menos 2 caracteres",
+                "emailRequired": "Se requiere un correo electrónico",
+                "emailInvalid": "Introduce una dirección de correo electrónico válida",
+                "currentPasswordRequired": "Es obligatorio indicar la contraseña actual",
+                "passwordRequired": "Se requiere la contraseña",
+                "passwordTooSmall": "La contraseña debe tener al menos {minLength, plural, =1 {1 carácter} other {# caracteres}}",
+                "passwordLowercaseRequired": "La contraseña debe contener al menos una letra minúscula",
+                "passwordUppercaseRequired": "La contraseña debe contener al menos una letra mayúscula",
+                "passwordNumberRequired": "La contraseña debe contener al menos {minNumbers, plural, =1 {un número} other {# números}}",
+                "passwordSpecialCharacterRequired": "La contraseña debe contener al menos un carácter especial",
+                "passwordsMustMatch": "Las contraseñas no coinciden",
+                "confirmPasswordRequired": "Confirma tu contraseña"
+            }
         }
     },
     "Wishlist": {
@@ -342,21 +425,29 @@
         "removeItem": "Eliminar artículo",
         "cartCombined": "Nos hemos dado cuenta de que tenías artículos guardados en un carrito anterior, así que los hemos añadido a tu carrito actual.",
         "cartRestored": "Empezaste a llenar un carrito en otro dispositivo y lo hemos restaurado aquí para que puedas seguir donde lo dejaste.",
+        "cartUpdateInProgress": "Tienes una actualización del carrito en curso. ¿Seguro que quieres abandonar esta página? Es posible que se pierdan los cambios.",
+        "originalPrice": "El precio original era {price}.",
+        "currentPrice": "El precio actual es {price}.",
+        "quantityReadyToShip": "{quantity, number} listo para enviar",
+        "quantityOnBackorder": "Cantidad que se añadirá a pedidos pendientes: {quantity, number}",
+        "partiallyAvailable": "Cantidad disponible: {quantity, number}",
         "CheckoutSummary": {
             "title": "Resumen",
             "subTotal": "Subtotal",
             "discounts": "Descuentos",
             "tax": "Impuesto",
+            "totalIncludesTax": "Incluye {tax} impuestos",
             "total": "Total",
             "CouponCode": {
                 "apply": "Aplicar",
                 "couponCode": "Código de cupón",
                 "removeCouponCode": "Elimina el código de cupón",
                 "invalidCouponCode": "Introduce un código de cupón válido",
-                "cartNotFound": "No se ha encontrado ninguna cookie cartId."
+                "cartNotFound": "Se ha producido un error al recuperar tu carrito"
             },
             "Shipping": {
                 "shipping": "Envío",
+                "shippingExcludingTax": "Envío (sin Impuestos)",
                 "add": "Añadir",
                 "change": "Cambiar",
                 "cancel": "Cancelar",
@@ -370,9 +461,20 @@
                 "shippingOptions": "Opciones de envío",
                 "updateShipping": "Actualizar envío",
                 "addShipping": "Añadir envío",
-                "cartNotFound": "No se ha encontrado ninguna cookie cartId.",
-                "noShippingOptions": "No hay opciones de envío disponibles para tu dirección"
+                "cartNotFound": "Se ha producido un error al recuperar tu carrito",
+                "noShippingOptions": "No hay opciones de envío disponibles para tu dirección",
+                "countryRequired": "El campo de país es obligatorio."
             }
+        },
+        "GiftCertificate": {
+            "giftCertificate": "Certificado de regalo",
+            "giftCertificateCode": "Código del certificado de regalo",
+            "removeGiftCertificate": "Eliminar certificado de regalo",
+            "apply": "Aplicar",
+            "to": "a",
+            "message": "Mensaje",
+            "invalidGiftCertificate": "Introduce un código de cupón de regalo válido",
+            "cartNotFound": "Se ha producido un error al recuperar tu carrito"
         },
         "Empty": {
             "title": "Su carrito está vacío.",
@@ -380,7 +482,7 @@
             "cta": "Seguir comprando"
         },
         "Errors": {
-            "cartNotFound": "No se ha encontrado ninguna cookie cartId.",
+            "cartNotFound": "Se ha producido un error al recuperar tu carrito",
             "lineItemNotFound": "No se ha encontrado el elemento.",
             "failedToUpdateQuantity": "No se pudo actualizar la cantidad.",
             "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde."
@@ -401,6 +503,8 @@
         "otherDetails": "Otros detalles",
         "noOtherDetails": "No hay más detalles.",
         "viewOptions": "Ver opciones",
+        "showMore": "Mostrar más",
+        "showLess": "Mostrar menos",
         "successMessage": "{cartItems, plural, =1 {1 Item} other {# Items}} añadidos <cartLink> al carrito</cartLink>",
         "missingCart": "No se ha encontrado el carrito. Vuelva a intentarlo más tarde.",
         "unknownError": "Error desconocido. Vuelva a intentarlo más tarde."
@@ -419,6 +523,16 @@
             "decreaseNumber": "Disminuir número",
             "thumbnail": "Ver número de imagen",
             "additionalInformation": "Información adicional",
+            "currentStock": "{cantidad, número} en existencias",
+            "backorderQuantity": "{cantidad, número} en pedidos pendientes",
+            "maxPurchasableQuantity": "La cantidad máxima disponible para tu compra es {quantity, number}. Ajusta y vuelve a intentarlo.",
+            "loadingMoreImages": "Cargando más imágenes",
+            "imagesLoaded": "{count, plural, =1 {1 imagen más cargada} other {# imágenes más cargadas}}",
+            "playVideo": "Ver vídeo",
+            "viewVideo": "Ver vídeo",
+            "videosTitle": "Vídeos",
+            "hideVideos": "Ocultar vídeos",
+            "showVideos": "Mostrar vídeos",
             "Submit": {
                 "addToCart": "Añadir al carrito",
                 "outOfStock": "Sin existencias",
@@ -446,7 +560,31 @@
             "title": "Reseñas",
             "empty": "No se han escrito opiniones para este producto.",
             "previous": "Reseñas anteriores",
-            "next": "Próximas reseñas"
+            "next": "Próximas reseñas",
+            "Form": {
+                "button": "Escribir una reseña",
+                "title": "Escribir una reseña",
+                "submit": "Enviar",
+                "cancel": "Cancelar",
+                "ratingLabel": "Calificación",
+                "titleLabel": "Título",
+                "reviewLabel": "Reseña",
+                "nameLabel": "Nombre",
+                "emailLabel": "Correo electrónico",
+                "successMessage": "¡Tu reseña se ha enviado correctamente!",
+                "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde.",
+                "recaptchaRequired": "Completa la verificación de reCAPTCHA.",
+                "FieldErrors": {
+                    "titleRequired": "El título es obligatorio",
+                    "authorRequired": "El campo Nombre es obligatorio",
+                    "emailRequired": "Se requiere un correo electrónico",
+                    "emailInvalid": "Introduce una dirección de correo electrónico válida",
+                    "textRequired": "La revisión es obligatoria",
+                    "ratingRequired": "La calificación es obligatoria",
+                    "ratingTooSmall": "La puntuación debe ser como mínimo 1",
+                    "ratingTooLarge": "La puntuación debe ser como máximo 5"
+                }
+            }
         }
     },
     "WebPages": {
@@ -466,7 +604,8 @@
                 "email": "Correo electrónico",
                 "comments": "Comentarios/Preguntas",
                 "cta": "Enviar formulario",
-                "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde."
+                "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde.",
+                "recaptchaRequired": "Completa la verificación de reCAPTCHA."
             }
         }
     },
@@ -487,13 +626,17 @@
         "search": "Buscar"
     },
     "Components": {
+        "ProductCard": {
+            "moreOffers": "+{count, plural, =1 {# oferta más} other {# más ofertas}}"
+        },
         "Header": {
             "home": "Inicio",
             "toggleNavigation": "Alternar navegación",
             "Icons": {
                 "account": "Perfil",
                 "cart": "Carrito",
-                "search": "Abrir ventana de búsqueda"
+                "search": "Abrir ventana de búsqueda",
+                "giftCertificates": "Certificados de regalo"
             },
             "SwitchCurrency": {
                 "label": "Cambiar divisa",
@@ -517,13 +660,132 @@
             "socialMediaLinks": "Vínculos a redes sociales",
             "categories": "Categorías",
             "brands": "Marcas",
-            "navigate": "Navegar"
+            "navigate": "Navegar",
+            "giftCertificates": "Certificados de regalo"
         },
         "Subscribe": {
             "title": "Suscribirse a nuestro boletín",
             "placeholder": "Introduzca su correo electrónico",
             "description": "Entérate de todas las novedades y ofertas de nuestra tienda.",
-            "success": "Gracias por tu interés. ¡La función de boletín estará disponible pronto!"
+            "subscribedToNewsletter": "¡Te has suscrito a nuestro boletín!",
+            "Errors": {
+                "emailRequired": "Se requiere un correo electrónico",
+                "invalidEmail": "Introduce una dirección de correo electrónico válida",
+                "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde."
+            }
+        },
+        "ConsentManager": {
+            "Common": {
+                "rejectAll": "Rechazar todo",
+                "acceptAll": "Aceptar todo",
+                "customize": "Personalizar",
+                "save": "Guardar la configuración"
+            },
+            "CookieBanner": {
+                "title": "Valoramos tu privacidad",
+                "description": "Este sitio utiliza cookies para mejorar tu experiencia de navegación, analizar el tráfico del sitio y mostrar contenido personalizado.",
+                "privacyPolicy": "Política de privacidad"
+            },
+            "Dialog": {
+                "title": "Configuración de privacidad",
+                "description": "Personaliza tu configuración de privacidad aquí. Puedes elegir qué tipos de cookies y tecnologías de seguimiento te gustaría permitir."
+            },
+            "ConsentTypes": {
+                "necessary": {
+                    "title": "Estrictamente necesario",
+                    "description": "Estas cookies son esenciales para que el sitio web funcione correctamente y no se pueden desactivar."
+                },
+                "functionality": {
+                    "title": "Funcionalidad",
+                    "description": "Estas cookies permiten mejorar la funcionalidad y la personalización del sitio web."
+                },
+                "marketing": {
+                    "title": "Marketing",
+                    "description": "Estas cookies se utilizan para ofrecer anuncios relevantes y realizar un seguimiento de su efectividad."
+                },
+                "measurement": {
+                    "title": "Análisis",
+                    "description": "Estas cookies nos ayudan a comprender cómo interactúan los visitantes con el sitio web y a mejorar su rendimiento."
+                },
+                "experience": {
+                    "title": "Experiencia",
+                    "description": "Estas cookies nos ayudan a brindar una mejor experiencia de usuario y probar nuevas funciones."
+                }
+            }
+        },
+        "Price": {
+            "originalPrice": "El precio original era {price}.",
+            "currentPrice": "El precio actual es {price}.",
+            "range": "Precios entre {minValue} y {maxValue}.",
+            "includingTax": "(con impuestos)",
+            "excludingTax": "(Sin Impuesto)",
+            "includingTaxFull": "Con impuestos",
+            "excludingTaxFull": "Excluye impuestos"
+        }
+    },
+    "GiftCertificates": {
+        "title": "Certificados de regalo",
+        "description": "Haz el regalo perfecto que nunca pasa de moda. Deja que tus amigos y seres queridos elijan exactamente lo que quieren de toda nuestra colección.",
+        "purchaseLabel": "Comprar ahora",
+        "checkBalanceLabel": "Verificar saldo",
+        "expiresAtLabel": "Válido hasta",
+        "CheckBalance": {
+            "title": "Verificar saldo",
+            "description": "Puedes comprobar el saldo y obtener la información sobre tu cupón de regalo escribiendo el código en la casilla de abajo.",
+            "inputLabel": "Código",
+            "inputPlaceholder": "XXX-XXX-XXX-XXX",
+            "purchasedDateLabel": "Comprado",
+            "senderLabel": "de",
+            "Errors": {
+                "invalidCode": "El código del cupón de regalo que has introducido no es válido. Compruébalo e inténtalo de nuevo.",
+                "codeRequired": "Introduce un código de cupón de regalo.",
+                "somethingWentWrong": "Algo salió mal. Vuelva a intentarlo más tarde."
+            }
+        },
+        "Purchase": {
+            "breadcrumbTitle": "Comprar un cupón de regalo",
+            "title": "Certificado de regalo digital",
+            "description": "Explora nuestros cupones de regalo, perfectos para cualquier ocasión. Elige el importe y personaliza tu mensaje.",
+            "successMessage": "Se ha añadido un cupón de regalo a <cartLink>tu carrito</cartLink>",
+            "missingCart": "No se ha encontrado el carrito. Vuelva a intentarlo más tarde.",
+            "unknownError": "Error desconocido. Vuelva a intentarlo más tarde.",
+            "Form": {
+                "amountLabel": "Cantidad",
+                "customAmountLabel": "Importe (entre {minAmount} y {maxAmount})",
+                "selectAmountPlaceholder": "Selecciona una cantidad",
+                "customAmountPlaceholder": "Introduce un importe personalizado",
+                "senderNameLabel": "Su nombre",
+                "senderEmailLabel": "Su correo electrónico",
+                "recipientNameLabel": "Nombre del destinatario",
+                "recipientEmailLabel": "Correo electrónico del destinatario",
+                "namePlaceholder": "Introduce el nombre",
+                "emailPlaceholder": "Introduzca el correo electrónico",
+                "messageLabel": "Mensaje",
+                "messagePlaceholder": "Ingresa tu mensaje (opcional)",
+                "nonRefundableCheckboxLabel": "Acepto que los cupones de regalo no son reembolsables",
+                "expiryCheckboxLabel": "Reconozco que este vale de regalo caducará el {expiryDate}",
+                "ctaLabel": "Añadir al carrito",
+                "Errors": {
+                    "amountRequired": "Selecciona o introduce un importe para el cupón de regalo",
+                    "amountInvalid": "Selecciona un importe válido para el cupón de regalo",
+                    "amountOutOfRange": "Introduce una cantidad entre {minAmount} y {maxAmount}",
+                    "unexpectedSettingsError": "Se ha producido un error inesperado al recuperar la configuración del cupón de regalo. Vuelve a intentarlo más tarde.",
+                    "senderNameRequired": "Tu nombre es obligatorio",
+                    "senderEmailRequired": "Tu correo electrónico es obligatorio",
+                    "recipientNameRequired": "El nombre del destinatario es obligatorio",
+                    "recipientEmailRequired": "El correo electrónico del destinatario es obligatorio",
+                    "emailInvalid": "Introduce una dirección de correo electrónico válida",
+                    "checkboxRequired": "Debes marcar esta casilla para continuar"
+                }
+            }
+        }
+    },
+    "Form": {
+        "optional": "Opcional",
+        "recaptchaRequired": "Completa la verificación de reCAPTCHA.",
+        "Errors": {
+            "invalidInput": "Comprueba lo que has escrito e inténtalo de nuevo",
+            "invalidFormat": "El valor introducido no coincide con el formato requerido"
         }
     }
 }

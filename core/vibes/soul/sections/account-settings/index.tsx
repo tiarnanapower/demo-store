@@ -1,10 +1,21 @@
+import {
+  Field,
+  FieldGroup,
+  PasswordComplexitySettings,
+} from '@/vibes/soul/form/dynamic-form/schema';
+
 import { ChangePasswordAction, ChangePasswordForm } from './change-password-form';
+import {
+  NewsletterSubscriptionForm,
+  UpdateNewsletterSubscriptionAction,
+} from './newsletter-subscription-form';
 import { Account, UpdateAccountAction, UpdateAccountForm } from './update-account-form';
 
 export interface AccountSettingsSectionProps {
   title?: string;
   account: Account;
   updateAccountAction: UpdateAccountAction;
+  updateAccountCustomFields?: Array<Field | FieldGroup<Field>>;
   updateAccountSubmitLabel?: string;
   changePasswordTitle?: string;
   changePasswordAction: ChangePasswordAction;
@@ -12,6 +23,13 @@ export interface AccountSettingsSectionProps {
   confirmPasswordLabel?: string;
   currentPasswordLabel?: string;
   newPasswordLabel?: string;
+  newsletterSubscriptionEnabled?: boolean;
+  isAccountSubscribed?: boolean;
+  newsletterSubscriptionTitle?: string;
+  newsletterSubscriptionLabel?: string;
+  newsletterSubscriptionCtaLabel?: string;
+  updateNewsletterSubscriptionAction?: UpdateNewsletterSubscriptionAction;
+  passwordComplexitySettings?: PasswordComplexitySettings | null;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -32,6 +50,7 @@ export function AccountSettingsSection({
   title = 'Account Settings',
   account,
   updateAccountAction,
+  updateAccountCustomFields,
   updateAccountSubmitLabel,
   changePasswordTitle = 'Change Password',
   changePasswordAction,
@@ -39,6 +58,13 @@ export function AccountSettingsSection({
   confirmPasswordLabel,
   currentPasswordLabel,
   newPasswordLabel,
+  newsletterSubscriptionEnabled = false,
+  isAccountSubscribed = false,
+  newsletterSubscriptionTitle = 'Marketing preferences',
+  newsletterSubscriptionLabel = 'Opt-in to receive emails about new products and promotions.',
+  newsletterSubscriptionCtaLabel = 'Save preferences',
+  updateNewsletterSubscriptionAction,
+  passwordComplexitySettings,
 }: AccountSettingsSectionProps) {
   return (
     <section className="w-full @container">
@@ -53,10 +79,11 @@ export function AccountSettingsSection({
             <UpdateAccountForm
               account={account}
               action={updateAccountAction}
+              customFields={updateAccountCustomFields}
               submitLabel={updateAccountSubmitLabel}
             />
           </div>
-          <div className="border-t border-[var(--account-settings-section-border,hsl(var(--contrast-100)))] pt-12">
+          <div className="border-t border-[var(--account-settings-section-border,hsl(var(--contrast-100)))] py-12">
             <h1 className="mb-10 font-[family-name:var(--account-settings-section-font-family,var(--font-family-heading))] text-2xl font-medium leading-none text-[var(--account-settings-section-text,var(--foreground))] @xl:text-2xl">
               {changePasswordTitle}
             </h1>
@@ -65,9 +92,23 @@ export function AccountSettingsSection({
               confirmPasswordLabel={confirmPasswordLabel}
               currentPasswordLabel={currentPasswordLabel}
               newPasswordLabel={newPasswordLabel}
+              passwordComplexitySettings={passwordComplexitySettings}
               submitLabel={changePasswordSubmitLabel}
             />
           </div>
+          {newsletterSubscriptionEnabled && updateNewsletterSubscriptionAction && (
+            <div className="border-t border-[var(--account-settings-section-border,hsl(var(--contrast-100)))] pt-12">
+              <h1 className="mb-10 font-[family-name:var(--account-settings-section-font-family,var(--font-family-heading))] text-2xl font-medium leading-none text-[var(--account-settings-section-text,var(--foreground))] @xl:text-2xl">
+                {newsletterSubscriptionTitle}
+              </h1>
+              <NewsletterSubscriptionForm
+                action={updateNewsletterSubscriptionAction}
+                ctaLabel={newsletterSubscriptionCtaLabel}
+                isAccountSubscribed={isAccountSubscribed}
+                label={newsletterSubscriptionLabel}
+              />
+            </div>
+          )}
         </div>
       </div>
     </section>

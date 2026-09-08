@@ -1,10 +1,20 @@
 import { clsx } from 'clsx';
+import { useTranslations } from 'next-intl';
+import {
+  Content as CalloutContent,
+  Description as CalloutDescription,
+  Header as CalloutHeader,
+  Root as CalloutRoot,
+  Title as CalloutTitle,
+} from 'storefront-kit/callout';
 
 import { Badge } from '@/vibes/soul/primitives/badge';
 import { Price, PriceLabel } from '@/vibes/soul/primitives/price-label';
 import * as Skeleton from '@/vibes/soul/primitives/skeleton';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
+
+import { Rating } from '../rating';
 
 import { Compare } from './compare';
 
@@ -17,6 +27,9 @@ export interface Product {
   subtitle?: string;
   badge?: string;
   rating?: number;
+  inventoryMessage?: string;
+  numberOfReviews?: number;
+  promotions?: Array<{ id: string; text: string }>;
 }
 
 export interface ProductCardProps {
@@ -29,6 +42,7 @@ export interface ProductCardProps {
   compareLabel?: string;
   compareParamName?: string;
   product: Product;
+  showRating?: boolean;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -43,16 +57,31 @@ export interface ProductCardProps {
  *   --product-card-light-background: hsl(var(--contrast-100));
  *   --product-card-light-title: hsl(var(--foreground));
  *   --product-card-light-subtitle: hsl(var(--foreground) / 75%);
+ *   --product-card-light-message: hsl(var(--foreground) / 75%);
  *   --product-card-dark-offset: hsl(var(--foreground));
  *   --product-card-dark-background: hsl(var(--contrast-500));
  *   --product-card-dark-title: hsl(var(--background));
  *   --product-card-dark-subtitle: hsl(var(--background) / 75%);
+ *   --product-card-dark-message: hsl(var(--background) / 75%);
  *   --product-card-font-family: var(--font-family-body);
  * }
  * ```
  */
 export function ProductCard({
-  product: { id, title, subtitle, badge, price, image, href },
+  product: {
+    id,
+    title,
+    subtitle,
+    badge,
+    price,
+    image,
+    href,
+    inventoryMessage,
+    rating,
+    numberOfReviews,
+    promotions,
+  },
+  showRating = false,
   colorScheme = 'light',
   className,
   showCompare = false,
@@ -62,6 +91,8 @@ export function ProductCard({
   imagePriority = false,
   imageSizes = '(min-width: 80rem) 20vw, (min-width: 64rem) 25vw, (min-width: 42rem) 33vw, (min-width: 24rem) 50vw, 100vw',
 }: ProductCardProps) {
+  const t = useTranslations('Components.ProductCard');
+
   return (
     <article
       className={clsx(
@@ -95,7 +126,7 @@ export function ProductCard({
                 }[colorScheme],
               )}
               fill
-              priority={imagePriority}
+              preload={imagePriority}
               sizes={imageSizes}
               src={image.src}
             />
@@ -123,7 +154,7 @@ export function ProductCard({
           <div className="flex-1 text-sm @[16rem]:text-base">
             <span
               className={clsx(
-                'block font-semibold',
+                'line-clamp-2 font-semibold',
                 {
                   light: 'text-[var(--product-card-light-title,hsl(var(--foreground)))]',
                   dark: 'text-[var(--product-card-dark-title,hsl(var(--background)))]',
@@ -132,11 +163,10 @@ export function ProductCard({
             >
               {title}
             </span>
-
             {subtitle != null && subtitle !== '' && (
               <span
                 className={clsx(
-                  'block text-sm font-normal',
+                  'mb-1.5 block text-sm font-normal',
                   {
                     light: 'text-[var(--product-card-light-subtitle,hsl(var(--foreground)/75%))]',
                     dark: 'text-[var(--product-card-dark-subtitle,hsl(var(--background)/75%))]',
@@ -146,7 +176,43 @@ export function ProductCard({
                 {subtitle}
               </span>
             )}
-            {price != null && <PriceLabel colorScheme={colorScheme} price={price} />}
+            {price != null && (
+              <PriceLabel
+                className="[&_abbr]:cursor-default [&_abbr]:no-underline"
+                colorScheme={colorScheme}
+                price={price}
+              />
+            )}
+            {promotions != null && promotions.length > 0 && (
+              <div className="mt-1.5">
+                <CalloutRoot size="small" variant="warning">
+                  <CalloutContent>
+                    <CalloutHeader>
+                      <CalloutTitle>{promotions[0]?.text ?? ''}</CalloutTitle>
+                      {promotions.length > 1 && (
+                        <CalloutDescription>
+                          {t('moreOffers', { count: promotions.length - 1 })}
+                        </CalloutDescription>
+                      )}
+                    </CalloutHeader>
+                  </CalloutContent>
+                </CalloutRoot>
+              </div>
+            )}
+            {showRating && typeof rating === 'number' && rating > 0 && (
+              <Rating className="mb-2 mt-1" numberOfReviews={numberOfReviews} rating={rating} />
+            )}
+            <span
+              className={clsx(
+                'block text-sm font-normal',
+                {
+                  light: 'text-[var(--product-card-light-message,hsl(var(--foreground)/75%))]',
+                  dark: 'text-[var(--product-card-dark-message,hsl(var(--background)/75%))]',
+                }[colorScheme],
+              )}
+            >
+              {inventoryMessage}
+            </span>
           </div>
         </div>
         {href !== '#' && (

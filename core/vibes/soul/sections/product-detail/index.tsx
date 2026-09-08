@@ -1,25 +1,47 @@
 import { ReactNode } from 'react';
+import {
+  Content as CalloutContent,
+  Header as CalloutHeader,
+  Root as CalloutRoot,
+  Title as CalloutTitle,
+} from 'storefront-kit/callout';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { Accordion, AccordionItem } from '@/vibes/soul/primitives/accordion';
+import { AnimatedUnderline } from '@/vibes/soul/primitives/animated-underline';
 import { Price, PriceLabel } from '@/vibes/soul/primitives/price-label';
-import { Rating } from '@/vibes/soul/primitives/rating';
 import * as Skeleton from '@/vibes/soul/primitives/skeleton';
 import { type Breadcrumb, Breadcrumbs } from '@/vibes/soul/sections/breadcrumbs';
-import { ProductGallery } from '@/vibes/soul/sections/product-detail/product-gallery';
+import {
+  ProductGallery,
+  ProductGalleryLoadMoreAction,
+} from '@/vibes/soul/sections/product-detail/product-gallery';
+import { ReviewForm, SubmitReviewAction } from '@/vibes/soul/sections/reviews/review-form';
 
-import { ProductDetailForm, ProductDetailFormAction } from './product-detail-form';
+import {
+  BackorderDisplayData,
+  ProductDetailForm,
+  ProductDetailFormAction,
+  StockDisplayData,
+} from './product-detail-form';
+import { RatingLink } from './rating-link';
 import { Field } from './schema';
 
 interface ProductDetailProduct {
   id: string;
   title: string;
   href: string;
-  images: Streamable<Array<{ src: string; alt: string }>>;
+  images: Streamable<{
+    images: Array<{ src: string; alt: string }>;
+    pageInfo?: { hasNextPage: boolean; endCursor: string | null };
+  }>;
   price?: Streamable<Price | null>;
   subtitle?: string;
   badge?: string;
   rating?: Streamable<number | null>;
+  reviewsEnabled?: boolean;
+  showRating?: boolean;
+  numberOfReviews?: number;
   summary?: Streamable<string>;
   description?: Streamable<string | ReactNode | null>;
   accordions?: Streamable<
@@ -30,10 +52,13 @@ interface ProductDetailProduct {
   >;
   minQuantity?: Streamable<number | null>;
   maxQuantity?: Streamable<number | null>;
+  stockDisplayData?: Streamable<StockDisplayData | null>;
+  backorderDisplayData?: Streamable<BackorderDisplayData | null>;
 }
 
 export interface ProductDetailProps<F extends Field> {
   breadcrumbs?: Streamable<Breadcrumb[]>;
+  promotionCallouts?: Streamable<Array<{ id: string; text: string }>>;
   product: Streamable<ProductDetailProduct | null>;
   action: ProductDetailFormAction<F>;
   fields: Streamable<F[]>;
@@ -47,6 +72,17 @@ export interface ProductDetailProps<F extends Field> {
   thumbnailLabel?: string;
   additionalInformationTitle?: string;
   additionalActions?: ReactNode;
+  reviewFormEmailLabel?: string;
+  reviewFormModalTitle?: string;
+  reviewFormNameLabel?: string;
+  reviewFormRatingLabel?: string;
+  reviewFormReviewLabel?: string;
+  reviewFormSubmitLabel?: string;
+  reviewFormTitleLabel?: string;
+  reviewFormAction: SubmitReviewAction;
+  user: Streamable<{ email: string; name: string }>;
+  loadMoreImagesAction?: ProductGalleryLoadMoreAction;
+  recaptchaSiteKey?: string;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -69,6 +105,7 @@ export function ProductDetail<F extends Field>({
   action,
   fields: streamableFields,
   breadcrumbs,
+  promotionCallouts,
   quantityLabel,
   incrementLabel,
   decrementLabel,
@@ -79,6 +116,17 @@ export function ProductDetail<F extends Field>({
   thumbnailLabel,
   additionalInformationTitle = 'Additional information',
   additionalActions,
+  reviewFormEmailLabel,
+  reviewFormModalTitle,
+  reviewFormNameLabel,
+  reviewFormRatingLabel,
+  reviewFormReviewLabel,
+  reviewFormSubmitLabel,
+  reviewFormTitleLabel,
+  reviewFormAction,
+  user,
+  loadMoreImagesAction,
+  recaptchaSiteKey,
 }: ProductDetailProps<F>) {
   return (
     <section className="@container">
@@ -94,7 +142,14 @@ export function ProductDetail<F extends Field>({
               <div className="grid grid-cols-1 items-stretch gap-x-8 gap-y-8 @2xl:grid-cols-2 @5xl:gap-x-12">
                 <div className="group/product-gallery hidden @2xl:block">
                   <Stream fallback={<ProductGallerySkeleton />} value={product.images}>
-                    {(images) => <ProductGallery images={images} />}
+                    {(imagesData) => (
+                      <ProductGallery
+                        images={imagesData.images}
+                        loadMoreAction={loadMoreImagesAction}
+                        pageInfo={imagesData.pageInfo}
+                        productId={Number(product.id)}
+                      />
+                    )}
                   </Stream>
                 </div>
                 {/* Product Details */}
@@ -107,11 +162,46 @@ export function ProductDetail<F extends Field>({
                   <h1 className="mb-3 mt-2 font-[family-name:var(--product-detail-title-font-family,var(--font-family-heading))] text-2xl font-medium leading-none @xl:mb-4 @xl:text-3xl @4xl:text-4xl">
                     {product.title}
                   </h1>
-                  <div className="group/product-rating">
-                    <Stream fallback={<RatingSkeleton />} value={product.rating}>
-                      {(rating) => <Rating rating={rating ?? 0} />}
-                    </Stream>
-                  </div>
+                  {product.reviewsEnabled && (
+                    <div className="group/product-rating">
+                      <ReviewForm
+                        action={reviewFormAction}
+                        formEmailLabel={reviewFormEmailLabel}
+                        formModalTitle={reviewFormModalTitle}
+                        formNameLabel={reviewFormNameLabel}
+                        formRatingLabel={reviewFormRatingLabel}
+                        formReviewLabel={reviewFormReviewLabel}
+                        formSubmitLabel={reviewFormSubmitLabel}
+                        formTitleLabel={reviewFormTitleLabel}
+                        productId={Number(product.id)}
+                        recaptchaSiteKey={recaptchaSiteKey}
+                        streamableImages={product.images}
+                        streamableProduct={{ name: product.title }}
+                        streamableUser={user}
+                        trigger={
+                          <AnimatedUnderline className="cursor-pointer">
+                            Write a review
+                          </AnimatedUnderline>
+                        }
+                      />
+                    </div>
+                  )}
+                  {product.showRating && (
+                    <div className="group/product-rating">
+                      <Stream
+                        fallback={<RatingSkeleton />}
+                        value={Streamable.all([product.rating, product.numberOfReviews])}
+                      >
+                        {([rating, numberOfReviews]) => (
+                          <RatingLink
+                            numberOfReviews={numberOfReviews ?? 0}
+                            rating={rating ?? 0}
+                            scrollTargetId="reviews"
+                          />
+                        )}
+                      </Stream>
+                    </div>
+                  )}
                   <div className="group/product-price">
                     <Stream fallback={<PriceLabelSkeleton />} value={product.price}>
                       {(price) => (
@@ -119,10 +209,37 @@ export function ProductDetail<F extends Field>({
                       )}
                     </Stream>
                   </div>
+                  {promotionCallouts != null && (
+                    <div className="group/product-promotions mb-4">
+                      <Stream fallback={null} value={promotionCallouts}>
+                        {(callouts) =>
+                          callouts.length > 0 ? (
+                            <div className="flex flex-col gap-2">
+                              {callouts.map((callout) => (
+                                <CalloutRoot key={callout.id} size="small" variant="warning">
+                                  <CalloutContent>
+                                    <CalloutHeader>
+                                      <CalloutTitle>{callout.text}</CalloutTitle>
+                                    </CalloutHeader>
+                                  </CalloutContent>
+                                </CalloutRoot>
+                              ))}
+                            </div>
+                          ) : null
+                        }
+                      </Stream>
+                    </div>
+                  )}
                   <div className="group/product-gallery mb-8 @2xl:hidden">
                     <Stream fallback={<ProductGallerySkeleton />} value={product.images}>
-                      {(images) => (
-                        <ProductGallery images={images} thumbnailLabel={thumbnailLabel} />
+                      {(imagesData) => (
+                        <ProductGallery
+                          images={imagesData.images}
+                          loadMoreAction={loadMoreImagesAction}
+                          pageInfo={imagesData.pageInfo}
+                          productId={Number(product.id)}
+                          thumbnailLabel={thumbnailLabel}
+                        />
                       )}
                     </Stream>
                   </div>
@@ -146,12 +263,23 @@ export function ProductDetail<F extends Field>({
                         streamableCtaDisabled,
                         product.minQuantity,
                         product.maxQuantity,
+                        product.stockDisplayData,
+                        product.backorderDisplayData,
                       ])}
                     >
-                      {([fields, ctaLabel, ctaDisabled, minQuantity, maxQuantity]) => (
+                      {([
+                        fields,
+                        ctaLabel,
+                        ctaDisabled,
+                        minQuantity,
+                        maxQuantity,
+                        stockDisplayData,
+                        backorderDisplayData,
+                      ]) => (
                         <ProductDetailForm
                           action={action}
                           additionalActions={additionalActions}
+                          backorderDisplayData={backorderDisplayData ?? undefined}
                           ctaDisabled={ctaDisabled ?? undefined}
                           ctaLabel={ctaLabel ?? undefined}
                           decrementLabel={decrementLabel}
@@ -163,6 +291,7 @@ export function ProductDetail<F extends Field>({
                           prefetch={prefetch}
                           productId={product.id}
                           quantityLabel={quantityLabel}
+                          stockDisplayData={stockDisplayData ?? undefined}
                         />
                       )}
                     </Stream>

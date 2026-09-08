@@ -12,19 +12,27 @@ interface DevProps {
   hostname: string;
   token?: string;
   cartId?: string;
+  bcGraphqlDomain?: string;
 }
 
-export function ScriptDev({ cartId, hostname, storeHash, channelId, token }: DevProps) {
+export function ScriptDev({
+  cartId,
+  hostname,
+  storeHash,
+  channelId,
+  token,
+  bcGraphqlDomain,
+}: DevProps) {
   useB2BAuth(token);
   useB2BCart(cartId);
 
   const src = `${hostname}/src/main.ts`;
-  
+
   return (
     <>
       <Script id="b2b-react-refresh" strategy="beforeInteractive" type="module">
         {`
-              import RefreshRuntime from 'http://localhost:3001/@react-refresh'
+              import RefreshRuntime from '${hostname}/@react-refresh'
               RefreshRuntime.injectIntoGlobalHook(window)
               window.$RefreshReg$ = () => {}
               window.$RefreshSig$ = () => (type) => type
@@ -33,22 +41,25 @@ export function ScriptDev({ cartId, hostname, storeHash, channelId, token }: Dev
       </Script>
       <Script
         id="b2b-vite-client"
-        src={`http://localhost:3001/@vite/client`}
+        src={`${hostname}/@vite/client`}
         strategy="beforeInteractive"
         type="module"
       />
-      <Script type="module" src="http://localhost:3001/src/main.ts"></Script>
+
       <Script id="b2b-config">
         {`
               window.B3 = {
                 setting: {
                   store_hash: '${storeHash}',
                   channel_id: ${channelId},
+                  platform: 'catalyst',
+                  cart_url: '/cart',
+                  bc_graphql_domain: '${bcGraphqlDomain ?? 'mybigcommerce.com'}',
                 },
               };
           `}
       </Script>
-      {/* <Script data-channelid={storeHash} data-storehash={channelId} src={src} type="module" /> */}
+      <Script data-channelid={channelId} data-storehash={storeHash} src={src} type="module" />
     </>
   );
 }
