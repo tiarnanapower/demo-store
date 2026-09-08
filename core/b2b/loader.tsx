@@ -5,15 +5,24 @@ import { auth } from '~/auth';
 import { ScriptDev } from './script-dev';
 import { ScriptProduction } from './script-production';
 
+// `z.string().url()` alone is not enough here: `new URL('localhost:3001')` parses
+// happily with protocol `localhost:`, so a scheme-less value passes validation and
+// then renders as a relative script URL. Require http(s) explicitly.
+const httpUrl = (label: string) =>
+  z
+    .string()
+    .url()
+    .refine((value) => /^https?:\/\//.test(value), {
+      message: `${label} must start with http:// or https://`,
+    });
+
 const EnvironmentSchema = z.object({
   BIGCOMMERCE_STORE_HASH: z.string({ message: 'BIGCOMMERCE_STORE_HASH is required' }),
   BIGCOMMERCE_CHANNEL_ID: z.string({ message: 'BIGCOMMERCE_CHANNEL_ID is required' }),
-  LOCAL_BUYER_PORTAL_HOST: z.string().url().optional(),
+  LOCAL_BUYER_PORTAL_HOST: httpUrl('LOCAL_BUYER_PORTAL_HOST').optional(),
   // Base URL of a self-hosted production Buyer Portal build. Trailing slashes are
   // trimmed so callers can set it either way.
-  PROD_BUYER_PORTAL_BASE_URL: z
-    .string()
-    .url()
+  PROD_BUYER_PORTAL_BASE_URL: httpUrl('PROD_BUYER_PORTAL_BASE_URL')
     .optional()
     .transform((url) => url?.replace(/\/+$/, '')),
   STAGING_B2B_CDN_ORIGIN: z.string().optional(),
