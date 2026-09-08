@@ -32,30 +32,29 @@ const GetCartCountQuery = graphql(`
   }
 `);
 
-// const GetCustomerGroupQuery = graphql(`  
-//   query GetCustomerGroupQuery {  
-//     customer {  
-//       ...CustomerGroupFragment  
-//     }  
-//   }  
+// const GetCustomerGroupQuery = graphql(`
+//   query GetCustomerGroupQuery {
+//     customer {
+//       ...CustomerGroupFragment
+//     }
+//   }
 // `);
 
-// const getCustomerGroup = cache(async (customerAccessToken: string) => {  
-//   const { data: response } = await client.fetch({  
-//     document: GetCustomerGroupQuery,  
-//     customerAccessToken,  
-//     fetchOptions: { cache: 'no-store' },  
-//   });  
+// const getCustomerGroup = cache(async (customerAccessToken: string) => {
+//   const { data: response } = await client.fetch({
+//     document: GetCustomerGroupQuery,
+//     customerAccessToken,
+//     fetchOptions: { cache: 'no-store' },
+//   });
 //   console.log("hello world")
 //   console.log(response.customer)
-//   return response.customer ? {  
+//   return response.customer ? {
 //        // @ts-ignore
-//     id: response.customer.customerGroupId,  
+//     id: response.customer.customerGroupId,
 //        // @ts-ignore
-//     name: response.customer.customerGroup?.name ?? null,  
-//   } : null;  
+//     name: response.customer.customerGroup?.name ?? null,
+//   } : null;
 // });
-
 
 const getCartCount = cache(async (cartId: string, customerAccessToken?: string) => {
   const response = await client.fetch({
@@ -212,7 +211,7 @@ export const Header = async () => {
         activeCurrencyId: streamableActiveCurrencyId,
         currencyAction: switchCurrency,
         switchCurrencyLabel: t('SwitchCurrency.label'),
-        customerGroup: isCustomerGroup, // Add this line 
+        customerGroup: isCustomerGroup, // Add this line
       }}
     />
   );

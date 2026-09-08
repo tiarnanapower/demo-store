@@ -96,7 +96,7 @@ export function ProductCard({
   return (
     <article
       className={clsx(
-        'group flex min-w-0 max-w-md flex-col gap-0 rounded-xl border border-[hsl(var(--contrast-100))] font-[family-name:var(--card-font-family,var(--font-family-body))] shadow-sm transition-shadow duration-200 hover:shadow-md @container',
+        'group flex min-w-0 max-w-md flex-col gap-0 rounded-xl border border-[hsl(var(--contrast-100))] font-[family-name:var(--card-font-family,var(--font-family-body))] shadow-sm transition-shadow duration-200 @container hover:shadow-md',
         className,
       )}
     >
@@ -233,7 +233,7 @@ export function ProductCard({
         )}
       </div>
       {showCompare && (
-        <div className="pb-2 ml-2 shrink-0">
+        <div className="ml-2 shrink-0 pb-2">
           <Compare
             colorScheme={colorScheme}
             label={compareLabel}

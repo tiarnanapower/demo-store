@@ -447,36 +447,36 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
         {/* Logo */}
         <div
           className={clsx(
-            'flex items-center justify-start self-stretch space-x-4',
+            'flex items-center justify-start space-x-4 self-stretch',
             linksPosition === 'center' ? 'flex-1' : 'flex-1 @4xl:flex-none',
           )}
         >
-            <div className="flex items-center">
-          <Logo
-            className={clsx(streamableMobileLogo != null ? 'hidden @4xl:flex' : 'flex')}
-            height={logoHeight}
-            href={logoHref}
-            label={logoLabel}
-            logo={streamableLogo}
-            width={logoWidth}
-          />
-          {streamableMobileLogo != null && (
+          <div className="flex items-center">
             <Logo
-              className="flex @4xl:hidden"
-              height={mobileLogoHeight}
+              className={clsx(streamableMobileLogo != null ? 'hidden @4xl:flex' : 'flex')}
+              height={logoHeight}
               href={logoHref}
               label={logoLabel}
-              logo={streamableMobileLogo}
-              width={mobileLogoWidth}
+              logo={streamableLogo}
+              width={logoWidth}
             />
-          )}
+            {streamableMobileLogo != null && (
+              <Logo
+                className="flex @4xl:hidden"
+                height={mobileLogoHeight}
+                href={logoHref}
+                label={logoLabel}
+                logo={streamableMobileLogo}
+                width={mobileLogoWidth}
+              />
+            )}
           </div>
-            <div className="w-px h-10 bg-gray-300" />
-            <div className="flex flex-col text-left leading-tight">
+          <div className="h-10 w-px bg-gray-300" />
+          <div className="flex flex-col text-left leading-tight">
             {/* <span className="text-lg font-semibold text-gray-900">
               English Language Teaching
             </span> */}
-  </div>
+          </div>
         </div>
 
         {/* Top Level Nav Links */}
@@ -508,57 +508,60 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
               </ul>
             }
             value={streamableLinks}
-          > 
+          >
             {(links) =>
-            
               links
-              .filter(item => customerGroup || !['Teaching Resources', 'Ressources pédagogiques'].includes(item.label)) // hide these if not
-              .map((item, i) => (
-                <NavigationMenu.Item key={i} value={i.toString()}>
-                  <NavigationMenu.Trigger asChild>
-                    <Link
-                      className="hidden items-center whitespace-nowrap rounded-xl bg-[var(--nav-link-background,transparent)] p-2.5 font-[family-name:var(--nav-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors duration-200 hover:bg-[var(--nav-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:inline-flex"
-                      href={item.href}
-                    >
-                      {item.label}
-                    </Link>
-                  </NavigationMenu.Trigger>
-                  {item.groups != null && item.groups.length > 0 && (
-                    <NavigationMenu.Content className="rounded-2xl bg-[var(--nav-menu-background,hsl(var(--background)))] shadow-xl ring-1 ring-[var(--nav-menu-border,hsl(var(--foreground)/5%))]">
-                      <div className="m-auto grid w-full max-w-screen-lg grid-cols-5 justify-center gap-5 px-5 pb-8 pt-5">
-                        {item.groups.map((group, columnIndex) => (
-                          <ul className="flex flex-col" key={columnIndex}>
-                            {/* Second Level Links */}
-                            {group.label != null && group.label !== '' && (
-                              <li>
-                                {group.href != null && group.href !== '' ? (
-                                  <Link className={navGroupClassName} href={group.href}>
-                                    {group.label}
-                                  </Link>
-                                ) : (
-                                  <span className={navGroupClassName}>{group.label}</span>
-                                )}
-                              </li>
-                            )}
+                .filter(
+                  (item) =>
+                    customerGroup ||
+                    !['Teaching Resources', 'Ressources pédagogiques'].includes(item.label),
+                ) // hide these if not
+                .map((item, i) => (
+                  <NavigationMenu.Item key={i} value={i.toString()}>
+                    <NavigationMenu.Trigger asChild>
+                      <Link
+                        className="hidden items-center whitespace-nowrap rounded-xl bg-[var(--nav-link-background,transparent)] p-2.5 font-[family-name:var(--nav-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-link-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors duration-200 hover:bg-[var(--nav-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2 @4xl:inline-flex"
+                        href={item.href}
+                      >
+                        {item.label}
+                      </Link>
+                    </NavigationMenu.Trigger>
+                    {item.groups != null && item.groups.length > 0 && (
+                      <NavigationMenu.Content className="rounded-2xl bg-[var(--nav-menu-background,hsl(var(--background)))] shadow-xl ring-1 ring-[var(--nav-menu-border,hsl(var(--foreground)/5%))]">
+                        <div className="m-auto grid w-full max-w-screen-lg grid-cols-5 justify-center gap-5 px-5 pb-8 pt-5">
+                          {item.groups.map((group, columnIndex) => (
+                            <ul className="flex flex-col" key={columnIndex}>
+                              {/* Second Level Links */}
+                              {group.label != null && group.label !== '' && (
+                                <li>
+                                  {group.href != null && group.href !== '' ? (
+                                    <Link className={navGroupClassName} href={group.href}>
+                                      {group.label}
+                                    </Link>
+                                  ) : (
+                                    <span className={navGroupClassName}>{group.label}</span>
+                                  )}
+                                </li>
+                              )}
 
-                            {group.links.map((link, idx) => (
-                              // Third Level Links
-                              <li key={idx}>
-                                <Link
-                                  className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
-                                  href={link.href}
-                                >
-                                  {link.label}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        ))}
-                      </div>
-                    </NavigationMenu.Content>
-                  )}
-                </NavigationMenu.Item>
-              ))
+                              {group.links.map((link, idx) => (
+                                // Third Level Links
+                                <li key={idx}>
+                                  <Link
+                                    className="block rounded-lg bg-[var(--nav-sub-link-background,transparent)] px-3 py-1.5 font-[family-name:var(--nav-sub-link-font-family,var(--font-family-body))] text-sm font-medium text-[var(--nav-sub-link-text,hsl(var(--contrast-500)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-sub-link-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-sub-link-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2"
+                                    href={link.href}
+                                  >
+                                    {link.label}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          ))}
+                        </div>
+                      </NavigationMenu.Content>
+                    )}
+                  </NavigationMenu.Item>
+                ))
             }
           </Stream>
         </ul>
