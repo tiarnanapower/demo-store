@@ -150,6 +150,12 @@ runtime.registerComponent(MSSlideshow, {
     }),
     accentColor: Color({ label: 'Accent color (arrow button)' }),
     paginationColor: Color({ label: 'Pagination color' }),
+    counterFormat: TextInput({
+      label: 'Counter text',
+      defaultValue: '{current} of {total}',
+    }),
+    prevLabel: TextInput({ label: 'Previous button label', defaultValue: 'Previous slide' }),
+    nextLabel: TextInput({ label: 'Next button label', defaultValue: 'Next slide' }),
     paginationStyle: Select({
       label: 'Pagination style',
       options: [

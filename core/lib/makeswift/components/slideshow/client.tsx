@@ -39,6 +39,9 @@ interface MSSlideshowProps {
   ctaStyle: 'button' | 'arrow';
   accentColor?: string;
   paginationColor?: string;
+  counterFormat: string;
+  prevLabel: string;
+  nextLabel: string;
   paginationStyle: 'bars' | 'arrows';
   cornerRadius: number;
   roundedSides: 'none' | 'bottom' | 'all';
@@ -62,6 +65,9 @@ export function MSSlideshow({
   ctaStyle,
   accentColor,
   paginationColor,
+  counterFormat,
+  prevLabel,
+  nextLabel,
   paginationStyle,
   cornerRadius,
   roundedSides,
@@ -75,9 +81,11 @@ export function MSSlideshow({
       className={className}
       contentWidth={contentWidth}
       cornerRadius={cornerRadius}
+      counterFormat={counterFormat}
       ctaStyle={ctaStyle}
       heightMode={heightMode}
       interval={interval * 1000}
+      nextLabel={nextLabel}
       overlayColor={overlayColor}
       overlayFadeTo={overlayFadeTo}
       overlayFrom={overlayFrom}
@@ -85,6 +93,7 @@ export function MSSlideshow({
       paginationColor={paginationColor}
       paginationStyle={paginationStyle}
       playOnInit={autoplay}
+      prevLabel={prevLabel}
       roundedSides={roundedSides}
       showAutoplayControl={showAutoplayControl}
       showPagination={showPagination}

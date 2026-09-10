@@ -82,6 +82,16 @@ interface Props {
    * fill is often too dim as a border on top of a tinted image.
    */
   paginationColor?: string;
+  /**
+   * Counter text for the arrows pagination. `{current}` and `{total}` are substituted, so
+   * "{current} of {total}" renders "1 of 3". Everything else is kept verbatim, which is what makes
+   * this translatable instead of a baked-in English "of".
+   */
+  counterFormat?: string;
+  /** Accessible label for the previous-slide button. */
+  prevLabel?: string;
+  /** Accessible label for the next-slide button. */
+  nextLabel?: string;
   /** `bars` is the progress-bar pagination; `arrows` is prev/next with an "n of total" counter. */
   paginationStyle?: PaginationStyle;
   /** Corner radius in px, applied per `roundedSides`. */
@@ -407,6 +417,10 @@ function FloatingCard({ slide, cardKey }: FloatingCardProps) {
 const arrowButtonClasses =
   'pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-[var(--slideshow-pagination,hsl(var(--background)))] text-[var(--slideshow-pagination,hsl(var(--background)))] transition-opacity duration-200 hover:opacity-70 focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-[var(--slideshow-focus,hsl(var(--primary)))] @xl:h-12 @xl:w-12';
 
+function formatCounter(template: string, current: number, total: number): string {
+  return template.replace(/\{current\}/g, String(current)).replace(/\{total\}/g, String(total));
+}
+
 interface BarsPaginationProps {
   scrollSnaps: number[];
   selectedIndex: number;
@@ -482,6 +496,9 @@ interface ArrowsPaginationProps {
   selectedIndex: number;
   totalSlides: number;
   paginationColor?: string;
+  counterFormat: string;
+  prevLabel: string;
+  nextLabel: string;
   onPrev: () => void;
   onNext: () => void;
 }
@@ -490,6 +507,9 @@ function ArrowsPagination({
   selectedIndex,
   totalSlides,
   paginationColor,
+  counterFormat,
+  prevLabel,
+  nextLabel,
   onPrev,
   onNext,
 }: ArrowsPaginationProps) {
@@ -498,7 +518,7 @@ function ArrowsPagination({
   return (
     <div className="ml-auto flex items-center gap-3 @xl:gap-4">
       <button
-        aria-label="Previous slide"
+        aria-label={prevLabel}
         className={arrowButtonClasses}
         onClick={onPrev}
         style={accentStyle}
@@ -510,10 +530,10 @@ function ArrowsPagination({
         className="font-[family-name:var(--slideshow-number-font-family,var(--font-family-body))] text-sm tabular-nums text-[var(--slideshow-number,hsl(var(--background)))] @xl:text-base"
         style={accentStyle == null ? undefined : { color: accentStyle.color }}
       >
-        {selectedIndex + 1} of {totalSlides}
+        {formatCounter(counterFormat, selectedIndex + 1, totalSlides)}
       </span>
       <button
-        aria-label="Next slide"
+        aria-label={nextLabel}
         className={arrowButtonClasses}
         onClick={onNext}
         style={accentStyle}
@@ -606,6 +626,9 @@ export function Slideshow({
   ctaStyle = 'button',
   accentColor,
   paginationColor,
+  counterFormat = '{current} of {total}',
+  prevLabel = 'Previous slide',
+  nextLabel = 'Next slide',
   paginationStyle = 'bars',
   cornerRadius = 0,
   roundedSides = 'bottom',
@@ -763,6 +786,8 @@ export function Slideshow({
 
           {showPagination && paginationStyle === 'arrows' && (
             <ArrowsPagination
+              counterFormat={counterFormat}
+              nextLabel={nextLabel}
               onNext={() => {
                 emblaApi?.goToNext();
                 resetAutoplay();
@@ -772,6 +797,7 @@ export function Slideshow({
                 resetAutoplay();
               }}
               paginationColor={paginationColor}
+              prevLabel={prevLabel}
               selectedIndex={selectedIndex}
               totalSlides={slides.length}
             />
