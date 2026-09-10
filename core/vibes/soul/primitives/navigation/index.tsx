@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useParams, useSearchParams } from 'next/navigation';
 import React, {
+  type CSSProperties,
   forwardRef,
   Ref,
   useActionState,
@@ -144,6 +145,10 @@ interface Props<S extends SearchResult> {
    * shoppers are not navigated away from the storefront.
    */
   ctaOpenInNewTab?: boolean;
+  ctaBackgroundColor?: string;
+  ctaTextColor?: string;
+  /** Falls back to a slightly darkened `ctaBackgroundColor` when not set. */
+  ctaHoverBackgroundColor?: string;
 }
 
 const MobileMenuButton = forwardRef<
@@ -208,10 +213,43 @@ MobileMenuButton.displayName = 'MobileMenuButton';
 const navGroupClassName =
   'block rounded-lg bg-[var(--nav-group-background,transparent)] px-3 py-2 font-[family-name:var(--nav-group-font-family,var(--font-family-body))] font-medium text-[var(--nav-group-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-group-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-group-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2';
 const navCtaClassName =
-  'hidden items-center gap-2 whitespace-nowrap rounded-full bg-[var(--nav-cta-background,hsl(var(--primary)))] px-4 py-2 font-[family-name:var(--nav-cta-font-family,var(--font-family-body))] text-sm font-semibold text-[var(--nav-cta-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-cta-background-hover,color-mix(in_oklab,hsl(var(--primary)),black_10%))] focus-visible:outline-0 focus-visible:ring-2 @4xl:inline-flex';
+  'hidden items-center gap-2 whitespace-nowrap rounded-full bg-[var(--nav-cta-background,hsl(var(--primary)))] px-4 py-2 font-[family-name:var(--nav-cta-font-family,var(--font-family-body))] text-sm font-semibold text-[var(--nav-cta-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-cta-background-hover,hsl(var(--primary)/85%))] focus-visible:outline-0 focus-visible:ring-2 @4xl:inline-flex';
 
 const navMobileCtaClassName =
   'flex w-full items-center justify-center gap-2 rounded-full bg-[var(--nav-cta-background,hsl(var(--primary)))] px-4 py-3 font-[family-name:var(--nav-cta-font-family,var(--font-family-body))] text-sm font-semibold text-[var(--nav-cta-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] focus-visible:outline-0 focus-visible:ring-2';
+
+interface NavCtaColors {
+  background?: string;
+  text?: string;
+  hoverBackground?: string;
+}
+
+/*
+ * Returns CSS variable overrides rather than plain `background-color` / `color`. Setting those
+ * directly would beat the `hover:bg-*` class on specificity and kill the hover state, whereas
+ * overriding the variables lets the existing classes resolve to the chosen colours.
+ */
+function buildNavCtaStyle({ background, text, hoverBackground }: NavCtaColors): CSSProperties {
+  const vars: Record<string, string> = {};
+
+  if (background != null && background !== '') {
+    vars['--nav-cta-background'] = background;
+    // Derive hover from the chosen background so it does not fall back to the theme colour.
+    // This is set inline, which the CSS minifier does not touch, so the color-mix survives.
+    vars['--nav-cta-background-hover'] = `color-mix(in oklab, ${background}, black 10%)`;
+  }
+
+  if (hoverBackground != null && hoverBackground !== '') {
+    vars['--nav-cta-background-hover'] = hoverBackground;
+  }
+
+  if (text != null && text !== '') {
+    vars['--nav-cta-text'] = text;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  return vars as CSSProperties;
+}
 
 const navButtonClassName =
   'relative rounded-lg bg-[var(--nav-button-background,transparent)] p-1.5 text-[var(--nav-button-icon,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors focus-visible:outline-0 focus-visible:ring-2 @4xl:hover:bg-[var(--nav-button-background-hover,hsl(var(--contrast-100)))] @4xl:hover:text-[var(--nav-button-icon-hover,hsl(var(--foreground)))]';
@@ -324,6 +362,9 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
     ctaLabel = '',
     ctaHref = '',
     ctaOpenInNewTab = false,
+    ctaBackgroundColor,
+    ctaTextColor,
+    ctaHoverBackgroundColor,
     giftCertificatesEnabled: streamableGiftCertificatesEnabled,
     customerGroup,
   }: Props<S>,
@@ -332,6 +373,11 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const hasCta = showCta && ctaLabel !== '' && ctaHref !== '';
+  const ctaStyle = buildNavCtaStyle({
+    background: ctaBackgroundColor,
+    text: ctaTextColor,
+    hoverBackground: ctaHoverBackgroundColor,
+  });
   const ctaLinkProps = ctaOpenInNewTab
     ? { rel: 'noopener noreferrer', target: '_blank' as const }
     : {};
@@ -388,6 +434,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
                       className={navMobileCtaClassName}
                       href={ctaHref}
                       onClick={() => setIsMobileMenuOpen(false)}
+                      style={ctaStyle}
                       {...ctaLinkProps}
                     >
                       {ctaLabel}
@@ -611,7 +658,12 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
           )}
         >
           {hasCta && (
-            <Link className={clsx(navCtaClassName, 'mr-2')} href={ctaHref} {...ctaLinkProps}>
+            <Link
+              className={clsx(navCtaClassName, 'mr-2')}
+              href={ctaHref}
+              style={ctaStyle}
+              {...ctaLinkProps}
+            >
               {ctaLabel}
               <ArrowRight size={16} strokeWidth={2} />
             </Link>

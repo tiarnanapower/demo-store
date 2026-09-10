@@ -1,5 +1,6 @@
 import {
   Checkbox,
+  Color,
   Group,
   Image,
   Link,
@@ -87,6 +88,9 @@ const cta = Group({
     label: TextInput({ label: 'Text', defaultValue: 'Get Recommendation' }),
     link: Link({ label: 'URL' }),
     openInNewTab: Checkbox({ label: 'Open in new tab', defaultValue: true }),
+    backgroundColor: Color({ label: 'Background color' }),
+    textColor: Color({ label: 'Text color' }),
+    hoverBackgroundColor: Color({ label: 'Background color (hover)' }),
   },
 });
 

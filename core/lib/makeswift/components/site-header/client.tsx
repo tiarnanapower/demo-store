@@ -77,6 +77,9 @@ interface Props {
     label: string;
     link?: { href?: string; target?: string };
     openInNewTab: boolean;
+    backgroundColor?: string;
+    textColor?: string;
+    hoverBackgroundColor?: string;
   };
 }
 
@@ -134,6 +137,9 @@ export const MakeswiftHeader = forwardRef(
           // Honour an explicit new-tab target from the Link control as well as the checkbox, so
           // either route works.
           ctaOpenInNewTab: cta.openInNewTab || cta.link?.target === '_blank',
+          ctaBackgroundColor: cta.backgroundColor,
+          ctaTextColor: cta.textColor,
+          ctaHoverBackgroundColor: cta.hoverBackgroundColor,
         }}
         ref={ref}
       />
