@@ -135,6 +135,15 @@ interface Props<S extends SearchResult> {
   giftCertificatesHref: string;
   giftCertificatesEnabled?: Streamable<boolean>;
   customerGroup?: boolean;
+  /** Renders a filled call-to-action button in the nav, left of the utility icons. */
+  showCta?: boolean;
+  ctaLabel?: string;
+  ctaHref?: string;
+  /**
+   * Opens the CTA in a new tab. Worth turning on for a link to a separate tool or domain, so
+   * shoppers are not navigated away from the storefront.
+   */
+  ctaOpenInNewTab?: boolean;
 }
 
 const MobileMenuButton = forwardRef<
@@ -198,6 +207,12 @@ MobileMenuButton.displayName = 'MobileMenuButton';
 
 const navGroupClassName =
   'block rounded-lg bg-[var(--nav-group-background,transparent)] px-3 py-2 font-[family-name:var(--nav-group-font-family,var(--font-family-body))] font-medium text-[var(--nav-group-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-group-background-hover,hsl(var(--contrast-100)))] hover:text-[var(--nav-group-text-hover,hsl(var(--foreground)))] focus-visible:outline-0 focus-visible:ring-2';
+const navCtaClassName =
+  'hidden items-center gap-2 whitespace-nowrap rounded-full bg-[var(--nav-cta-background,hsl(var(--primary)))] px-4 py-2 font-[family-name:var(--nav-cta-font-family,var(--font-family-body))] text-sm font-semibold text-[var(--nav-cta-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors hover:bg-[var(--nav-cta-background-hover,color-mix(in_oklab,hsl(var(--primary)),black_10%))] focus-visible:outline-0 focus-visible:ring-2 @4xl:inline-flex';
+
+const navMobileCtaClassName =
+  'flex w-full items-center justify-center gap-2 rounded-full bg-[var(--nav-cta-background,hsl(var(--primary)))] px-4 py-3 font-[family-name:var(--nav-cta-font-family,var(--font-family-body))] text-sm font-semibold text-[var(--nav-cta-text,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] focus-visible:outline-0 focus-visible:ring-2';
+
 const navButtonClassName =
   'relative rounded-lg bg-[var(--nav-button-background,transparent)] p-1.5 text-[var(--nav-button-icon,hsl(var(--foreground)))] ring-[var(--nav-focus,hsl(var(--primary)))] transition-colors focus-visible:outline-0 focus-visible:ring-2 @4xl:hover:bg-[var(--nav-button-background-hover,hsl(var(--contrast-100)))] @4xl:hover:text-[var(--nav-button-icon-hover,hsl(var(--foreground)))]';
 
@@ -305,12 +320,21 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
     switchCurrencyLabel,
     giftCertificatesLabel = 'Gift Certificates',
     giftCertificatesHref,
+    showCta = false,
+    ctaLabel = '',
+    ctaHref = '',
+    ctaOpenInNewTab = false,
     giftCertificatesEnabled: streamableGiftCertificatesEnabled,
     customerGroup,
   }: Props<S>,
   ref: Ref<HTMLDivElement>,
 ) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const hasCta = showCta && ctaLabel !== '' && ctaHref !== '';
+  const ctaLinkProps = ctaOpenInNewTab
+    ? { rel: 'noopener noreferrer', target: '_blank' as const }
+    : {};
   const { isSearchOpen, setIsSearchOpen } = useSearch();
 
   const pathname = usePathname();
@@ -358,6 +382,19 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
           <Popover.Portal>
             <Popover.Content className="max-h-[calc(var(--radix-popover-content-available-height)-8px)] w-[var(--radix-popper-anchor-width)] @container data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95">
               <div className="max-h-[inherit] divide-y divide-[var(--nav-mobile-divider,hsl(var(--contrast-100)))] overflow-y-auto bg-[var(--nav-mobile-background,hsl(var(--background)))]">
+                {hasCta && (
+                  <div className="p-3">
+                    <Link
+                      className={navMobileCtaClassName}
+                      href={ctaHref}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      {...ctaLinkProps}
+                    >
+                      {ctaLabel}
+                      <ArrowRight size={16} strokeWidth={2} />
+                    </Link>
+                  </div>
+                )}
                 <Stream
                   fallback={
                     <ul className="flex animate-pulse flex-col gap-4 p-5 @4xl:gap-2 @4xl:p-5">
@@ -573,6 +610,13 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
             linksPosition === 'center' ? 'flex-1' : 'flex-1 @4xl:flex-none',
           )}
         >
+          {hasCta && (
+            <Link className={clsx(navCtaClassName, 'mr-2')} href={ctaHref} {...ctaLinkProps}>
+              {ctaLabel}
+              <ArrowRight size={16} strokeWidth={2} />
+            </Link>
+          )}
+
           {searchAction ? (
             <Popover.Root onOpenChange={setIsSearchOpen} open={isSearchOpen}>
               <Popover.Anchor className="absolute left-0 right-0 top-full" />
