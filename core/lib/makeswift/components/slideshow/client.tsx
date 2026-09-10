@@ -31,6 +31,17 @@ interface MSSlideshowProps {
   cardStyle: boolean;
   heightMode: 'sm' | 'md' | 'lg' | 'xl';
   overlayOpacity: number;
+  overlayFrom: 'none' | 'top' | 'bottom' | 'left' | 'right';
+  overlayColor?: string;
+  overlayFadeTo: number;
+  verticalAlignment: 'top' | 'center' | 'bottom';
+  contentWidth: 'narrow' | 'medium' | 'wide' | 'full';
+  ctaStyle: 'button' | 'arrow';
+  accentColor?: string;
+  paginationColor?: string;
+  paginationStyle: 'bars' | 'arrows';
+  cornerRadius: number;
+  roundedSides: 'none' | 'bottom' | 'all';
   showPagination: boolean;
   showAutoplayControl: boolean;
 }
@@ -43,17 +54,38 @@ export function MSSlideshow({
   cardStyle,
   heightMode,
   overlayOpacity,
+  overlayFrom,
+  overlayColor,
+  overlayFadeTo,
+  verticalAlignment,
+  contentWidth,
+  ctaStyle,
+  accentColor,
+  paginationColor,
+  paginationStyle,
+  cornerRadius,
+  roundedSides,
   showPagination,
   showAutoplayControl,
 }: MSSlideshowProps) {
   return (
     <Slideshow
+      accentColor={accentColor}
       cardStyle={cardStyle}
       className={className}
+      contentWidth={contentWidth}
+      cornerRadius={cornerRadius}
+      ctaStyle={ctaStyle}
       heightMode={heightMode}
       interval={interval * 1000}
+      overlayColor={overlayColor}
+      overlayFadeTo={overlayFadeTo}
+      overlayFrom={overlayFrom}
       overlayOpacity={overlayOpacity}
+      paginationColor={paginationColor}
+      paginationStyle={paginationStyle}
       playOnInit={autoplay}
+      roundedSides={roundedSides}
       showAutoplayControl={showAutoplayControl}
       showPagination={showPagination}
       slides={slides.map(
@@ -93,6 +125,7 @@ export function MSSlideshow({
           };
         },
       )}
+      verticalAlignment={verticalAlignment}
     />
   );
 }

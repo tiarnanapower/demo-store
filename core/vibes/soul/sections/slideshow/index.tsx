@@ -5,17 +5,25 @@ import { EmblaCarouselType } from 'embla-carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import Fade from 'embla-carousel-fade';
 import useEmblaCarousel from 'embla-carousel-react';
-import { Pause, Play } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { ComponentPropsWithoutRef, CSSProperties, useCallback, useEffect, useState } from 'react';
 
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import { Image } from '~/components/image';
+import { Link } from '~/components/link';
 
 type ButtonLinkProps = ComponentPropsWithoutRef<typeof ButtonLink>;
 
 type TextAlignment = 'left' | 'center' | 'right';
 type ImagePosition = 'top' | 'center' | 'bottom';
 type HeightMode = 'sm' | 'md' | 'lg' | 'xl';
+/** Edge where the colour overlay is strongest; it fades towards the opposite edge. */
+type OverlayFrom = 'none' | 'top' | 'bottom' | 'left' | 'right';
+type VerticalAlignment = 'top' | 'center' | 'bottom';
+type ContentWidth = 'narrow' | 'medium' | 'wide' | 'full';
+type CtaStyle = 'button' | 'arrow';
+type PaginationStyle = 'bars' | 'arrows';
+type RoundedSides = 'none' | 'bottom' | 'all';
 
 interface SlideCta {
   label: string;
@@ -49,8 +57,36 @@ interface Props {
    */
   cardStyle?: boolean;
   heightMode?: HeightMode;
-  /** 0–100 — how dark the bottom gradient overlay is in non-card mode. */
+  /** 0–100 — overlay strength at the `overlayFrom` edge, in non-card mode. */
   overlayOpacity?: number;
+  /** Which edge the overlay is strongest at. `none` disables the overlay entirely. */
+  overlayFrom?: OverlayFrom;
+  /**
+   * Any CSS colour for the overlay tint. When omitted, the original `--slideshow-mask` gradient is
+   * used so existing pages render unchanged.
+   */
+  overlayColor?: string;
+  /** 0–100 — overlay strength at the opposite edge. Only applies when `overlayColor` is set. */
+  overlayFadeTo?: number;
+  /** Vertical placement of the slide text within the hero. */
+  verticalAlignment?: VerticalAlignment;
+  /** Maximum width of the slide text block. */
+  contentWidth?: ContentWidth;
+  /** `arrow` renders the primary CTA as a circular arrow button with a label beside it. */
+  ctaStyle?: CtaStyle;
+  /** Accent colour for the arrow CTA circle. */
+  accentColor?: string;
+  /**
+   * Colour for the arrow pagination controls. Kept separate from `accentColor` because the CTA
+   * circle is a filled shape while the pagination is an outline, so a colour that reads well as a
+   * fill is often too dim as a border on top of a tinted image.
+   */
+  paginationColor?: string;
+  /** `bars` is the progress-bar pagination; `arrows` is prev/next with an "n of total" counter. */
+  paginationStyle?: PaginationStyle;
+  /** Corner radius in px, applied per `roundedSides`. */
+  cornerRadius?: number;
+  roundedSides?: RoundedSides;
   showPagination?: boolean;
   showAutoplayControl?: boolean;
 }
@@ -87,12 +123,147 @@ const imagePositionClasses: Record<ImagePosition, string> = {
   bottom: 'object-bottom',
 };
 
-interface SlideContentProps {
-  slide: Slide;
+// The overlay is strongest at the named edge, so the gradient runs towards the opposite one.
+const overlayDirections: Record<Exclude<OverlayFrom, 'none'>, string> = {
+  bottom: 'to top',
+  top: 'to bottom',
+  left: 'to right',
+  right: 'to left',
+};
+
+const verticalAlignmentClasses: Record<VerticalAlignment, string> = {
+  top: 'justify-start',
+  center: 'justify-center',
+  bottom: 'justify-end',
+};
+
+const contentWidthClasses: Record<ContentWidth, string> = {
+  narrow: 'max-w-md',
+  medium: 'max-w-xl',
+  wide: 'max-w-3xl',
+  full: 'max-w-none',
+};
+
+interface OverlayArgs {
+  overlayFrom: OverlayFrom;
+  overlayColor?: string;
   overlayOpacity: number;
+  overlayFadeTo: number;
 }
 
-function SlideContent({ slide, overlayOpacity }: SlideContentProps) {
+function buildOverlayStyle({
+  overlayFrom,
+  overlayColor,
+  overlayOpacity,
+  overlayFadeTo,
+}: OverlayArgs): CSSProperties | undefined {
+  if (overlayFrom === 'none') return undefined;
+
+  const direction = overlayDirections[overlayFrom];
+
+  // Without an explicit colour, keep the original mask expression verbatim: `--slideshow-mask`
+  // already carries its own alpha, so wrapping it in color-mix would double up the transparency.
+  if (overlayColor == null || overlayColor === '') {
+    return {
+      backgroundImage: `linear-gradient(${direction}, var(--slideshow-mask, hsl(var(--foreground) / ${overlayOpacity}%)), transparent)`,
+    };
+  }
+
+  return {
+    backgroundImage: `linear-gradient(${direction}, color-mix(in srgb, ${overlayColor} ${overlayOpacity}%, transparent), color-mix(in srgb, ${overlayColor} ${overlayFadeTo}%, transparent))`,
+  };
+}
+
+function buildRadiusStyle(
+  cornerRadius: number,
+  roundedSides: RoundedSides,
+): CSSProperties | undefined {
+  const radius = Math.max(0, cornerRadius);
+
+  if (radius === 0 || roundedSides === 'none') return undefined;
+  if (roundedSides === 'all') return { borderRadius: `${radius}px` };
+
+  return {
+    borderBottomLeftRadius: `${radius}px`,
+    borderBottomRightRadius: `${radius}px`,
+  };
+}
+
+// Applies a Makeswift accent colour when one is set, otherwise defers to the CSS variables.
+function buildAccentStyle(accentColor?: string): CSSProperties | undefined {
+  if (accentColor == null || accentColor === '') return undefined;
+
+  return { borderColor: accentColor, color: accentColor };
+}
+
+interface ArrowCtaProps {
+  href: string;
+  label: string;
+  accentColor?: string;
+}
+
+function ArrowCta({ href, label, accentColor }: ArrowCtaProps) {
+  return (
+    <Link className="group inline-flex items-center gap-4 focus-visible:outline-0" href={href}>
+      <span
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--slideshow-accent,hsl(var(--primary)))] transition-transform duration-300 group-hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-[var(--slideshow-focus,hsl(var(--primary)))] @xl:h-14 @xl:w-14"
+        style={
+          accentColor != null && accentColor !== '' ? { backgroundColor: accentColor } : undefined
+        }
+      >
+        <ArrowRight
+          className="h-5 w-5 text-[var(--slideshow-accent-foreground,hsl(var(--background)))] @xl:h-6 @xl:w-6"
+          strokeWidth={2}
+        />
+      </span>
+      <span className="font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] text-base font-bold text-[var(--slideshow-title,hsl(var(--background)))] @xl:text-lg">
+        {label}
+      </span>
+    </Link>
+  );
+}
+
+interface PrimaryCtaProps {
+  cta?: SlideCta;
+  ctaStyle: CtaStyle;
+  accentColor?: string;
+}
+
+function PrimaryCta({ cta, ctaStyle, accentColor }: PrimaryCtaProps) {
+  const href = cta?.href ?? '#';
+  const label = cta?.label ?? 'Learn more';
+
+  if (ctaStyle === 'arrow') {
+    return <ArrowCta accentColor={accentColor} href={href} label={label} />;
+  }
+
+  return (
+    <ButtonLink
+      href={href}
+      shape={cta?.shape ?? 'pill'}
+      size={cta?.size ?? 'large'}
+      variant={cta?.variant ?? 'primary'}
+    >
+      {label}
+    </ButtonLink>
+  );
+}
+
+interface SlideContentProps {
+  slide: Slide;
+  ctaStyle: CtaStyle;
+  accentColor?: string;
+  verticalAlignment: VerticalAlignment;
+  contentWidth: ContentWidth;
+}
+
+function SlideContent({
+  slide,
+  ctaStyle,
+  accentColor,
+  verticalAlignment,
+  contentWidth,
+}: SlideContentProps) {
   const {
     eyebrow,
     title,
@@ -108,61 +279,56 @@ function SlideContent({ slide, overlayOpacity }: SlideContentProps) {
   const showEyebrow = eyebrow != null && eyebrow !== '';
   const showButtons = showCta || (showSecondaryCta && secondaryCta != null);
 
-  const gradientStyle: CSSProperties = {
-    backgroundImage: `linear-gradient(to top, var(--slideshow-mask, hsl(var(--foreground) / ${overlayOpacity}%)), transparent)`,
-  };
-
   return (
-    <div className="absolute inset-x-0 bottom-0 z-10" style={gradientStyle}>
-      <div
-        className={clsx(
-          'mx-auto flex w-full max-w-screen-2xl flex-col text-balance px-4 pb-20 pt-16 @xl:px-8 @xl:pb-24 @xl:pt-20 @4xl:px-12 @4xl:pb-28 @4xl:pt-24',
-          textAlignmentClasses[textAlignment],
-        )}
-      >
-        {showEyebrow && (
-          <span className="mb-3 inline-block font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] text-xs font-semibold uppercase tracking-[0.18em] text-[var(--slideshow-description,hsl(var(--background)/80%))] @xl:text-sm">
-            {eyebrow}
-          </span>
-        )}
-        <h1 className="m-0 max-w-xl font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] text-4xl font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))] @2xl:text-5xl @2xl:leading-[.9] @4xl:text-7xl">
-          {title}
-        </h1>
-        {showDescription && (
-          <p className="mt-2 max-w-xl font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] text-base leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))] @xl:mt-3 @xl:text-lg">
-            {description}
-          </p>
-        )}
-        {showButtons && (
-          <div
-            className={clsx(
-              'mt-8 flex flex-wrap gap-3 @xl:mt-10',
-              textAlignment === 'center' && 'justify-center',
-              textAlignment === 'right' && 'justify-end',
-            )}
-          >
-            {showCta && (
-              <ButtonLink
-                href={cta?.href ?? '#'}
-                shape={cta?.shape ?? 'pill'}
-                size={cta?.size ?? 'large'}
-                variant={cta?.variant ?? 'primary'}
-              >
-                {cta?.label ?? 'Learn more'}
-              </ButtonLink>
-            )}
-            {showSecondaryCta && secondaryCta != null && (
-              <ButtonLink
-                href={secondaryCta.href}
-                shape={secondaryCta.shape ?? 'pill'}
-                size={secondaryCta.size ?? 'large'}
-                variant={secondaryCta.variant ?? 'ghost'}
-              >
-                {secondaryCta.label}
-              </ButtonLink>
-            )}
-          </div>
-        )}
+    <div
+      className={clsx(
+        'pointer-events-none absolute inset-0 z-20 flex flex-col',
+        verticalAlignmentClasses[verticalAlignment],
+      )}
+    >
+      <div className="mx-auto flex w-full max-w-screen-2xl flex-col px-4 pb-20 pt-16 @xl:px-8 @xl:pb-24 @xl:pt-20 @4xl:px-12 @4xl:pb-28 @4xl:pt-24">
+        <div
+          className={clsx(
+            'pointer-events-auto flex w-full flex-col text-balance',
+            contentWidthClasses[contentWidth],
+            textAlignmentClasses[textAlignment],
+          )}
+        >
+          {showEyebrow && (
+            <span className="mb-3 inline-block font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] text-xs font-semibold uppercase tracking-[0.18em] text-[var(--slideshow-description,hsl(var(--background)/80%))] @xl:text-sm">
+              {eyebrow}
+            </span>
+          )}
+          <h1 className="m-0 font-[family-name:var(--slideshow-title-font-family,var(--font-family-heading))] text-4xl font-bold leading-none text-[var(--slideshow-title,hsl(var(--background)))] @2xl:text-5xl @2xl:leading-[.9] @4xl:text-7xl">
+            {title}
+          </h1>
+          {showDescription && (
+            <p className="mt-2 font-[family-name:var(--slideshow-description-font-family,var(--font-family-body))] text-base leading-normal text-[var(--slideshow-description,hsl(var(--background)/80%))] @xl:mt-3 @xl:text-lg">
+              {description}
+            </p>
+          )}
+          {showButtons && (
+            <div
+              className={clsx(
+                'mt-8 flex flex-wrap items-center gap-3 @xl:mt-10',
+                textAlignment === 'center' && 'justify-center',
+                textAlignment === 'right' && 'justify-end',
+              )}
+            >
+              {showCta && <PrimaryCta accentColor={accentColor} cta={cta} ctaStyle={ctaStyle} />}
+              {showSecondaryCta && secondaryCta != null && (
+                <ButtonLink
+                  href={secondaryCta.href}
+                  shape={secondaryCta.shape ?? 'pill'}
+                  size={secondaryCta.size ?? 'large'}
+                  variant={secondaryCta.variant ?? 'ghost'}
+                >
+                  {secondaryCta.label}
+                </ButtonLink>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -238,6 +404,127 @@ function FloatingCard({ slide, cardKey }: FloatingCardProps) {
   );
 }
 
+const arrowButtonClasses =
+  'pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-[var(--slideshow-pagination,hsl(var(--background)))] text-[var(--slideshow-pagination,hsl(var(--background)))] transition-opacity duration-200 hover:opacity-70 focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-[var(--slideshow-focus,hsl(var(--primary)))] @xl:h-12 @xl:w-12';
+
+interface BarsPaginationProps {
+  scrollSnaps: number[];
+  selectedIndex: number;
+  totalSlides: number;
+  isPlaying: boolean;
+  playCount: number;
+  interval: number;
+  onProgressButtonClick: (index: number) => void;
+  resetAutoplay: () => void;
+}
+
+function BarsPagination({
+  scrollSnaps,
+  selectedIndex,
+  totalSlides,
+  isPlaying,
+  playCount,
+  interval,
+  onProgressButtonClick,
+  resetAutoplay,
+}: BarsPaginationProps) {
+  const barWidth = `${150 / totalSlides}px`;
+  const currentLabel = selectedIndex + 1 < 10 ? `0${selectedIndex + 1}` : `${selectedIndex + 1}`;
+  const totalLabel = totalSlides < 10 ? `0${totalSlides}` : `${totalSlides}`;
+
+  return (
+    <>
+      {scrollSnaps.map((_: number, index: number) => (
+        <button
+          aria-label={`View image number ${index + 1}`}
+          className="rounded-lg px-1.5 py-2 focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-[var(--slideshow-focus,hsl(var(--primary)))]"
+          key={index}
+          onClick={() => {
+            onProgressButtonClick(index);
+            resetAutoplay();
+          }}
+        >
+          <div className="relative overflow-hidden">
+            {/* Current index indicator / progress bar */}
+            <div
+              className={clsx(
+                'absolute h-0.5 bg-[var(--slideshow-pagination,hsl(var(--background)))]',
+                'opacity-0 fill-mode-forwards',
+                isPlaying ? 'running' : 'paused',
+                index === selectedIndex
+                  ? 'opacity-100 ease-linear animate-in slide-in-from-left'
+                  : 'ease-out animate-out fade-out',
+              )}
+              key={`progress-${playCount}`}
+              style={{
+                animationDuration: index === selectedIndex ? `${interval}ms` : '200ms',
+                width: barWidth,
+              }}
+            />
+            {/* Track */}
+            <div
+              className="h-0.5 bg-[var(--slideshow-pagination,hsl(var(--background)))] opacity-30"
+              style={{ width: barWidth }}
+            />
+          </div>
+        </button>
+      ))}
+
+      {/* Carousel count - "01/03" */}
+      <span className="ml-auto mr-3 mt-px font-[family-name:var(--slideshow-number-font-family,var(--font-family-mono))] text-sm text-[var(--slideshow-number,hsl(var(--background)))]">
+        {currentLabel}/{totalLabel}
+      </span>
+    </>
+  );
+}
+
+interface ArrowsPaginationProps {
+  selectedIndex: number;
+  totalSlides: number;
+  paginationColor?: string;
+  onPrev: () => void;
+  onNext: () => void;
+}
+
+function ArrowsPagination({
+  selectedIndex,
+  totalSlides,
+  paginationColor,
+  onPrev,
+  onNext,
+}: ArrowsPaginationProps) {
+  const accentStyle = buildAccentStyle(paginationColor);
+
+  return (
+    <div className="ml-auto flex items-center gap-3 @xl:gap-4">
+      <button
+        aria-label="Previous slide"
+        className={arrowButtonClasses}
+        onClick={onPrev}
+        style={accentStyle}
+        type="button"
+      >
+        <ChevronLeft className="pointer-events-none h-5 w-5" strokeWidth={1.5} />
+      </button>
+      <span
+        className="font-[family-name:var(--slideshow-number-font-family,var(--font-family-body))] text-sm tabular-nums text-[var(--slideshow-number,hsl(var(--background)))] @xl:text-base"
+        style={accentStyle == null ? undefined : { color: accentStyle.color }}
+      >
+        {selectedIndex + 1} of {totalSlides}
+      </span>
+      <button
+        aria-label="Next slide"
+        className={arrowButtonClasses}
+        onClick={onNext}
+        style={accentStyle}
+        type="button"
+      >
+        <ChevronRight className="pointer-events-none h-5 w-5" strokeWidth={1.5} />
+      </button>
+    </div>
+  );
+}
+
 const useProgressButton = (
   emblaApi: EmblaCarouselType | undefined,
   onButtonClick?: (emblaApi: EmblaCarouselType) => void,
@@ -298,6 +585,8 @@ const useProgressButton = (
  *   --slideshow-play-text: hsl(var(--background));
  *   --slideshow-number: hsl(var(--background));
  *   --slideshow-number-font-family: var(--font-family-mono);
+ *   --slideshow-accent: hsl(var(--primary));
+ *   --slideshow-accent-foreground: hsl(var(--background));
  * }
  * ```
  */
@@ -309,6 +598,17 @@ export function Slideshow({
   cardStyle = false,
   heightMode = 'lg',
   overlayOpacity = 80,
+  overlayFrom = 'bottom',
+  overlayColor,
+  overlayFadeTo = 0,
+  verticalAlignment = 'bottom',
+  contentWidth = 'medium',
+  ctaStyle = 'button',
+  accentColor,
+  paginationColor,
+  paginationStyle = 'bars',
+  cornerRadius = 0,
+  roundedSides = 'bottom',
   showPagination = true,
   showAutoplayControl = true,
 }: Props) {
@@ -359,7 +659,21 @@ export function Slideshow({
 
   const activeSlide = slides[selectedIndex];
   const clampedOpacity = Math.max(0, Math.min(100, overlayOpacity));
+  const clampedFadeTo = Math.max(0, Math.min(100, overlayFadeTo));
   const hasControls = showPagination || showAutoplayControl;
+
+  // The overlay only applies in gradient mode; card mode has never had one, and defaulting it on
+  // would change how existing card-style heroes look.
+  const overlayStyle = cardStyle
+    ? undefined
+    : buildOverlayStyle({
+        overlayFrom,
+        overlayColor,
+        overlayOpacity: clampedOpacity,
+        overlayFadeTo: clampedFadeTo,
+      });
+
+  const radiusStyle = buildRadiusStyle(cornerRadius, roundedSides);
 
   return (
     <section
@@ -370,8 +684,9 @@ export function Slideshow({
           : heightClasses[heightMode],
         className,
       )}
+      style={radiusStyle}
     >
-      <div className="h-full overflow-hidden" ref={emblaRef}>
+      <div className="h-full overflow-hidden" ref={emblaRef} style={radiusStyle}>
         <div className="flex h-full">
           {slides.map((slide, idx) => {
             const { image } = slide;
@@ -379,7 +694,23 @@ export function Slideshow({
 
             return (
               <div className="relative h-full w-full min-w-0 shrink-0 grow-0 basis-full" key={idx}>
-                {!cardStyle && <SlideContent overlayOpacity={clampedOpacity} slide={slide} />}
+                {!cardStyle && (
+                  <SlideContent
+                    accentColor={accentColor}
+                    contentWidth={contentWidth}
+                    ctaStyle={ctaStyle}
+                    slide={slide}
+                    verticalAlignment={verticalAlignment}
+                  />
+                )}
+
+                {overlayStyle != null && (
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 z-10"
+                    style={overlayStyle}
+                  />
+                )}
 
                 {hasImage && (
                   <Image
@@ -413,56 +744,37 @@ export function Slideshow({
       {hasControls && (
         <div
           className={clsx(
-            'absolute left-1/2 flex w-full max-w-screen-2xl -translate-x-1/2 flex-wrap items-center px-4 @xl:px-6 @4xl:px-8',
+            'absolute left-1/2 z-30 flex w-full max-w-screen-2xl -translate-x-1/2 flex-wrap items-center px-4 @xl:px-6 @4xl:px-8',
             cardStyle ? 'bottom-[5.5rem]' : 'bottom-4 @xl:bottom-6',
           )}
         >
-          {/* Progress Buttons */}
-          {showPagination &&
-            scrollSnaps.map((_: number, index: number) => {
-              return (
-                <button
-                  aria-label={`View image number ${index + 1}`}
-                  className="rounded-lg px-1.5 py-2 focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-[var(--slideshow-focus,hsl(var(--primary)))]"
-                  key={index}
-                  onClick={() => {
-                    onProgressButtonClick(index);
-                    resetAutoplay();
-                  }}
-                >
-                  <div className="relative overflow-hidden">
-                    {/* White Bar - Current Index Indicator / Progress Bar */}
-                    <div
-                      className={clsx(
-                        'absolute h-0.5 bg-[var(--slideshow-pagination,hsl(var(--background)))]',
-                        'opacity-0 fill-mode-forwards',
-                        isPlaying ? 'running' : 'paused',
-                        index === selectedIndex
-                          ? 'opacity-100 ease-linear animate-in slide-in-from-left'
-                          : 'ease-out animate-out fade-out',
-                      )}
-                      key={`progress-${playCount}`}
-                      style={{
-                        animationDuration: index === selectedIndex ? `${interval}ms` : '200ms',
-                        width: `${150 / slides.length}px`,
-                      }}
-                    />
-                    {/* Grey Bar BG */}
-                    <div
-                      className="h-0.5 bg-[var(--slideshow-pagination,hsl(var(--background)))] opacity-30"
-                      style={{ width: `${150 / slides.length}px` }}
-                    />
-                  </div>
-                </button>
-              );
-            })}
+          {showPagination && paginationStyle === 'bars' && (
+            <BarsPagination
+              interval={interval}
+              isPlaying={isPlaying}
+              onProgressButtonClick={onProgressButtonClick}
+              playCount={playCount}
+              resetAutoplay={resetAutoplay}
+              scrollSnaps={scrollSnaps}
+              selectedIndex={selectedIndex}
+              totalSlides={slides.length}
+            />
+          )}
 
-          {/* Carousel Count - "01/03" */}
-          {showPagination && (
-            <span className="ml-auto mr-3 mt-px font-[family-name:var(--slideshow-number-font-family,var(--font-family-mono))] text-sm text-[var(--slideshow-number,hsl(var(--background)))]">
-              {selectedIndex + 1 < 10 ? `0${selectedIndex + 1}` : selectedIndex + 1}/
-              {slides.length < 10 ? `0${slides.length}` : slides.length}
-            </span>
+          {showPagination && paginationStyle === 'arrows' && (
+            <ArrowsPagination
+              onNext={() => {
+                emblaApi?.goToNext();
+                resetAutoplay();
+              }}
+              onPrev={() => {
+                emblaApi?.goToPrev();
+                resetAutoplay();
+              }}
+              paginationColor={paginationColor}
+              selectedIndex={selectedIndex}
+              totalSlides={slides.length}
+            />
           )}
 
           {/* Stop / Start Button */}
@@ -472,6 +784,7 @@ export function Slideshow({
               className={clsx(
                 'flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--slideshow-play-border,hsl(var(--contrast-300)/50%))] text-[var(--slideshow-play-text,hsl(var(--background)))] ring-[var(--slideshow-focus)] transition-opacity duration-300 hover:border-[var(--slideshow-play-border-hover,hsl(var(--contrast-300)/80%))] focus-visible:outline-0 focus-visible:ring-2',
                 !showPagination && 'ml-auto',
+                showPagination && paginationStyle === 'arrows' && 'ml-3',
               )}
               onClick={toggleAutoplay}
               type="button"
