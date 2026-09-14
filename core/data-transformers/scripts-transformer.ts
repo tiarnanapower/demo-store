@@ -19,6 +19,25 @@ const BC_TO_C15T_CONSENT_CATEGORY_MAP = {
 
 type ScriptInfo = { textContent: string } | { src: string } | null;
 
+/*
+ * Stencil block helpers -- `{{#if}}`, `{{#contains}}`, their `{{/...}}` closers.
+ *
+ * Stencil renders these server-side with Handlebars; Catalyst has no Handlebars, so the Scripts
+ * API value is injected verbatim and `#if` reaches the JS parser, which reads it as a private
+ * field and throws "Private field '#if' must be declared in an enclosing class". That kills the
+ * script, and because it throws during the consent manager's appendChild loop it can take later
+ * scripts in the same batch with it.
+ *
+ * This deliberately matches block helpers only, not every `{{...}}`. A plain interpolation can
+ * legitimately appear inside a string -- a script shipping its own Mustache/Handlebars client
+ * template -- and that parses fine. A block helper at statement position never does.
+ */
+const STENCIL_BLOCK_HELPER = /\{\{[#/]/;
+
+function hasUnrenderedStencilTemplate(textContent: string): boolean {
+  return STENCIL_BLOCK_HELPER.test(textContent);
+}
+
 /**
  * Extracts HTML attributes from a script tag's opening element.
  * Handles both boolean attributes (async, defer) and key-value attributes (data-*, crossorigin).
@@ -101,7 +120,7 @@ export function scriptsTransformer(scripts: BigCommerceScripts): C15tScripts {
 
   const scriptNodes = removeEdgesAndNodes(scripts);
 
-  return scriptNodes.map((script) => {
+  const transformed = scriptNodes.map((script): C15tScript | null => {
     const baseConfig: C15tScript = {
       category: mapConsentCategory(script.consentCategory),
       id: script.entityId,
@@ -119,6 +138,18 @@ export function scriptsTransformer(scripts: BigCommerceScripts): C15tScripts {
 
       // Prefer textContent if available (true inline script)
       if (scriptInfo !== null && 'textContent' in scriptInfo) {
+        if (hasUnrenderedStencilTemplate(scriptInfo.textContent)) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            `[scripts] Skipping Script Manager script ${script.entityId}: it contains unrendered ` +
+              `Stencil template syntax, which is a syntax error on Catalyst. This is usually a ` +
+              `Stencil-only script (for example the B2B Edition ones) left enabled on a Catalyst ` +
+              `channel; remove it in Script Manager.`,
+          );
+
+          return null;
+        }
+
         return {
           ...baseConfig,
           textContent: scriptInfo.textContent,
@@ -141,4 +172,6 @@ export function scriptsTransformer(scripts: BigCommerceScripts): C15tScripts {
 
     return { ...baseConfig, attributes };
   });
+
+  return transformed.filter((script): script is C15tScript => script !== null);
 }
