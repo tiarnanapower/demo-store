@@ -191,14 +191,18 @@ async function loginWithJwt(credentials: unknown): Promise<User | null> {
   };
 }
 
+// The Makeswift builder renders the storefront in a cross-site iframe, so these cookies have to
+// be partitioned (CHIPS) and SameSite=None to be sent at all.
+const PARTITIONED_COOKIE_OPTIONS = {
+  partitioned: true,
+  secure: true,
+  sameSite: 'none',
+} as const;
+
 const partitionedCookie = (name?: string) =>
   ({
     ...(name !== undefined ? { name } : {}),
-    options: {
-      partitioned: true,
-      secure: true,
-      sameSite: 'none',
-    },
+    options: PARTITIONED_COOKIE_OPTIONS,
   }) as const;
 
 const config = {
@@ -371,16 +375,21 @@ const SESSION_TOKEN_NAME_RE = /^(__Secure-)?authjs\.session-token(\.\d+)?$/;
 // Auth.js sets Expires on session token cookies via cookies().set() when signIn/updateSession
 // are called from server actions. Re-set those cookies without Expires so they comply with
 // Essential classification (session cookies that expire when the browser closes).
+//
+// The rest of the attributes must match what `cookies.sessionToken` above configures. Re-setting
+// with different ones overwrites the cookie Auth.js just wrote with a different cookie: dropping
+// `partitioned` and switching SameSite from None to Lax means the next request does not present
+// the cookie Auth.js looks for, so the shopper appears signed out immediately after signing in --
+// and, because there is then no customer session, downstream B2B calls run as a guest.
 async function patchSessionTokenCookies() {
   const cookieJar = await cookies();
 
   cookieJar.getAll().forEach(({ name, value }) => {
     if (SESSION_TOKEN_NAME_RE.test(name) && value) {
       cookieJar.set(name, value, {
+        ...PARTITIONED_COOKIE_OPTIONS,
         httpOnly: true,
-        sameSite: 'lax' as const,
         path: '/',
-        secure: name.startsWith('__Secure-'),
       });
     }
   });
