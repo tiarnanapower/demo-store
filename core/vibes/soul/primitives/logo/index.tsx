@@ -29,7 +29,15 @@ interface Props {
 export function Logo({ className, logo: streamableLogo, href, width, height, label }: Props) {
   return (
     <Stream
-      fallback={<div className="h-6 w-16 animate-pulse rounded-md bg-contrast-100" />}
+      fallback={
+        // Reserves the resolved logo's box. A shorter placeholder lets the header grow after
+        // mount, which leaves react-headroom's wrapper height stale and the header overlapping
+        // the content below it.
+        <div
+          className="w-full animate-pulse rounded-md bg-contrast-100"
+          style={{ maxWidth: `${width}px`, height: `${height}px` }}
+        />
+      }
       value={streamableLogo}
     >
       {(logo) => (

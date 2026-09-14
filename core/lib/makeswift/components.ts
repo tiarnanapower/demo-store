@@ -1,8 +1,10 @@
 import './components/accordion/register';
 import './components/button-link/register';
+import './components/category-grid/register';
 import './components/card/register';
 import './components/card-carousel/register';
 import './components/carousel/register';
+import './components/custom-component/register';
 import './components/customer-group-slot/register';
 import './components/product-card/register';
 import './components/product-detail/register';

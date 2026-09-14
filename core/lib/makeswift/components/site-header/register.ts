@@ -1,5 +1,6 @@
 import {
   Checkbox,
+  Color,
   Group,
   Image,
   Link,
@@ -79,6 +80,20 @@ const groups = List({
   getItemLabel: (item) => item?.label ?? 'Text',
 });
 
+const cta = Group({
+  label: 'Call to action button',
+  preferredLayout: Group.Layout.Popover,
+  props: {
+    show: Checkbox({ label: 'Show button', defaultValue: false }),
+    label: TextInput({ label: 'Text', defaultValue: 'Get Recommendation' }),
+    link: Link({ label: 'URL' }),
+    openInNewTab: Checkbox({ label: 'Open in new tab', defaultValue: true }),
+    backgroundColor: Color({ label: 'Background color' }),
+    textColor: Color({ label: 'Text color' }),
+    hoverBackgroundColor: Color({ label: 'Background color (hover)' }),
+  },
+});
+
 runtime.registerComponent(MakeswiftHeader, {
   type: COMPONENT_TYPE,
   label: 'Site Header',
@@ -98,6 +113,7 @@ runtime.registerComponent(MakeswiftHeader, {
       }),
       getItemLabel: (item) => item?.label ?? 'Text',
     }),
+    cta,
     linksPosition: Select({
       label: 'Links position',
       options: [

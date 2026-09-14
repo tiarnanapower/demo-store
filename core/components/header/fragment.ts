@@ -29,6 +29,15 @@ export const HeaderFragment = graphql(`
   }
 `);
 
+export const CustomerGroupFragment = graphql(`  
+  fragment CustomerGroupFragment on Customer {  
+    customerGroupId  
+    customerGroup {  
+      name  
+    }  
+  }  
+`);
+
 export const HeaderLinksFragment = graphql(`
   fragment HeaderLinksFragment on Site {
     categoryTree {

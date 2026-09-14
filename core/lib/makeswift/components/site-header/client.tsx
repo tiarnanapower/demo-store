@@ -72,6 +72,15 @@ interface Props {
     link?: { href: string };
   };
   linksPosition: 'center' | 'left' | 'right';
+  cta: {
+    show: boolean;
+    label: string;
+    link?: { href?: string; target?: string };
+    openInNewTab: boolean;
+    backgroundColor?: string;
+    textColor?: string;
+    hoverBackgroundColor?: string;
+  };
 }
 
 function combineLinks(
@@ -93,7 +102,7 @@ function combineLinks(
 }
 
 export const MakeswiftHeader = forwardRef(
-  ({ banner, links, logo, linksPosition }: Props, ref: Ref<HTMLDivElement>) => {
+  ({ banner, links, logo, linksPosition, cta }: Props, ref: Ref<HTMLDivElement>) => {
     const { navigation: passedProps, banner: passedBanner } = useContext(PropsContext);
     const combinedBanner = banner.show
       ? {
@@ -122,6 +131,15 @@ export const MakeswiftHeader = forwardRef(
           mobileLogoHeight: logo.mobile.height,
           linksPosition,
           logoHref: logo.link?.href ?? passedProps.logoHref,
+          showCta: cta.show,
+          ctaLabel: cta.label,
+          ctaHref: cta.link?.href ?? '',
+          // Honour an explicit new-tab target from the Link control as well as the checkbox, so
+          // either route works.
+          ctaOpenInNewTab: cta.openInNewTab || cta.link?.target === '_blank',
+          ctaBackgroundColor: cta.backgroundColor,
+          ctaTextColor: cta.textColor,
+          ctaHoverBackgroundColor: cta.hoverBackgroundColor,
         }}
         ref={ref}
       />

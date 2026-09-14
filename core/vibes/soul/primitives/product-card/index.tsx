@@ -96,21 +96,21 @@ export function ProductCard({
   return (
     <article
       className={clsx(
-        'group flex min-w-0 max-w-md flex-col gap-3 font-[family-name:var(--card-font-family,var(--font-family-body))] @container',
+        'group flex min-w-0 max-w-md flex-col gap-0 rounded-xl border border-[hsl(var(--contrast-100))] font-[family-name:var(--card-font-family,var(--font-family-body))] shadow-sm transition-shadow duration-200 @container hover:shadow-md',
         className,
       )}
     >
       <div className="relative">
         <div
           className={clsx(
-            'relative overflow-hidden rounded-xl @md:rounded-2xl',
+            'relative overflow-hidden rounded-t-xl',
             {
               '5:6': 'aspect-[5/6]',
               '3:4': 'aspect-[3/4]',
               '1:1': 'aspect-square',
             }[aspectRatio],
             {
-              light: 'bg-[var(--product-card-light-background,hsl(var(--contrast-100)))]',
+              light: 'bg-[var(--product-card-light-background,hsl(var(--background)))]',
               dark: 'bg-[var(--product-card-dark-background,hsl(var(--contrast-500)))]',
             }[colorScheme],
           )}
@@ -150,7 +150,7 @@ export function ProductCard({
           )}
         </div>
 
-        <div className="mt-2 flex flex-col items-start gap-x-4 gap-y-3 px-1 @xs:mt-3 @2xl:flex-row">
+        <div className="mt-0 flex flex-col items-start gap-x-4 gap-y-3 border-t border-[hsl(var(--contrast-100))] px-4 py-4 @2xl:flex-row">
           <div className="flex-1 text-sm @[16rem]:text-base">
             <span
               className={clsx(
@@ -233,7 +233,7 @@ export function ProductCard({
         )}
       </div>
       {showCompare && (
-        <div className="ml-1 mt-auto shrink-0">
+        <div className="ml-2 shrink-0 pb-2">
           <Compare
             colorScheme={colorScheme}
             label={compareLabel}
