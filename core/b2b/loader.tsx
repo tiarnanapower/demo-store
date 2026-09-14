@@ -10,6 +10,13 @@ const EnvironmentSchema = z.object({
   BIGCOMMERCE_CHANNEL_ID: z.string({ message: 'BIGCOMMERCE_CHANNEL_ID is required' }),
   LOCAL_BUYER_PORTAL_HOST: z.string().url().optional(),
   STAGING_B2B_CDN_ORIGIN: z.string().optional(),
+  // Base URL of a self-hosted Buyer Portal build. Only selects where a script is loaded from, and
+  // B2BLoader renders in the root layout, so a malformed value must not throw and take down every
+  // page -- it is ignored, falling back to the BigCommerce-hosted portal.
+  PROD_BUYER_PORTAL_BASE_URL: z
+    .string()
+    .optional()
+    .transform((value) => (value != null && /^https?:\/\//.test(value) ? value : undefined)),
   BIGCOMMERCE_GRAPHQL_API_DOMAIN: z.string().optional().default('mybigcommerce.com'),
 });
 
@@ -19,6 +26,7 @@ export async function B2BLoader() {
     BIGCOMMERCE_CHANNEL_ID,
     LOCAL_BUYER_PORTAL_HOST,
     STAGING_B2B_CDN_ORIGIN,
+    PROD_BUYER_PORTAL_BASE_URL,
     BIGCOMMERCE_GRAPHQL_API_DOMAIN,
   } = EnvironmentSchema.parse(process.env);
 
@@ -42,6 +50,7 @@ export async function B2BLoader() {
   return (
     <ScriptProduction
       bcGraphqlDomain={BIGCOMMERCE_GRAPHQL_API_DOMAIN}
+      buyerPortalBaseUrl={PROD_BUYER_PORTAL_BASE_URL}
       cartId={session?.user?.cartId}
       channelId={BIGCOMMERCE_CHANNEL_ID}
       environment={environment}
