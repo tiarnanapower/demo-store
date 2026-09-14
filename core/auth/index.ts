@@ -191,14 +191,19 @@ async function loginWithJwt(credentials: unknown): Promise<User | null> {
   };
 }
 
+// The Makeswift builder renders the storefront in a cross-site iframe, so these cookies must be
+// partitioned (CHIPS) and SameSite=None to be sent at all. Anything that re-writes one of these
+// cookies has to use the same attributes, or it writes a *different* cookie.
+const PARTITIONED_COOKIE_OPTIONS = {
+  partitioned: true,
+  secure: true,
+  sameSite: 'none',
+} as const;
+
 const partitionedCookie = (name?: string) =>
   ({
     ...(name !== undefined ? { name } : {}),
-    options: {
-      partitioned: true,
-      secure: true,
-      sameSite: 'none',
-    },
+    options: PARTITIONED_COOKIE_OPTIONS,
   }) as const;
 
 const config = {
@@ -371,16 +376,21 @@ const SESSION_TOKEN_NAME_RE = /^(__Secure-)?authjs\.session-token(\.\d+)?$/;
 // Auth.js sets Expires on session token cookies via cookies().set() when signIn/updateSession
 // are called from server actions. Re-set those cookies without Expires so they comply with
 // Essential classification (session cookies that expire when the browser closes).
+//
+// Only Expires may differ. The other attributes must match `cookies.sessionToken` above, because
+// a cookie is identified by name + domain + path *and* partition: re-writing it as non-partitioned
+// SameSite=Lax stores a second, different cookie. signOut is not wrapped by this helper, so it
+// deletes using the configured partitioned attributes and cannot remove that second cookie -- the
+// shopper then cannot sign out, and the session reads inconsistently between requests.
 async function patchSessionTokenCookies() {
   const cookieJar = await cookies();
 
   cookieJar.getAll().forEach(({ name, value }) => {
     if (SESSION_TOKEN_NAME_RE.test(name) && value) {
       cookieJar.set(name, value, {
+        ...PARTITIONED_COOKIE_OPTIONS,
         httpOnly: true,
-        sameSite: 'lax' as const,
         path: '/',
-        secure: name.startsWith('__Secure-'),
       });
     }
   });
