@@ -40,11 +40,19 @@ export function ScriptProduction({
             }
         `}
       </Script>
+      {/*
+        Points at the built bundle (index.js), not this host's headless.js. headless.js is only a
+        loader: it calls initHeadlessScripts(), which asks the B2B API for the portal's script URLs
+        and is answered with BigCommerce-hosted ones -- verified directly against
+        api-b2b.bigcommerce.com, which returns
+        microapps.bigcommerce.com/b2b-buyer-portal/index.*.js for this store and channel. Routing
+        through it therefore runs stock BigCommerce rather than this build.
+      */}
       <Script
         data-channelid={channelId}
         data-environment={environment}
         data-storehash={storeHash}
-        src="https://mainbuyer-portal-po-agent.netlify.app/headless.js"
+        src="https://mainbuyer-portal-po-agent.netlify.app/index.js"
         type="module"
       />
     </>
