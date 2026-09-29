@@ -335,6 +335,21 @@ const StreamableProductQuery = graphql(
           minPurchaseQuantity
           maxPurchaseQuantity
           warranty
+          selectedVariant: variants(optionValueIds: $optionValueIds, first: 1) {
+            edges {
+              node {
+                entityId
+                metafields(namespace: "dunlop_moq", keys: ["minimum_order_quantity"], first: 1) {
+                  edges {
+                    node {
+                      key
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }
           ...ProductViewedFragment
           ...ProductSchemaFragment
         }

@@ -523,6 +523,16 @@ export default async function Product({ params, searchParams }: Props) {
   const streamableMinQuantity = Streamable.from(async () => {
     const product = await streamableProduct;
 
+    const variantMoqMetafield = removeEdgesAndNodes(product.selectedVariant)
+      .flatMap((variant) => removeEdgesAndNodes(variant.metafields))
+      .find((metafield) => metafield.key === 'minimum_order_quantity');
+
+    const variantMoq = variantMoqMetafield != null ? Number(variantMoqMetafield.value) : Number.NaN;
+
+    if (!Number.isNaN(variantMoq)) {
+      return variantMoq;
+    }
+
     return product.minPurchaseQuantity;
   });
 
