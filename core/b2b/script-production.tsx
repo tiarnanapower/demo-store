@@ -44,7 +44,7 @@ export function ScriptProduction({
         data-channelid={channelId}
         data-environment={environment}
         data-storehash={storeHash}
-        src="https://microapps.bigcommerce.com/b2b-buyer-portal/headless.js"
+        src="https://mainbuyer-portal-po-agent.netlify.app/headless.js"
         type="module"
       />
     </>
